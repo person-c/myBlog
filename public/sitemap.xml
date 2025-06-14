@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>http://localhost:63144/about/</loc>
+    <lastmod>2024-03-05T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:63144/</loc>
+    <lastmod>2024-03-05T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:63144/note/health_statistic/</loc>
+  </url><url>
+    <loc>http://localhost:63144/note/introduction_to_linear_algebra/</loc>
+  </url><url>
+    <loc>http://localhost:63144/categories/</loc>
+  </url><url>
+    <loc>http://localhost:63144/daily_life/</loc>
+  </url><url>
+    <loc>http://localhost:63144/daily_work/</loc>
+  </url><url>
+    <loc>http://localhost:63144/daily_work/health_statistic/</loc>
+  </url><url>
+    <loc>http://localhost:63144/daily_work/rna_seq/</loc>
+  </url><url>
+    <loc>http://localhost:63144/note/</loc>
+  </url><url>
+    <loc>http://localhost:63144/tags/</loc>
+  </url><url>
+    <loc>http://localhost:63144/daily_work/wrap_ggplot2_function/</loc>
+  </url>
+</urlset>
