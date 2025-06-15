@@ -2,4 +2,4 @@ module github.com/person-c/myBlog
 
 go 1.24.4
 
-require github.com/person-c/Nothing v1.1.2 // indirect
+require github.com/person-c/Nothing v1.1.3 // indirect
