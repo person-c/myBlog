@@ -1,0 +1,429 @@
+/* ===== 变量定义 (方便全局修改) ===== */
+:root {
+    --primary-color: #007bff;
+    --text-color: #333;
+    --text-color-light: #555;
+    --bg-color-light: #f8f9fa;
+    --border-color: #ddd;
+    --code-color: #d6336c;
+    --white-color: #ffffff;
+    --shadow-color-light: rgba(0, 0, 0, 0.05);
+    --shadow-color-medium: rgba(0, 0, 0, 0.1);
+
+    --font-serif: 'EB Garamond', 'Noto Serif SC', serif;
+    --font-mono: 'Fira Code', 'Courier New', monospace;
+}
+
+/* ===== 字体引入 (重要：请从这里移除，并添加到 HTML <head> 中) ===== */
+/* @import url('https://fonts.googleapis.com/css2?family=...'); */
+
+/* ===== 全局样式 ===== */
+html,
+body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    font-family: var(--font-serif);
+    font-size: 16px;
+    line-height: 1.6;
+    min-height: 100vh;
+}
+
+/* ===== 语言特定字体 ===== */
+*:lang(zh),
+*:lang(zh-CN),
+*:lang(zh-TW),
+*:lang(zh-HK) {
+    font-family: 'Noto Serif SC', serif;
+}
+
+*:lang(en) {
+    font-family: 'EB Garamond', serif;
+}
+
+/* ===== 布局结构 ===== */
+main {
+    flex: 1;
+}
+
+.layout {
+    display: grid;
+    grid-template-columns: 15% auto 20%;
+    gap: 1rem;
+    align-items: flex-start;
+}
+
+/* ===== 内容区域 ===== */
+article {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 1rem;
+    box-sizing: border-box;
+}
+
+article *:lang(zh),
+article *:lang(zh-CN),
+article *:lang(zh-TW),
+article *:lang(zh-HK) {
+    font-size: 14px;
+}
+
+article *:lang(en) {
+    font-size: 18px;
+    line-height: 1.6;
+}
+
+/* ===== 标题样式 ===== */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    color: var(--text-color);
+}
+
+h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+h2 {
+    font-size: 2rem;
+    margin-bottom: 0.75rem;
+}
+
+h3 {
+    font-size: 1.75rem;
+    margin-bottom: 0.5rem;
+}
+
+article>h1 {
+    text-align: center;
+    margin: 20px 0;
+}
+
+/* ===== 段落与链接 ===== */
+p {
+    font-size: 1rem;
+    margin-bottom: 1rem;
+}
+
+a {
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* ===== 代码块样式 ===== */
+code {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    color: var(--text-color);
+}
+
+p code {
+    background: var(--bg-color-light);
+    color: var(--code-color);
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-size: 90%;
+}
+
+.highlight {
+    background: var(--white-color);
+    color: var(--text-color);
+    padding: 15px;
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+    box-shadow: 0 4px 6px var(--shadow-color-light);
+    overflow-x: auto;
+}
+
+/* ===== 表格样式 ===== */
+article table {
+    width: 100%;
+    border-collapse: collapse;
+    overflow-x: auto;
+}
+
+article table th,
+article table td {
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    text-align: left;
+}
+
+/* ===== 页眉页脚 ===== */
+header,
+footer {
+    background: var(--bg-color-light);
+    padding: 20px;
+    text-align: center;
+}
+
+header a,
+footer a {
+    color: inherit;
+    /* 关键：继承父元素的文字颜色（即普通文本颜色） */
+}
+
+/* (推荐) 同时，可以定义一个不同的悬浮效果，比如移除下划线 */
+header a:hover,
+footer a:hover {
+    text-decoration: none;
+    /* 鼠标悬浮时不再显示下划线 */
+    color: var(--primary-color);
+    /* 或者在悬浮时才显示主题色，效果更好 */
+}
+
+
+header ul,
+footer ul {
+    list-style: none;
+    display: flex;
+    justify-content: center;
+    padding: 0;
+    margin: 0;
+}
+
+header li,
+footer li {
+    margin: 0 10px;
+}
+
+footer {
+    position: relative;
+    bottom: 0;
+    width: 100%;
+    box-shadow: 0 -2px 5px var(--shadow-color-medium);
+}
+
+header ul,
+footer ul {
+    list-style: none;
+    display: flex;
+    justify-content: center;
+    padding: 0;
+    margin: 0;
+}
+
+header li,
+footer li {
+    margin: 0 10px;
+}
+
+footer {
+    position: relative;
+    bottom: 0;
+    width: 100%;
+    box-shadow: 0 -2px 5px var(--shadow-color-medium);
+}
+
+/* ===== 文章列表 (通用) ===== */
+.article-list {
+    margin: 20px auto;
+    padding: 0;
+    max-width: 800px;
+}
+
+.article-list h2 {
+    text-align: center;
+    font-size: 18px;
+    margin-bottom: 10px;
+    font-weight: normal;
+}
+
+.article-list ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.article-list li {
+    margin: 3px 0;
+    font-size: 18px;
+}
+
+.article-title {
+    font-size: 16px;
+    margin-bottom: 0.2rem;
+}
+
+/* ===== 侧边栏 ===== */
+/* 左侧脚注 */
+aside.footnotes {
+    position: relative;
+    padding: 0 1rem;
+    font-size: 0.85rem;
+    color: var(--text-color-light);
+}
+
+#dynamic-footnotes {
+    position: relative;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    width: 100%;
+}
+
+#dynamic-footnotes li {
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: normal;
+}
+
+/* 右侧目录 */
+aside.toc {
+    position: sticky;
+    top: 1rem;
+    padding: 1rem;
+    background-color: transparent;
+    border-left: 1px solid var(--border-color);
+    font-size: 0.85rem;
+    color: var(--text-color-light);
+    height: fit-content;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+aside.toc nav ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+
+aside.toc nav li {
+    margin-bottom: 0.5em;
+    font-size: 0.95em;
+}
+
+aside.toc nav li a {
+    color: var(--text-color);
+    text-decoration: none;
+    transition: color 0.2s ease;
+    /* 平滑过渡 */
+}
+
+aside.toc nav li a:hover {
+    color: var(--primary-color);
+}
+
+/* 新增：TOC 当前章节高亮样式 */
+aside.toc nav li a.active {
+    color: var(--primary-color);
+    font-weight: bold;
+}
+
+/* ===== 脚注系统 ===== */
+sup.footnote-ref {
+    font-size: 0.8rem;
+    vertical-align: super;
+    cursor: pointer;
+    color: var(--primary-color);
+}
+
+sup.footnote-ref:hover {
+    text-decoration: underline;
+}
+
+div.footnotes {
+    margin-top: 2rem;
+    font-size: 0.9rem;
+    color: var(--text-color-light);
+}
+
+div.footnotes hr {
+    border: none;
+    border-top: 1px solid var(--border-color);
+    margin: 1rem 0;
+}
+
+div.footnotes ol {
+    list-style: decimal;
+    padding-left: 1.5rem;
+    margin: 0;
+}
+
+div.footnotes li {
+    margin-bottom: 1rem;
+    line-height: 1.6;
+}
+
+div.footnotes p {
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+/* ===== 响应式设计 ===== */
+@media (max-width: 800px) {
+    .layout {
+        grid-template-columns: 1fr;
+    }
+
+    aside.footnotes,
+    aside.toc {
+        display: none;
+    }
+
+    /* 插入到正文中的脚注容器样式 */
+    .inserted-footnotes-container {
+        margin: 1rem 0 1rem 1.5rem;
+        padding: 0.75rem 1rem;
+        border-left: 3px solid var(--primary-color);
+        background-color: var(--bg-color-light);
+        border-radius: 4px;
+        font-size: 0.9em;
+        color: var(--text-color-light);
+        transition: background-color 0.3s ease;
+        /* 添加平滑过渡 */
+    }
+
+    .inserted-footnotes-container ol {
+        padding-left: 1.2rem;
+        margin: 0;
+    }
+
+    .inserted-footnotes-container li {
+        margin-bottom: 0.5rem;
+    }
+
+    .inserted-footnotes-container li:last-child {
+        margin-bottom: 0;
+    }
+
+    .inserted-footnotes-container p {
+        margin: 0;
+        display: inline;
+    }
+}
+
+@media (max-width: 600px) {
+    body {
+        font-size: 14px;
+    }
+
+    h1 {
+        font-size: 2rem;
+    }
+
+    h2 {
+        font-size: 1.75rem;
+    }
+
+    header,
+    footer {
+        padding: 15px;
+    }
+
+    header ul,
+    footer ul {
+        flex-direction: column;
+        gap: 8px;
+    }
+}
