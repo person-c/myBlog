@@ -1,7 +1,6 @@
 baseURL = "https://cying.org/"
 languageCode = "en-us"
 title = "Example Site"
-theme = "Nothing"
 
 [markup]
   [markup.goldmark.renderer]
@@ -12,3 +11,7 @@ theme = "Nothing"
     lineNumbers = true      # 显示行号
     lineNumbersInTable = true # 行号显示在表格中
     guessSyntax = true      # 自动猜测代码语言
+
+[module]
+  [[module.imports]]
+    path = "github.com/person-c/Nothing" 
