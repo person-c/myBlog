@@ -1,1 +1,1 @@
-# github.com/person-c/Nothing v0.0.0-20250615065039-f690efe96481
+# github.com/person-c/Nothing v1.1.1
