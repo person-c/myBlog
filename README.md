@@ -1,4 +1,4 @@
-This is my personal blog built with [Hugo](https://gohugo.io/) based on the Hugo theme [Nothing](https://githhub.com/person-c/Iothing).I 
+This is my personal blog built with [Hugo](https://gohugo.io/) based on the Hugo theme [Nothing](https://githhub.com/person-c/Iothing).
 
 ## Update the theme
 
