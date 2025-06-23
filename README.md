@@ -5,6 +5,7 @@ This is my personal blog built with [Hugo](https://gohugo.io/) based on the Hugo
 To update the theme, run the following commands.
 
 ```shell
+hugo mod clean
 hugo mod get -u 
 hugo mod vendor 
 ```
