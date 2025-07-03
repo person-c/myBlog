@@ -1,6 +1,6 @@
 baseURL = "https://cying.org/"
 languageCode = "en-us"
-title = "Example Site"
+title = "Nightingale "
 
 [markup]
   [markup.goldmark.renderer]
