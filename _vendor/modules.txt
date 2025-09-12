@@ -1,1 +1,1 @@
-# github.com/person-c/Nothing v2.1.6+incompatible
+# github.com/person-c/Nothing v2.1.7+incompatible
