@@ -8,4 +8,6 @@ To update the theme, run the following commands.
 hugo mod clean
 hugo mod get -u 
 hugo mod vendor 
+
+hugo server --noHTTPCache --disableFastRender
 ```
