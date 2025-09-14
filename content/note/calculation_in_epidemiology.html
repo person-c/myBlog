@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<meta name="generator" content="litedown 0.7">
+<title>Calculations in Epidemiology</title>
+<style type="text/css">
+body {
+  font-family: sans-serif;
+  max-width: 800px;
+  margin: auto;
+  padding: 1em;
+  line-height: 1.5;
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+body, .abstract, code, .footnotes, footer, #refs, .caption { font-size: .9em; }
+li li { font-size: .95em; }
+ul:has(li > input[type="checkbox"]) { list-style: none; padding-left: 1em; }
+*, :before, :after { box-sizing: border-box; }
+a { color: steelblue; }
+pre, img { max-width: 100%; }
+pre { white-space: pre-wrap; word-break: break-word; }
+pre code { display: block; padding: 1em; overflow-x: auto; }
+code { font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace; }
+:not(pre, th) > code, code[class], div > .caption { background: #f8f8f8; }
+pre > code:is(:not([class]), .language-plain, .language-none, .plain), .box, .figure, .table { background: inherit; border: 1px solid #eee; }
+pre > code {
+  &.message { border-color: #9eeaf9; }
+  &.warning { background: #fff3cd; border-color: #fff3cd; }
+  &.error { background: #f8d7da; border-color: #f8d7da; }
+}
+.fenced-chunk { border-left: 1px solid #666; }
+.code-fence {
+  opacity: .4;
+  border: 1px dashed #666;
+  border-left: 2px solid;
+  &:hover { opacity: inherit; }
+}
+.box, .figure, .table, table { margin: 1em auto; }
+div > .caption { padding: 1px 1em; }
+.figure { p:has(img, svg), pre:has(svg) { text-align: center; } }
+.flex-col { display: flex; justify-content: space-between; }
+table {
+  &:only-child:not(.table > *) { margin: auto; }
+  th, td { padding: 5px; font-variant-numeric: tabular-nums; }
+  thead, tfoot, tr:nth-child(even) { background: whitesmoke; }
+  thead th { border-bottom: 1px solid #ddd; }
+  &:not(.datatable-table) {
+    border-top: 1px solid #666;
+    border-bottom: 1px solid #666;
+  }
+}
+blockquote {
+  color: #666;
+  margin: 0;
+  padding: 1px 1em;
+  border-left: .5em solid #eee;
+}
+hr, .footnotes::before { border: 1px dashed #ddd; }
+.frontmatter { text-align: center; }
+#TOC {
+  a { text-decoration: none; }
+  ul { list-style: none; padding-left: 1em; }
+  & > ul { padding: 0; }
+  ul ul { border-left: 1px solid lightsteelblue; }
+}
+.body h2 { border-bottom: 1px solid #666; }
+.body .appendix, .appendix ~ h2 { border-bottom-style: dashed; }
+.main-number::after { content: "."; }
+span[class^="ref-number-"] { font-weight: bold; }
+.ref-number-fig::after, .ref-number-tab::after { content: ":"; }
+.cross-ref-chp::before { content: "Chapter "; }
+.cross-ref-sec::before { content: "Section "; }
+.cross-ref-fig::before, .ref-number-fig::before { content: "Figure "; }
+.cross-ref-tab::before, .ref-number-tab::before { content: "Table "; }
+.cross-ref-eqn::before, .MathJax_ref:has(mjx-mtext > mjx-c + mjx-c)::before { content: "Equation "; }
+.abstract, #refs {
+  &::before { display: block; margin: 1em auto; font-weight: bold; }
+}
+.abstract::before { content: "Abstract"; text-align: center; }
+#refs::before { content: "Bibliography"; font-size: 1.5em; }
+.ref-paren-open::before { content: "("; }
+.ref-paren-close::after { content: ")"; }
+.ref-semicolon::after { content: "; "; }
+.ref-and::after { content: " and "; }
+.ref-et-al::after { content: " et al."; font-style: italic; }
+.footnote-ref a {
+  &::before { content: "["; }
+  &::after { content: "]"; }
+}
+section.footnotes {
+  margin-top: 2em;
+  &::before { content: ""; display: block; max-width: 20em; }
+}
+.fade {
+  background: repeating-linear-gradient(135deg, white, white 30px, #ddd 32px, #ddd 32px);
+  opacity: 0.6;
+}
+
+@media print {
+  body { max-width: 100%; }
+  tr, img { break-inside: avoid; }
+}
+@media only screen and (min-width: 992px) {
+  body:not(.pagesjs) pre:has(.line-numbers):not(:hover) { white-space: pre; }
+}
+</style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/combine/npm/katex@0.16.22/dist/katex.min.js,npm/katex@0.16.22/dist/contrib/auto-render.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/@xiee/utils@1.14.14/js/render-katex.min.js" defer></script>
+</head>
+<body>
+<div class="frontmatter">
+<div class="title"><h1>Calculations in Epidemiology</h1></div>
+<div class="date"><h3>2025-09-14</h3></div>
+</div>
+<div class="body">
+<h2 id="sec:sample-size-calculation">样本量估算 (Sample Size Calculation)</h2>
+<p>无论是队列研究 (cohort study)、病例对照研究 (case-control study) 还是实验性研究 (experimental study)，在设计阶段都需要进行样本量估算。分类变量的样本量估算有一个通用的基本公式。</p>
+<p><strong>1. 比较两组率的通用公式</strong></p>
+<p>\(n = \frac{(Z_{\alpha/2}\sqrt{2\bar{p}\bar{q}} + Z_\beta \sqrt{p_0 q_0 + p_1 q_1})^2}{(p_1 - p_0)^2}\)</p>
+<ul>
+<li>\(Z_{\alpha/2}\): 双侧检验水准 \(\alpha\) 对应的 Z 值 (例如，双侧 \(\alpha=0.05\) 时， \(Z_{0.025}=1.96\) )。</li>
+<li>\(Z_\beta\): 检验效能 \(1-\beta\) 对应的 Z 值 (例如，效能为 90% 时， \(Z_\beta=1.28\) )。</li>
+<li>\(p_0, p_1\): 两组事件的预期发生率。</li>
+<li>\(\bar{p} = (p_0+p_1)/2\), \(\bar{q} = 1-\bar{p}\)</li>
+</ul>
+<p><strong>应用场景:</strong></p>
+<ul>
+<li><strong>队列研究</strong>: \(p\) 为<strong>发病率</strong>， \(p_1 = RR \cdot p_0\)。</li>
+<li><strong>病例对照研究</strong>: \(p\) 为<strong>暴露率</strong>， \(p_1 = \frac{OR \cdot p_0}{1 - p_0 + OR \cdot p_0}\) (p₁ 为病例组暴露率, p₀ 为对照组暴露率)。</li>
+<li><strong>实验性研究</strong>: \(p\) 为某结局的发生率。</li>
+</ul>
+<p><strong>2. 1:1 个体匹配病例对照研究</strong></p>
+<p>\(m = \frac{(Z_{\alpha/2} \cdot 0.5 + Z_\beta \sqrt{p(1-p)})^2}{(p-0.5)^2}\)</p>
+<ul>
+<li>其中 \(p = \frac{OR}{OR + 1}\)，代表暴露-疾病状态不一致的配对中，病例暴露而对照不暴露的概率。</li>
+<li>\(m\) 是所需的不一致配对（b+c）的数量。</li>
+<li>总样本对数 \(M\) 可估算为： \(M \approx \frac{m}{p_0 q_1 + p_1 q_0}\)</li>
+</ul>
+<p><strong>3. 计量资料的样本量估算 (实验性研究)</strong></p>
+<p>\(N = \frac{2(Z_{\alpha/2} + Z_\beta)^2 \sigma^2}{d^2}\)</p>
+<ul>
+<li>\(N\) 为每组所需样本量。</li>
+<li>\(\sigma^2\): 数据的方差。</li>
+<li>\(d\): 两组均数间有实际意义的最小差值。</li>
+</ul>
+<p><strong>4. 筛检试验的样本量估算</strong></p>
+<p>用于估计灵敏度或特异度达到一定精度时的样本量。</p>
+<p>\(n = \frac{Z_{\alpha/2}^2 \cdot p(1-p)}{\delta^2}\)</p>
+<ul>
+<li>\(p\): 预估的灵敏度或特异度。</li>
+<li>\(\delta\): 允许的绝对误差范围。</li>
+</ul>
+<p>当预估的灵敏度或特异度 \(p\) 很极端时（如 \(p &lt; 0.2\) 或 \(p &gt; 0.8\)），上述基于正态近似的公式会不够准确。此时，建议使用基于反正弦变换（arcsine transformation）的公式，结果更为可靠：</p>
+<p>\(n = \frac{Z_{\alpha/2}^2}{(\arcsin\sqrt{p+\delta} - \arcsin\sqrt{p-\delta})^2}\)</p>
+<blockquote>
+<p><strong>注意</strong>: 计算出的样本量是理论最小值，实际研究中需考虑 <strong>10%-20%</strong> 的失访率，适当增加样本量。同时，样本量并非越多越好，过大的样本量会造成资源浪费。</p>
+</blockquote>
+<h2 id="sec:analysis-of-association">关联分析 (Analysis of Association)</h2>
+<table>
+<thead>
+<tr>
+<th align="center"></th>
+<th align="center">患病 (D+)</th>
+<th align="center">未患病 (D-)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><strong>暴露 (E+)</strong></td>
+<td align="center">a</td>
+<td align="center">b</td>
+</tr>
+<tr>
+<td align="center"><strong>未暴露 (E-)</strong></td>
+<td align="center">c</td>
+<td align="center">d</td>
+</tr>
+</tbody>
+</table>
+<p>无论是队列研究还是病例对照研究，分析流程通常都是先检验关联是否存在（假设检验），然后估算关联强度（效应量估计）。</p>
+<p>对于检验关联是否存在，两者基于卡方检验，队列研究基于暴露组与非暴露组的期望事件发生率没有差异的零假设；而病例对照研究则基于病例组与对照组的期望暴露率没有差异的零假设。尽管两者基于不同的假设，但无论是队列研究的暴露组和非暴露组作为一个总体计算期望事件发生率，还是病例对照研究的病例组和对照组作为一个总体计算期望暴露率，最终都指向同一个代数形式，即Pearson卡方检验的计算公式。
+因此我们不用关注a, b, c, d的具体含义，而是关注其代数形式，这是一个通用的公式。但是对于配对设计的病例对照研究，由于两个分类变量不是独立的，我们必须关注a, b, c, d的具体含义，使用McNemar检验。</p>
+<h3 id="sec:cohort-study">队列研究 (Cohort Study)</h3>
+<p>队列研究结局发生率有三种计算方式。若队列总人数较多且人口比较稳定则为固定队列，计算累计发病率 (Cumulative Incidence, CI)——累计发病率需要报告追踪时间，否则流行病学意义不明确；若队列人数动态变化则为动态队列，计算发病密度 (Incidence Density, ID)；若队列人数较少，结局发生率低，则计算标化比例数 (Standardized Incidence Ratio, SIR)。</p>
+<ul>
+<li><strong>检验方法</strong>: 卡方检验或 Fisher 精确检验。</li>
+<li><strong>关联强度指标</strong>:</li>
+</ul>
+<ol>
+<li>
+<p><strong>相对危险度 (Relative Risk, RR)</strong>:
+\(RR = \frac{I_e}{I_{ne}} = \frac{a/(a+b)}{c/(c+d)}\)</p>
+<ul>
+<li>\(ln(RR)\) 的95%置信区间: \(ln(RR) \pm 1.96 \sqrt{\frac{b}{a(a+b)} + \frac{d}{c(c+d)}}\)</li>
+</ul>
+</li>
+<li>
+<p><strong>归因危险度 (Attributable Risk, AR)</strong>:
+\(AR = I_e - I_{ne} = \frac{a}{a+b} - \frac{c}{c+d}\)</p>
+<ul>
+<li>\(AR\) 的95%置信区间: \(AR \pm 1.96 \sqrt{\frac{I_e(1-I_e)}{a+b} + \frac{I_{ne}(1-I_{ne})}{c+d}}\)</li>
+</ul>
+</li>
+<li>
+<p><strong>暴露人群归因危险度百分比 (Attributable Risk Percent, AR%)</strong>:
+\(AR\% = \frac{I_e - I_{ne}}{I_e} \times 100\% = \frac{RR-1}{RR} \times 100\)</p>
+</li>
+<li>
+<p><strong>人群归因危险度 (Population Attributable Risk, PAR)</strong>:
+\(PAR = I_t - I_{ne}\)  (其中 \(I_t = \frac{a+c}{a+b+c+d}\) 为全人群发病率)</p>
+</li>
+<li>
+<p><strong>人群归因危险度百分比 (Population Attributable Risk Percent, PAR%)</strong>:
+\(PAR\% = \frac{I_t - I_{ne}}{I_t} \times 100\% = \frac{P_e(RR-1)}{P_e(RR-1)+1} \times 100\)
+(其中 \(P_e = \frac{a+b}{a+b+c+d}\) 为人群暴露率)</p>
+</li>
+</ol>
+<p>RR 衡量暴露的病因学意义，AR 和 PAR 则更具公共卫生学意义，表示去除暴露后可减少的超额风险。</p>
+<p>\(ln(RR)\) 近似服从正态分布，其方差 \(Var(ln(RR)) = \frac{b}{a(a+b)} + \frac{d}{c(c+d)}\)，并且对 \(RR\) 进行对数变换以后可以使得正向和负向的影响对称（ \(ln0.1 = -ln10\) ）。</p>
+<p>人群归因危险度百分比的备选公式:</p>
+<p>\(PAR\% = \frac{P_e \times AR}{I_t} = \frac{P_e(I_e - I_{ne})}{P_e I_e + (1-P_e)I_{ne}}\)</p>
+<p><strong>剂量反应关系分析 (Dose-Response Analysis)</strong>：当暴露有不同水平（如吸烟量：不吸烟、&lt;10支/天、10-20支/天、&gt;20支/天）时，分析是否存在剂量反应关系可以为病因推断提供更有力的证据。
+将暴露水平分为几个有序的等级，通常以无暴露组作为参照组,计算各层RR,然后进行<strong>趋势性检验 (Test for Trend)</strong>。之后可以使用 <strong>Poisson 回归</strong> (用于发病率数据) 或 <strong>Cox 比例风险模型</strong> (用于生存时间数据) 进行更复杂的分析。在模型中，可以将暴露水平作为有序分类变量或连续变量放入，模型的系数可以解释暴露每增加一个单位（或一个等级）对风险的影响，同时可以校正其他混杂因素。</p>
+<h3 id="sec:case-control-study">病例对照研究 (Case-Control Study)</h3>
+<ul>
+<li><strong>检验方法</strong>: 非匹配设计使用 Pearson 卡方检验，个体匹配设计使用 McNemar 检验。</li>
+<li><strong>关联强度指标</strong>:</li>
+</ul>
+<ol>
+<li>
+<p><strong>比值比 (Odds Ratio, OR)</strong></p>
+<ul>
+<li>非配对或成组匹配设计: \(OR = \frac{ad}{bc}\)</li>
+<li>1:1 匹配设计: \(OR = \frac{c}{b}\)</li>
+</ul>
+</li>
+<li>
+<p><strong>OR 的置信区间</strong>:
+目前有两种常用的计算方法：</p>
+<ul>
+<li>
+<p><strong>a. Woolf’s 对数转换法 (Logit-based)</strong>:</p>
+<ul>
+<li>这是最经典和常用的方法，基于对数正态分布的近似。</li>
+<li>\(ln(OR)\) 的95%置信区间: \(ln(OR) \pm 1.96 \sqrt{\frac{1}{a} + \frac{1}{b} + \frac{1}{c} + \frac{1}{d}}\)</li>
+<li>将计算出的上下限取反对数 (exp) 即可得到 OR 的置信区间。</li>
+<li><strong>缺点</strong>: 当a,b,c,d中有0时，此方法失效。为解决此问题，可在计算前为所有单元格（a, b, c, d）加上0.5（Haldane-Anscombe 修正）。</li>
+</ul>
+</li>
+<li>
+<p><strong>b. Miettinen’s 检验为基础的近似法 (Test-based)</strong>:</p>
+<ul>
+<li>这是一种利用卡方检验结果来快速估算置信区间的方法。</li>
+<li><strong>公式</strong>: \(OR^{(1 \pm 1.96 / \chi)}\)</li>
+<li>其中 \(\chi = \sqrt{\chi^2}\)，而 \(\chi^2\) 是未经校正的Pearson卡方值。</li>
+<li><strong>优点</strong>: 计算简单，且在有零格导致Woolf法失效时依然可以使用。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<blockquote>
+<p><strong>要点</strong>:</p>
+<ul>
+<li>当疾病的发病率很低时，OR 可作为 RR 的良好近似值。</li>
+<li>当存在多个暴露水平时，可进行<strong>卡方趋势性检验</strong>来判断是否存在剂量反应关系。</li>
+</ul>
+</blockquote>
+<h3 id="sec:experimental-study-clinical-trial">实验研究 (Experimental Study) / 临床试验 (Clinical Trial)</h3>
+<p>实验研究或临床试验在关联分析上与队列研究非常相似，因为它们都前瞻性地追踪人群以观察结局。然而，其术语更侧重于评估干预措施的“疗效”或“效果”。基本数据结构仍然是 2x2 表。</p>
+<table>
+<thead>
+<tr>
+<th align="center"></th>
+<th align="center">结局发生 (Outcome+)</th>
+<th align="center">结局未发生 (Outcome-)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><strong>试验组 (E+)</strong></td>
+<td align="center">a</td>
+<td align="center">b</td>
+</tr>
+<tr>
+<td align="center"><strong>对照组 (E-)</strong></td>
+<td align="center">c</td>
+<td align="center">d</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>试验组事件率 (Experimental Event Rate, EER)</strong>: \(EER = \frac{a}{a+b}\)</li>
+<li><strong>对照组事件率 (Control Event Rate, CER)</strong>: \(CER = \frac{c}{c+d}\)</li>
+</ul>
+<p><strong>疗效评价指标 (Efficacy Measures):</strong></p>
+<ol>
+<li>
+<p><strong>相对危险度 (Relative Risk, RR)</strong>:
+\(RR = \frac{EER}{CER}\)</p>
+<ul>
+<li>RR &lt; 1 表示干预措施有效（降低风险）。</li>
+<li>RR &gt; 1 表示干预措施有害（增加风险）。</li>
+</ul>
+</li>
+<li>
+<p><strong>绝对风险降低 (Absolute Risk Reduction, ARR)</strong>:
+\(ARR = CER - EER\)</p>
+<ul>
+<li>表示干预措施带来的风险净减少量。这与队列研究中的归因危险度 (AR) 在计算上是相同的。</li>
+</ul>
+</li>
+<li>
+<p><strong>相对风险降低 (Relative Risk Reduction, RRR)</strong>:
+\(RRR = \frac{CER - EER}{CER} = 1 - RR\)</p>
+<ul>
+<li>表示与对照组相比，干预措施使风险降低的百分比。</li>
+</ul>
+</li>
+<li>
+<p><strong>需治疗人数 (Number Needed to Treat, NNT)</strong>:
+\(NNT = \frac{1}{ARR} = \frac{1}{CER - EER}\)</p>
+<ul>
+<li><strong>解释</strong>: 为了预防一例不良结局的发生，需要用该干预措施治疗的平均人数。NNT 是一个非常直观和实用的临床指标，通常越小越好。</li>
+<li><strong>注意</strong>: NNT 必须与其时间范围一起报告（例如，5年 NNT 为 10）。此外，NNT的数值高度依赖于基线风险(CER)。对于同一个干预措施(具有相同的RRR)，在高风险人群中(CER高)，NNT会更小；在低风险人群中(CER低)，NNT会更大。因此，在解读和应用NNT时，必须考虑其所对应的基线风险人群。</li>
+</ul>
+</li>
+<li>
+<p><strong>需伤害人数 (Number Needed to Harm, NNH)</strong>:</p>
+<ul>
+<li>当干预措施可能导致不良反应（即有害）时使用。</li>
+<li>\(NNH = \frac{1}{ARI} = \frac{1}{EER - CER}\) (其中 ARI 为绝对风险增加 Absolute Risk Increase)</li>
+<li><strong>解释</strong>: 每治疗多少人会额外导致一例不良事件发生。NNH 通常越大越好。</li>
+</ul>
+</li>
+</ol>
+<p>这些指标为评价一项临床干预的有效性和安全性提供了核心证据。</p>
+<h3 id="sec:field-and-community-trials">现场试验和社区干预试验 (Field and Community Trials)</h3>
+<p>除了以患者为中心的临床试验，实验流行病学还包括在更广泛人群中进行的现场试验和社区干预试验。</p>
+<ol>
+<li>
+<p><strong>现场试验 (Field Trials)</strong></p>
+<ul>
+<li><strong>对象</strong>: 通常是尚未患病但有风险的个体（如对儿童进行疫苗试验）。</li>
+<li><strong>目的</strong>: 评价预防性措施（如疫苗、饮食补充）在真实世界环境中的效果。</li>
+<li><strong>核心指标</strong>: <strong>保护率 (Protective Rate, PR)</strong> 或 <strong>疫苗效力 (Vaccine Efficacy, VE)</strong>。
+<ul>
+<li>该指标衡量干预措施相比于对照组能减少多少发病风险。</li>
+<li><strong>公式</strong>: \(PR = \frac{I_{对照组} - I_{试验组}}{I_{对照组}} \times 100%\)</li>
+<li>从公式可以看出，保护率在数学上等同于<strong>相对风险降低 (RRR)</strong>。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>社区干预试验 (Community Intervention Trials)</strong></p>
+<ul>
+<li><strong>对象</strong>: 以社区或群体（如学校、村庄、城市）作为干预和分析的基本单位，而非个体。这是一种<strong>整群随机试验 (Cluster Randomized Trial)</strong>。</li>
+<li><strong>目的</strong>: 评价针对整个社区的公共卫生措施（如健康教育项目、环境改造、政策改变）的效果。</li>
+<li><strong>评价指标</strong>:
+<ul>
+<li>指标本身与临床试验类似，如比较干预社区和对照社区的<strong>发病率</strong>、<strong>患病率</strong>或某些<strong>行为改变率</strong>的差异。</li>
+<li>然而，分析时必须考虑“整群效应”，即同一社区内个体间的相似性（Intracluster Correlation, ICC）。标准的统计检验方法需要调整，否则会增加假阳性的风险。</li>
+</ul>
+</li>
+<li><strong>挑战</strong>: 由于干预单位是社区，可供研究的单位数量通常较少，这使得在社区层面控制混杂因素和进行随机分配变得更加困难。</li>
+</ul>
+</li>
+</ol>
+<p>这些试验将研究从临床环境扩展到现实世界，其结果对于制定公共卫生政策至关重要。</p>
+<h3 id="sec:">分层分析与混杂控制</h3>
+<p>分层分析是控制混杂因素的一种重要方法。</p>
+<ol>
+<li>
+<p><strong>计算各层 OR (\(OR_i\))</strong>: 按混杂因素（如年龄、性别）分层，计算每层的 OR。</p>
+</li>
+<li>
+<p><strong>同质性检验 (Test for Homogeneity)</strong>:</p>
+<ul>
+<li><strong>目的</strong>: 判断各层间的 \(OR_i\) 是否有统计学差异。若无差异（同质），则该因素为混杂因素，可计算合并 OR；若有差异（异质），则提示该因素为<strong>效应修饰物</strong>，应分别报告各层 OR。</li>
+<li><strong>方法</strong>: Woolf’s \(\chi^2\) 检验。</li>
+<li><strong>公式</strong>: \(\chi^2_{homogeneity} = \sum_{i=1}^k w_i (lnOR_i - \overline{lnOR})^2\)，自由度 df = k - 1。</li>
+<li><strong>判断</strong>: 通常以 P &lt; 0.10 作为异质性的判断标准。</li>
+</ul>
+</li>
+<li>
+<p><strong>计算合并 OR (Pooled OR)</strong>:</p>
+<ul>
+<li><strong>方法</strong>: 常用 Mantel-Haenszel (M-H) 法计算合并的 OR (\(OR_{MH}\))，该值是各层 OR 的加权平均，校正了混杂因素的影响。</li>
+<li><strong>公式</strong>: \(OR_{MH} = \frac{\sum_{i=1}^k (a_i d_i / n_i)}{\sum_{i=1}^k (b_i c_i / n_i)}\)</li>
+<li>同时，可进行 \(\chi^2_{MH}\) 检验来判断合并后的 OR 是否与 1 有统计学差异。</li>
+</ul>
+</li>
+</ol>
+<h2 id="sec:evaluation-of-screening-tests">筛检试验评价 (Evaluation of Screening Tests)</h2>
+<table>
+<thead>
+<tr>
+<th align="left"></th>
+<th align="center">疾病状态: 有 (D+)</th>
+<th align="center">疾病状态: 无 (D-)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><strong>筛检结果: 阳性 (T+)</strong></td>
+<td align="center">a (真阳性, TP)</td>
+<td align="center">b (假阳性, FP)</td>
+</tr>
+<tr>
+<td align="left"><strong>筛检结果: 阴性 (T-)</strong></td>
+<td align="center">c (假阴性, FN)</td>
+<td align="center">d (真阴性, TN)</td>
+</tr>
+</tbody>
+</table>
+<p>筛检实验经常需要考虑不同指标的权衡，及其相互影响，但是只要知道对于真实性的评价是以金标准作为基准判断——即其作为分母，是一个不变量（其只与患病率有关）；而对于预测值的评价是以筛检结果作为基准判断——即其作为分母，是一个变量，而且分子——即金标准的结果是一个不变量，就能理清各种指标之间的关系。</p>
+<h3 id="sec:1-validity">1. 真实性 (Validity)</h3>
+<p>评价筛检试验结果与金标准“诊断”结果的符合程度。</p>
+<ol>
+<li>
+<p><strong>灵敏度 (Sensitivity)</strong>: \(Se = \frac{TP}{TP + FN} = \frac{a}{a+c}\)
+(真实患者中，被正确检出为阳性的概率)</p>
+</li>
+<li>
+<p><strong>特异度 (Specificity)</strong>: \(Sp = \frac{TN}{TN + FP} = \frac{d}{b+d}\)
+(真实非患者中，被正确检出为阴性的概率)</p>
+</li>
+<li>
+<p><strong>似然比 (Likelihood Ratio, LR)</strong></p>
+<ul>
+<li><strong>阳性似然比 (LR+)</strong>: \(LR+ = \frac{Sensitivity}{1 - Specificity}\) (越大越好, &gt;10 则价值高)</li>
+<li><strong>阴性似然比 (LR-)</strong>: \(LR- = \frac{1 - Sensitivity}{Specificity}\) (越小越好, &lt;0.1 则价值高)</li>
+</ul>
+</li>
+<li>
+<p><strong>约登指数 (Youden’s Index)</strong>: \(J = Sensitivity + Specificity - 1\)
+(综合评价真实性的指标，值越大越好)</p>
+</li>
+</ol>
+<p>灵敏度表明了筛检实验发现病人的能力，特异度表明了筛检实验发现非病人的能力。似然比的含义为真实患者之于非患者中，筛检结果为阳性（阳性似然比）或者阴性（阴性似然比）的比值。约登指数是灵敏度与特异度的加权综合指标。</p>
+<h3 id="sec:2-predictive-value">2. 预测值 (Predictive Value)</h3>
+<p>评价筛检结果本身的预测价值，受<strong>患病率 (Prevalence)</strong> 影响极大。</p>
+<ol>
+<li>
+<p><strong>阳性预测值 (Positive Predictive Value, PPV)</strong>: \(PPV = \frac{TP}{TP + FP} = \frac{a}{a+b}\)
+(筛检结果为阳性的人中，真正患病的概率)</p>
+</li>
+<li>
+<p><strong>阴性预测值 (Negative Predictive Value, NPV)</strong>: \(NPV = \frac{TN}{TN + FN} = \frac{d}{c+d}\)
+(筛检结果为阴性的人中，真正未患病的概率)</p>
+</li>
+</ol>
+<blockquote>
+<p><strong>核心关系</strong>: 灵敏度和特异度是筛检试验的<strong>内在属性</strong>，不受患病率影响。而<strong>预测值 (PPV, NPV) 会随患病率变化</strong>：患病率升高，PPV 升高，NPV 降低。</p>
+</blockquote>
+<p>预测值属于收益评价的部分；而收益评价还包括在卫生经济学评价中：<strong>效果(Effectiveness)</strong> 使用临床自然单位（如治愈率），<strong>效用(Utility)</strong> 综合生命质量（如QALYs），而 <strong>效益(Benefit)</strong> 则将所有产出统一为货币单位。</p>
+<h3 id="sec:3-reliability">3. 可靠性 (Reliability)</h3>
+<p>评价筛检试验结果的稳定与一致性。</p>
+<ol>
+<li>
+<p><strong>符合率 (Agreement Rate)</strong>: \(P_o = \frac{a+d}{a+b+c+d}\) (两次检验结果一致的比例)</p>
+</li>
+<li>
+<p><strong>Kappa 检验</strong>:</p>
+<ul>
+<li><strong>公式</strong>: \(Kappa = \frac{P_o - P_e}{1 - P_e}\)</li>
+<li>\(P_e\) 为机遇一致率: \(P_e = \frac{(a+b)(a+c) + (c+d)(b+d)}{(a+b+c+d)^2}\)</li>
+<li><strong>意义</strong>: Kappa 值校正了机遇造成的一致性，更真实地反映一致性程度。通常认为 Kappa &gt; 0.75 表示一致性很好。</li>
+</ul>
+</li>
+</ol>
+<h3 id="sec:4">4. 试验的联合应用</h3>
+<ol>
+<li>
+<p><strong>并联试验 (Parallel Testing)</strong></p>
+<ul>
+<li><strong>规则</strong>: 任一试验为阳性，即为阳性。</li>
+<li><strong>目的</strong>: 提高<strong>灵敏度</strong>，常用于初筛。</li>
+<li><strong>净灵敏度</strong>: \(Se_{net} = 1 - (1 - Se_A)(1 - Se_B)\) (升高)</li>
+<li><strong>净特异度</strong>: \(Sp_{net} = Sp_A \times Sp_B\) (降低)</li>
+</ul>
+</li>
+<li>
+<p><strong>串联试验 (Serial Testing)</strong></p>
+<ul>
+<li><strong>规则</strong>: 所有试验均为阳性，才为阳性。</li>
+<li><strong>目的</strong>: 提高<strong>特异度</strong>，常用于确诊。</li>
+<li><strong>净灵敏度</strong>: \(Se_{net} = Se_A \times Se_B\) (降低)</li>
+<li><strong>净特异度</strong>: \(Sp_{net} = 1 - (1 - Sp_A)(1 - Sp_B)\) (升高)</li>
+</ul>
+</li>
+</ol>
+<p>联合实验是提高筛检与诊断实验效率的有效方法；在筛检实验确定后，灵敏度和特异度是固定的，此时也可以通过在患病率高的人群中进行筛检来提高阳性预测值。</p>
+<h2 id="sec:chi-square-test">卡方检验 (Chi-Square Test)</h2>
+<h3 id="sec:1-2x2-pearson-s-chi-2-test">1. 2x2 四格表卡方检验 (Pearson’s \(\chi^2\) Test)</h3>
+<ul>
+<li><strong>思想</strong>: 比较观察频数 (A) 与期望频数 (T) 的差异。</li>
+<li><strong>公式</strong>: \(\chi^2 = \frac{n(ad-bc)^2}{(a+b)(c+d)(a+c)(b+d)}\)</li>
+<li><strong>自由度</strong>: df = 1</li>
+<li><strong>适用条件</strong>:
+<ul>
+<li>当 n ≥ 40 且所有 T ≥ 5 时，使用此公式。</li>
+<li>当 n ≥ 40 但有 1 ≤ T &lt; 5 时，使用<strong>连续性校正</strong>公式: \(\chi^2_c = \frac{n(|ad-bc| - n/2)^2}{(a+b)(c+d)(a+c)(b+d)}\)</li>
+<li>当 n &lt; 40 或有 T &lt; 1 时，应使用 <strong>Fisher’s 精确检验</strong>。</li>
+</ul>
+</li>
+</ul>
+<h3 id="sec:2-r-c">2. R×C 列联表卡方检验</h3>
+<ul>
+<li><strong>用途</strong>: 分析两个多分类变量的关联性。</li>
+<li><strong>自由度</strong>: df = (R-1)(C-1)</li>
+<li><strong>公式</strong>: \(\chi^2 = \sum \frac{(A_{ij} - T_{ij})^2}{T_{ij}}\)，其中理论频数 \(T_{ij} = \frac{行合计 \times 列合计}{总例数}\)</li>
+</ul>
+<h3 id="sec:3-mcnemar-s-test">3. 配对设计卡方检验 (McNemar’s Test)</h3>
+<ul>
+<li><strong>用途</strong>: 专用于 1:1 配对设计的病例对照研究。</li>
+<li><strong>核心</strong>: 只比较不一致的配对（即 b 和 c）。</li>
+<li><strong>配对四格表</strong>:</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th align="center"></th>
+<th align="center">病例暴露</th>
+<th align="center">病例不暴露</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><strong>对照暴露</strong></td>
+<td align="center">a</td>
+<td align="center">b</td>
+</tr>
+<tr>
+<td align="center"><strong>对照不暴露</strong></td>
+<td align="center">c</td>
+<td align="center">d</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>公式</strong>: \(\chi^2 = \frac{(b-c)^2}{b+c}\) (当 b+c 较小时，可校正: \(\frac{(|b-c|-1)^2}{b+c}\))</li>
+<li><strong>自由度</strong>: df = 1</li>
+</ul>
+<h3 id="sec:4-cochran-armitage-test-for-trend">4. 卡方趋势性检验 (Cochran-Armitage Test for Trend)</h3>
+<ul>
+<li><strong>用途</strong>: 当一个变量是有序分类变量（如暴露剂量：无、低、高），另一个是二分类变量（如是否患病）时，检验后者是否随前者的等级变化呈现线性趋势。</li>
+<li><strong>自由度</strong>: df = 1</li>
+<li><strong>意义</strong>: 若检验有统计学意义 (P &lt; 0.05)，则说明存在<strong>剂量反应关系</strong>。计算通常由统计软件完成。</li>
+</ul>
+</div>
+</body>
+</html>
