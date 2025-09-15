@@ -114,7 +114,7 @@ section.footnotes {
 <body>
 <div class="frontmatter">
 <div class="title"><h1>Calculations in Epidemiology</h1></div>
-<div class="date"><h3>2025-09-14</h3></div>
+<div class="date"><h3>2025-09-15</h3></div>
 </div>
 <div class="body">
 <h2 id="sec:sample-size-calculation">样本量估算 (Sample Size Calculation)</h2>
@@ -270,6 +270,29 @@ section.footnotes {
 <li>当存在多个暴露水平时，可进行<strong>卡方趋势性检验</strong>来判断是否存在剂量反应关系。</li>
 </ul>
 </blockquote>
+<p><strong>分层分析</strong>是控制混杂因素的一种重要方法：</p>
+<ol>
+<li>
+<p><strong>计算各层 OR (\(OR_i\))</strong>: 按混杂因素（如年龄、性别）分层，计算每层的 OR。</p>
+</li>
+<li>
+<p><strong>同质性检验 (Test for Homogeneity)</strong>:</p>
+<ul>
+<li><strong>目的</strong>: 判断各层间的 \(OR_i\) 是否有统计学差异。若无差异（同质），则该因素为混杂因素，可计算合并 OR；若有差异（异质），则提示该因素为<strong>效应修饰物</strong>，应分别报告各层 OR。</li>
+<li><strong>方法</strong>: Woolf’s \(\chi^2\) 检验。</li>
+<li><strong>公式</strong>: \(\chi^2_{homogeneity} = \sum_{i=1}^k w_i (lnOR_i - \overline{lnOR})^2\)，自由度 df = k - 1。</li>
+<li><strong>判断</strong>: 通常以 P &lt; 0.10 作为异质性的判断标准。</li>
+</ul>
+</li>
+<li>
+<p><strong>计算合并 OR (Pooled OR)</strong>:</p>
+<ul>
+<li><strong>方法</strong>: 常用 Mantel-Haenszel (M-H) 法计算合并的 OR (\(OR_{MH}\))，该值是各层 OR 的加权平均，校正了混杂因素的影响。</li>
+<li><strong>公式</strong>: \(OR_{MH} = \frac{\sum_{i=1}^k (a_i d_i / n_i)}{\sum_{i=1}^k (b_i c_i / n_i)}\)</li>
+<li>同时，可进行 \(\chi^2_{MH}\) 检验来判断合并后的 OR 是否与 1 有统计学差异。</li>
+</ul>
+</li>
+</ol>
 <h3 id="sec:experimental-study-clinical-trial">实验研究 (Experimental Study) / 临床试验 (Clinical Trial)</h3>
 <p>实验研究或临床试验在关联分析上与队列研究非常相似，因为它们都前瞻性地追踪人群以观察结局。然而，其术语更侧重于评估干预措施的“疗效”或“效果”。基本数据结构仍然是 2x2 表。</p>
 <table>
@@ -372,30 +395,6 @@ section.footnotes {
 </li>
 </ol>
 <p>这些试验将研究从临床环境扩展到现实世界，其结果对于制定公共卫生政策至关重要。</p>
-<h3 id="sec:">分层分析与混杂控制</h3>
-<p>分层分析是控制混杂因素的一种重要方法。</p>
-<ol>
-<li>
-<p><strong>计算各层 OR (\(OR_i\))</strong>: 按混杂因素（如年龄、性别）分层，计算每层的 OR。</p>
-</li>
-<li>
-<p><strong>同质性检验 (Test for Homogeneity)</strong>:</p>
-<ul>
-<li><strong>目的</strong>: 判断各层间的 \(OR_i\) 是否有统计学差异。若无差异（同质），则该因素为混杂因素，可计算合并 OR；若有差异（异质），则提示该因素为<strong>效应修饰物</strong>，应分别报告各层 OR。</li>
-<li><strong>方法</strong>: Woolf’s \(\chi^2\) 检验。</li>
-<li><strong>公式</strong>: \(\chi^2_{homogeneity} = \sum_{i=1}^k w_i (lnOR_i - \overline{lnOR})^2\)，自由度 df = k - 1。</li>
-<li><strong>判断</strong>: 通常以 P &lt; 0.10 作为异质性的判断标准。</li>
-</ul>
-</li>
-<li>
-<p><strong>计算合并 OR (Pooled OR)</strong>:</p>
-<ul>
-<li><strong>方法</strong>: 常用 Mantel-Haenszel (M-H) 法计算合并的 OR (\(OR_{MH}\))，该值是各层 OR 的加权平均，校正了混杂因素的影响。</li>
-<li><strong>公式</strong>: \(OR_{MH} = \frac{\sum_{i=1}^k (a_i d_i / n_i)}{\sum_{i=1}^k (b_i c_i / n_i)}\)</li>
-<li>同时，可进行 \(\chi^2_{MH}\) 检验来判断合并后的 OR 是否与 1 有统计学差异。</li>
-</ul>
-</li>
-</ol>
 <h2 id="sec:evaluation-of-screening-tests">筛检试验评价 (Evaluation of Screening Tests)</h2>
 <table>
 <thead>
