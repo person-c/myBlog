@@ -22,6 +22,9 @@ Daily-work目录下是我日常工作的记录，Note目录下是我平时学习
 
 最近在做笔记的整理，准备搬运到这个网站上来，现阶段该网站上的内容仅仅是测试所用，有的笔记还不完整（我需要再把该网站的主题完善一下——不知道什么时候了，再搬运我的笔记）。
 
+## 未竟之事
+
+想做的总是太多，真正做的却是太少......
 
 ## 一些资源链接
 
@@ -38,6 +41,3 @@ Learning R programming
 [regex](https://deerchao.cn/tutorials/regex/regex.htm)
 [git](https://git-scm.com/book/zh/v2)
 
-## 未竟之事
-
-......
