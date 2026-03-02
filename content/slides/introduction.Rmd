@@ -12,9 +12,9 @@ output:
       number_sections: true
 ---
 
-## 项目成果展示：胃癌多组学研究设计
+## 项目成果展示：胃癌多组学研究设计s
 
-[点击此处查看高清PDF原图](Gastric_Cancer_Study_Design.pdf)
+[点击此处查看高清PDF原图](gastric_cancer_study_design.pdf)
 
 ::: {.scroll-box style="max-height: 75vh; overflow-y: auto; border: 1px solid #ddd; padding: 1em; margin: auto;"}
 ```{mermaid, echo=FALSE}
