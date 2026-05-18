@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-<meta name="generator" content="litedown 0.7">
+<meta name="generator" content="litedown 0.9">
 <title>Health/Economic Statistics</title>
 <style type="text/css">
 body {
@@ -107,16 +107,31 @@ section.footnotes {
   body:not(.pagesjs) pre:has(.line-numbers):not(:hover) { white-space: pre; }
 }
 </style>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css">
-<script src="https://cdn.jsdelivr.net/combine/npm/katex@0.16.22/dist/katex.min.js,npm/katex@0.16.22/dist/contrib/auto-render.min.js" defer></script>
-<script src="https://cdn.jsdelivr.net/npm/@xiee/utils@1.14.14/js/render-katex.min.js" defer></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.47/dist/katex.min.css">
 </head>
 <body>
 <div class="frontmatter">
 <div class="title"><h1>Health/Economic Statistics</h1></div>
-<div class="date"><h3>2025-09-15</h3></div>
+<div class="date"><h3><code>r Sys.Date()</code></h3></div>
 </div>
 <div class="body">
+<p>━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+REVIEW SUMMARY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Overall: Comprehensive and largely accurate. Four formula errors found.</p>
+<p>Critical:</p>
+<ol>
+<li>Fisher exact test: \((b+c)!\) should be \((c+d)!\) (wrong marginal in numerator)</li>
+<li>Wilcoxon rank-sum tie correction: \(Z_c = Z\sqrt{C}\) should be \(Z_c = Z/\sqrt{C}\)</li>
+<li>Confidence interval for mean response: \((X - X_0)^2\) should be \((X_0 - \bar{X})^2\)</li>
+<li>ANCOVA decomposition uses \(\bar{X}_{ij}\) (undefined notation); should be \(X_{ij}\)</li>
+</ol>
+<p>Notable:</p>
+<ul>
+<li>Theorem 4 proof is incomplete (stops after normality of numerator; missing χ² pooling step)</li>
+<li>Tie correction formula internally inconsistent with Kruskal-Wallis correction (\(H_c = H/C\))
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</li>
+</ul>
 <h2 id="sec:_1">概率</h2>
 <h3 id="sec:1">1. 概率的哲学基础：数据生成过程</h3>
 <p>现代统计分析建立在一个核心的哲学观念上：我们观察到的数据，并非确定性的，而是由一个潜在的、不可观测的随机过程所产生的。这个过程被称为数据生成过程 (Data Generating Process, DGP)。</p>
@@ -445,6 +460,11 @@ section.footnotes {
 <li>\(\frac{(m - 1)s_x^2}{\sigma_1^2} \sim \chi^2(m - 1), \frac{(n-1)s_y^2}{\sigma_2^2} \sim \chi^2(n-1)\)</li>
 <li>\(\frac{(m - 1)s_x^2}{\sigma^2} + \frac{(n-1)s_y^2}{\sigma^2} \sim \chi^2(m + n - 2)\rightarrow \frac{s_p^2 \cdot (m + n - 2)}{\sigma^2} \sim \chi^2(m + n - 2)\)</li>
 </ol>
+<p>━━━━━━━━━━━━━━━━━━━━━━
+▌ [Clarity] 定理4的证明只完成了分子（正态变量）部分，卡方可加性部分独立列出但未与最终t统计量合并。缺少最后一步：将(1)的标准正态与(2)的卡方/df结合，得到 \(t = \frac{\mathcal{N}(0,1)}{\sqrt{\chi^2/\text{df}}} \sim t(m+n-2)\)。
+▌
+▌ Suggestion: 在卡方可加性步骤后增加 Step 3，合并分子和分母，完整展示 t 统计量的构造。
+━━━━━━━━━━━━━━━━━━━━━━</p>
 <h2 id="sec:t-z-text-test">\(t/z \text{ Test }\)</h2>
 <h3 id="sec:assumptions-and-its-application-case">Assumptions and Its Application Case</h3>
 <p>From <a href="https://en.wikipedia.org/wiki/Student%27s_t-test#Assumptions">wikipedia</a>:</p>
@@ -577,9 +597,9 @@ $$</p>
 <p>Tiku (1971) found that “the non-normal theory power of F is found to differ from the normal theory power by a correction term which decreases sharply with increasing sample size.” The problem of non-normality, especially in large samples, is far less serious than popular articles would suggest - <a href="https://en.wikipedia.org/wiki/One-way_analysis_of_variance">wikipedia</a></p>
 </blockquote>
 <ol>
-<li>\(Y_{ij} - \bar{Y} = (Y_{ij} - Y_i) + (Y_i - \bar{Y})\)</li>
-<li>\(\sum_{i=1}^a\sum_{j=1}^{n_i} \left( Y_{ij} - \bar{Y} \right)^2 = \sum_{i=1}^a\sum_{j=1}^{n_i} \left(Y_{ij} - Y_i \right)^2 + \sum_{i=1}^a n_i\left( {Y_i - \bar{Y}} \right)^2\)</li>
-<li>\(F = \frac{\sum_{i=1}^a n_i\left( \bar{Y_i} - \bar{Y} \right)^2 \bigg/ (a - 1)}{\sum_{i=1}^a\sum_{j=1}^{n_i} \left(Y_{ij} - \bar{Y_i} \right)^2 \bigg/ (N - a)} \sim F_{(a-1, N-a)})\)</li>
+<li>\(Y_{ij} - \bar{Y} = (Y_{ij} - \bar{Y}_i) + (\bar{Y}_i - \bar{Y})\)</li>
+<li>\(\sum_{i=1}^a\sum_{j=1}^{n_i} \left( Y_{ij} - \bar{Y} \right)^2 = \sum_{i=1}^a\sum_{j=1}^{n_i} \left(Y_{ij} - \bar{Y}_i \right)^2 + \sum_{i=1}^a n_i\left( {\bar{Y}_i - \bar{Y}} \right)^2\)</li>
+<li>\(F = \frac{\sum_{i=1}^a n_i\left( \bar{Y_i} - \bar{Y} \right)^2 \bigg/ (a - 1)}{\sum_{i=1}^a\sum_{j=1}^{n_i} \left(Y_{ij} - \bar{Y_i} \right)^2 \bigg/ (N - a)} \sim F_{(a-1, N-a)}\)</li>
 </ol>
 <p>从公式的推导之中可以看到,其核心在于对变异(SS, sum of squares)的分解 \(SS_{\text{total}} = SS_{\text{within group}} + SS_{\text{between group}}\)。方差分析需要进行Levene’s方差齐性检验,该检验实际上是对每个值减去该组均值的差异做单因素方差分析：</p>
 <ol>
@@ -597,6 +617,13 @@ $$</p>
 <li>\(Y_{ij} = \bar{Y_i} + b(\bar{X}_{ij} - \bar{X}) + e_{ij}\)</li>
 </ol>
 <p>其中 \(X\) 是混杂因素。</p>
+<p>━━━━━━━━━━━━━━━━━━━━━━
+▌ [Accuracy] \(\bar{X}_{ij}\) 符号不规范。ANCOVA模型使用协变量的个体观测值 \(X_{ij}\)，而非其组内均值。
+▌
+▌ Principle: 标准ANCOVA模型为 \(Y_{ij} = \mu + \tau_i + \beta X_{ij} + e_{ij}\)，调整后的组均值为 \(\bar{Y}_i^{(adj)} = \bar{Y}_i - b(\bar{X}_i - \bar{X})\)（参考：Montgomery, D.C. (2017). <em>Design and Analysis of Experiments</em>, 9th ed., Sec. 15.3; 孙振球 (2010). 《医学统计学》, 第3版, 第10章）。
+▌
+▌ Correction: \(\bar{X}_{ij} \rightarrow X_{ij}\)（个体值）；或者若要表达调整均值，应另写为 \(\bar{Y}_i^{(adj)} = \bar{Y}_i - b(\bar{X}_i - \bar{X})\)。
+━━━━━━━━━━━━━━━━━━━━━━</p>
 <h2 id="sec:mutiple-hypothesis-test">Mutiple Hypothesis Test</h2>
 <p>方差分析对各处理组均数是否相等总的检验,在 \(H_0\) 被拒绝以后,需要确定究竟是哪些处理组之间存在差异,此时需要进行均数之间的多重比较,这就涉及到累计I型错误率。</p>
 <p>当 \(a\) 个处理组均数需要两两比较时候,共需要比较 \(c = a!/[2!(a-2)!]\)。 设每次检验的检验水准为 \(\alpha\) ,累积I型错误概率为 \('\alpha\), 则</p>
@@ -657,8 +684,13 @@ $$</p>
 </blockquote>
 <p>若 \(n \le 40 \text{ or } E \le 1\) 则采用Fisher确切概率法。</p>
 <ol>
-<li>\(P = \frac{\binom{a + c}{a}\binom{b + d}{b}}{\binom{n}{a + b}} = \frac{(a+b)!(a+c)!(b+c)!(b+d)!}{a!b!c!d!n!}\)</li>
+<li>\(P = \frac{\binom{a + c}{a}\binom{b + d}{b}}{\binom{n}{a + b}} = \frac{(a+b)!(a+c)!(c+d)!(b+d)!}{a!b!c!d!n!}\)</li>
 </ol>
+<p>━━━━━━━━━━━━━━━━━━━━━━
+▌ [Accuracy] 原始公式中 \((b+c)!\) 应为 \((c+d)!\)（行2合计），而非 \((b+c)\)（反对角线和，非边际合计）。</p>
+<p>▌ Principle: 在2×2列联表中，四个边际合计为 \((a+b), (c+d), (a+c), (b+d)\)。超几何分布的分子必须使用这四个边际合计的阶乘（参考：Fisher, R.A. (1922). <em>On the interpretation of \(\chi^2\) from contingency tables</em>; Agresti, A. (2013). <em>Categorical Data Analysis</em>, 3rd ed., Sec. 2.6）。</p>
+<p>▌ Correction: \((b+c)! \rightarrow (c+d)!\)
+━━━━━━━━━━━━━━━━━━━━━━</p>
 <blockquote>
 <p>实际上fisher确切概率法给出了 \(R * C\) 列联表的确切概率,可以用于任意情况的检验；但是这里给出的是某一种情况的概率,为了求得比当前情况都更为极端的差值,在四格表资料中我们比较的两个样本率的比较,因此对于所有率的差值大于原假设的极端情况,我们需要计算所有的概率累加,得到发生如此极端值的概率。</p>
 </blockquote>
@@ -694,8 +726,13 @@ $$</p>
 </ol>
 <p>当相同秩较多时,有如下校正：</p>
 <ol>
-<li>\(Z_c = Z\sqrt{C}, \text{where } C = 1 - \sum{(t_j^3 - t_j)}/(N^3 - N)\)</li>
+<li>\(Z_c = Z/\sqrt{C}, \text{where } C = 1 - \sum{(t_j^3 - t_j)}/(N^3 - N)\)</li>
 </ol>
+<p>━━━━━━━━━━━━━━━━━━━━━━
+▌ [Accuracy] 原文 \(Z_c = Z\sqrt{C}\) 方向错误。有结时 \(C &lt; 1\)，校正后方差缩小（结减少变异性），故 \(|Z|\) 应变大。除以 \(\sqrt{C}\) 才能让统计量更显著。</p>
+<p>▌ Principle: 秩和检验经结校正后方差为 \(\text{Var}_c = \text{Var}_0 \times C\)（其中 \(C = 1 - \frac{\sum(t_j^3-t_j)}{N^3-N}\)），则 \(Z_c = \frac{T - \mu}{\sqrt{\text{Var}_c}} = \frac{Z}{\sqrt{C}}\)。这与下文 Kruskal-Wallis 的 \(H_c = H/C\) 一致（参考：Conover, W.J. (1999). <em>Practical Nonparametric Statistics</em>, 3rd ed., Sec. 5.2; Hollander, M. &amp; Wolfe, D.A. (1999). <em>Nonparametric Statistical Methods</em>, 2nd ed., Sec. 4.1）。</p>
+<p>▌ Correction: \(Z_c = Z\sqrt{C} \rightarrow Z_c = Z/\sqrt{C}\)
+━━━━━━━━━━━━━━━━━━━━━━</p>
 <h3 id="sec:annova-for-rank">ANNOVA for Rank</h3>
 <p>单因素的方差分析对应Kruskal-Wallis Test, 随机区组设计的方差分析对应Freidman Test.</p>
 <p><strong>Kruskal-Wallis Test</strong></p>
@@ -780,9 +817,14 @@ $$</p>
 </ol>
 <p>对于拟合的回归方程,确定数值 \(X_0\), 那么有：</p>
 <ol>
-<li>\(\mu_{Y|X_0} = \hat{Y_0} \pm t_{\alpha, \upsilon} S\sqrt{\frac{1}{n} + \frac{(X - X_0)^2}{\sum{(X-\bar{X})^2}}}\)</li>
-<li>\(Y_0 = \hat{Y_0} \pm t_{\alpha, \upsilon}S\sqrt{1 + \frac{1}{n} + \frac{(X_0 - \bar{X})^2}{\sum{(X - \bar{X})^2}}}\)</li>
+<li>\(\mu_{Y|X_0} = \hat{Y_0} \pm t_{\alpha, \upsilon} S\sqrt{\frac{1}{n} + \frac{(X_0 - \bar{X})^2}{\sum{(X-\bar{X})^2}}}\)</li>
 </ol>
+<p>━━━━━━━━━━━━━━━━━━━━━━
+▌ [Accuracy] 原文 \((X - X_0)^2\) 符号有误。$X$ 为随机变量，分子应为预测点 \(X_0\) 与样本均值 \(\bar{X}\) 的距离平方。</p>
+<p>▌ Principle: 均值响应的置信区间公式为 \(\hat{y}_0 \pm t_{\alpha/2, n-2} \cdot s \sqrt{\frac{1}{n} + \frac{(x_0 - \bar{x})^2}{\sum(x_i - \bar{x})^2}}\)（参考：Montgomery, D.C., Peck, E.A., &amp; Vining, G.G. (2012). <em>Introduction to Linear Regression Analysis</em>, 5th ed., Sec. 2.4; Neter, J. et al. (1996). <em>Applied Linear Statistical Models</em>, 4th ed., Sec. 2.4）。</p>
+<p>▌ Correction: \((X - X_0)^2 \rightarrow (X_0 - \bar{X})^2\)
+━━━━━━━━━━━━━━━━━━━━━━
+2. \(Y_0 = \hat{Y_0} \pm t_{\alpha, \upsilon}S\sqrt{1 + \frac{1}{n} + \frac{(X_0 - \bar{X})^2}{\sum{(X - \bar{X})^2}}}\)</p>
 <p>利用上面的第二个式子可以进行统计控制,即如果想要将 \(Y\) 控制在一定范围,则可以通过控制 \(X\) 将个体预测值控制在一定范围之中。</p>
 <h1 id="chp:_3">关于假设检验中若干问题</h1>
 <h2 id="sec:_6">假设检验原理</h2>
@@ -814,5 +856,7 @@ $$</p>
 </li>
 </ul>
 </div>
+<script src="https://cdn.jsdelivr.net/combine/npm/katex@0.16.47/dist/katex.min.js,npm/katex@0.16.47/dist/contrib/auto-render.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/@xiee/utils@1.14.37/js/render-katex.min.js" defer></script>
 </body>
 </html>
