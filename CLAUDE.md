@@ -178,3 +178,29 @@ Annotate every substantive issue. For trivial typos/spelling/grammar, fix direct
 #### Step 3: Terminal summary
 
 After all edits, output 2-3 sentences: overall quality, total annotations added, and the single most critical issue.
+
+#### Step 4: Preview with litedown
+
+After the terminal summary, start a live preview of the reviewed file's directory as a background task:
+
+```sh
+R -e "litedown::roam('<dir>'); while(TRUE) Sys.sleep(1)"
+```
+
+Replace `<dir>` with the directory containing the reviewed file (e.g., `content/note`). `litedown::roam()` takes a directory, not a file — it serves all files in that directory for browser-based preview.
+
+**IMPORTANT:** Use `R`, not `Rscript`. `Rscript` exits immediately after execution, killing the HTTP server. The `while(TRUE) Sys.sleep(1)` keeps the R process alive. Run this as a background task.
+
+After starting the server, scan nearby ports to find the actual URL (the default port is 4321, but it auto-increments if busy):
+
+```sh
+for port in $(seq 4321 4330); do
+  code=$(curl -s -o /dev/null -w "%{http_code}" --connect-timeout 2 "http://127.0.0.1:$port/custom/litedown/" 2>/dev/null)
+  if [ "$code" = "200" ]; then
+    echo "Preview available at: http://127.0.0.1:$port/custom/litedown/"
+    break
+  fi
+done
+```
+
+Report the URL to the user so they can open it in a browser.
