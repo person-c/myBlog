@@ -181,26 +181,44 @@ After all edits, output 2-3 sentences: overall quality, total annotations added,
 
 #### Step 4: Preview with litedown
 
-After the terminal summary, start a live preview of the reviewed file's directory as a background task:
+After the terminal summary, start a live preview of the reviewed file's **parent directory** (the directory directly containing the file) as a background task.
 
-```sh
-R -e "litedown::roam('<dir>'); while(TRUE) Sys.sleep(1)"
-```
+**Critical: Directory selection and server reuse**
 
-Replace `<dir>` with the directory containing the reviewed file (e.g., `content/note`). `litedown::roam()` takes a directory, not a file — it serves all files in that directory for browser-based preview.
+1. **The directory must be the directory that contains the reviewed file.** For example:
+   - `content/_index.md` → use `content`
+   - `content/note/some-note.md` → use `content/note`
+   - `content/daily_work/2025-09-19.md` → use `content/daily_work`
 
-**IMPORTANT:** Use `R`, not `Rscript`. `Rscript` exits immediately after execution, killing the HTTP server. The `while(TRUE) Sys.sleep(1)` keeps the R process alive. Run this as a background task.
+2. **Before starting a new server, check existing litedown servers:**
+   ```sh
+   for port in $(seq 4321 4330); do
+     code=$(curl -s -o /dev/null -w "%{http_code}" --connect-timeout 2 "http://127.0.0.1:$port/custom/litedown/" 2>/dev/null)
+     if [ "$code" = "200" ]; then
+       echo "Existing server on port $port"
+     fi
+   done
+   ```
+   - If an existing litedown server already serves this directory or a **parent directory** that covers the file, reuse it — do not start a new one. Just report the existing URL.
+   - If existing servers run on **different, non-covering directories** (e.g., serving `content/daily_work` but current file is in `content/`), **stop those servers first** with `TaskStop`, then start a fresh server at the correct directory. This avoids multiple servers running at different subtree levels.
 
-After starting the server, scan nearby ports to find the actual URL (the default port is 4321, but it auto-increments if busy):
+3. **Start the server** (only if needed):
+   ```sh
+   R -e "litedown::roam('<dir>'); while(TRUE) Sys.sleep(1)"
+   ```
+   `<dir>` is the directory containing the reviewed file. `litedown::roam()` takes a directory, not a file — it serves all files in that directory for browser-based preview.
 
-```sh
-for port in $(seq 4321 4330); do
-  code=$(curl -s -o /dev/null -w "%{http_code}" --connect-timeout 2 "http://127.0.0.1:$port/custom/litedown/" 2>/dev/null)
-  if [ "$code" = "200" ]; then
-    echo "Preview available at: http://127.0.0.1:$port/custom/litedown/"
-    break
-  fi
-done
-```
+   **IMPORTANT:** Use `R`, not `Rscript`. `Rscript` exits immediately after execution, killing the HTTP server. The `while(TRUE) Sys.sleep(1)` keeps the R process alive. Run this as a background task.
 
-Report the URL to the user so they can open it in a browser.
+4. **Scan nearby ports to find the actual URL** (the default port is 4321, but it auto-increments if busy):
+   ```sh
+   for port in $(seq 4321 4330); do
+     code=$(curl -s -o /dev/null -w "%{http_code}" --connect-timeout 2 "http://127.0.0.1:$port/custom/litedown/" 2>/dev/null)
+     if [ "$code" = "200" ]; then
+       echo "Preview available at: http://127.0.0.1:$port/custom/litedown/"
+       break
+     fi
+   done
+   ```
+
+5. **Report the URL** to the user so they can open it in a browser. The URL must point to the directory of the **current** reviewed article.
