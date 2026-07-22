@@ -1,12 +1,13 @@
 document.addEventListener("DOMContentLoaded", function () {
-    // --- 模块化初始化 ---
     initResponsiveFootnotes();
-    initTableOfContents(); // Now generates a nested structure
-    initTocInteractivity(); // New: handles collapse/expand
+    initTableOfContents();
+    initTocInteractivity();
     initTOCScrollSpy();
+    initMobileToc();
+    initCodeCopyButtons();
+    initSidenoteReflow();
 });
 
-// ... (initResponsiveFootnotes 和其辅助函数保持不变) ...
 function initResponsiveFootnotes() {
     const footnoteRefs = document.querySelectorAll("a.footnote-ref");
     const originalFootnotesDiv = document.querySelector("div.footnotes");
@@ -21,18 +22,23 @@ function initResponsiveFootnotes() {
             renderInlineFootnotes(footnoteRefs);
         }
     }
-    handleFootnotesLayout();
     window.addEventListener('resize', () => {
         clearTimeout(resizeTimer);
         resizeTimer = setTimeout(handleFootnotesLayout, 250);
     });
     const article = document.querySelector("article");
     if (article) {
+        let observerInitialized = false;
         new ResizeObserver(() => {
+            if (!observerInitialized) {
+                observerInitialized = true;
+                return;
+            }
             clearTimeout(resizeTimer);
             resizeTimer = setTimeout(handleFootnotesLayout, 250);
         }).observe(article);
     }
+    handleFootnotesLayout();
 }
 function cleanupDynamicFootnotes() {
     const leftSidenotesContainer = document.querySelector("aside.footnotes");
@@ -47,8 +53,15 @@ function renderSidenotes(footnoteRefs) {
     dynamicList.id = "dynamic-footnotes";
     container.appendChild(dynamicList);
 
+    // Assign IDs to refs for back-linking
+    footnoteRefs.forEach(function (ref, index) {
+        if (!ref.id) ref.id = 'fnref-' + (index + 1);
+    });
+
     // First pass: create all items with their natural positions
     const items = [];
+    const containerRect = container.getBoundingClientRect();
+    var containerTop = containerRect.top + container.scrollTop;
     footnoteRefs.forEach(ref => {
         const footnoteId = ref.getAttribute("href").substring(1);
         const footnoteElement = document.getElementById(footnoteId);
@@ -60,9 +73,16 @@ function renderSidenotes(footnoteRefs) {
             listItem.innerHTML = contentClone.innerHTML.trim();
             listItem.style.position = "absolute";
             dynamicList.appendChild(listItem);
+
+            var backToRef = document.createElement('a');
+            backToRef.href = '#' + ref.id;
+            backToRef.className = 'sidenote-backlink';
+            backToRef.textContent = '↩';
+            backToRef.title = 'Back to reference';
+            listItem.appendChild(backToRef);
+
             const refRect = ref.getBoundingClientRect();
-            const containerRect = container.getBoundingClientRect();
-            const desiredTop = refRect.top - containerRect.top + container.scrollTop;
+            const desiredTop = refRect.top - containerTop;
             items.push({ li: listItem, desiredTop: desiredTop });
         }
     });
@@ -172,6 +192,61 @@ function initTableOfContents() {
     });
 
     tocContainer.appendChild(tocList);
+
+    tocContainer.querySelectorAll('.collapsible').forEach(function (li) {
+        li.classList.add('is-open');
+        var btn = li.querySelector('.toc-toggle');
+        if (btn) btn.setAttribute('aria-expanded', 'true');
+    });
+
+    // Add TOC collapse/expand: inline hide button + floating restore button
+    var tocAside = document.querySelector('aside.toc');
+    var layout = document.querySelector('.layout');
+    if (tocAside && layout) {
+        // Inline collapse button at top of TOC
+        var collapseBtn = document.createElement('button');
+        collapseBtn.className = 'toc-collapse-toggle';
+        collapseBtn.title = 'Hide table of contents';
+        collapseBtn.innerHTML = '×';
+        collapseBtn.setAttribute('aria-label', 'Hide table of contents');
+        tocAside.insertBefore(collapseBtn, tocContainer);
+
+        // Floating restore button (appended to body, shown only when TOC hidden)
+        var floatBtn = document.createElement('button');
+        floatBtn.className = 'toc-float-toggle';
+        floatBtn.title = 'Show table of contents';
+        floatBtn.innerHTML = '☰';
+        floatBtn.setAttribute('aria-label', 'Show table of contents');
+        document.body.appendChild(floatBtn);
+
+        function recalcFullwidth() {
+            if (layout._fullwidthRecalc) layout._fullwidthRecalc();
+        }
+
+        function hideToc() {
+            layout.classList.add('toc-hidden');
+            tocAside.classList.add('hidden');
+            floatBtn.classList.add('visible');
+            localStorage.setItem('toc-hidden', 'true');
+            recalcFullwidth();
+        }
+
+        function showToc() {
+            layout.classList.remove('toc-hidden');
+            tocAside.classList.remove('hidden');
+            floatBtn.classList.remove('visible');
+            localStorage.setItem('toc-hidden', 'false');
+            recalcFullwidth();
+        }
+
+        collapseBtn.addEventListener('click', hideToc);
+        floatBtn.addEventListener('click', showToc);
+
+        // Restore persisted state
+        if (localStorage.getItem('toc-hidden') === 'true') {
+            hideToc();
+        }
+    }
 }
 
 /**
@@ -181,7 +256,8 @@ function createToggleButton() {
     const button = document.createElement('button');
     button.className = 'toc-toggle';
     button.setAttribute('aria-expanded', 'false');
-    button.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right"><polyline points="9 18 15 12 9 6"></polyline></svg>`;
+    button.setAttribute('aria-label', 'Toggle section');
+    button.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>';
     return button;
 }
 
@@ -225,4 +301,91 @@ function initTOCScrollSpy() {
         });
     }, { rootMargin: "0px 0px -75% 0px", threshold: 0.1 });
     headings.forEach(heading => observer.observe(heading));
+}
+
+/* ---------------------------- Mobile TOC Toggle ----------------------------- */
+function initMobileToc() {
+    var toggle = document.querySelector('.toc-mobile-toggle');
+    var toc = document.querySelector('aside.toc');
+    if (!toggle || !toc) return;
+
+    toggle.addEventListener('click', function () {
+        var isOpen = toc.classList.toggle('mobile-visible');
+        toggle.classList.toggle('is-open', isOpen);
+        toggle.setAttribute('aria-expanded', isOpen);
+        // Override desktop hidden state when opening on mobile
+        if (isOpen) {
+            toc.classList.remove('hidden');
+            var layout = document.querySelector('.layout');
+            if (layout) {
+                layout.classList.remove('toc-hidden');
+                if (layout._fullwidthRecalc) layout._fullwidthRecalc();
+            }
+            var floatBtn = document.querySelector('.toc-float-toggle');
+            if (floatBtn) floatBtn.classList.remove('visible');
+        }
+    });
+}
+
+/* ----------------------------- Code Copy Buttons ---------------------------- */
+function initCodeCopyButtons() {
+    document.querySelectorAll('.highlight').forEach(function (block) {
+        var wrapper = document.createElement('div');
+        wrapper.className = 'code-block-wrapper';
+        block.parentNode.insertBefore(wrapper, block);
+        wrapper.appendChild(block);
+
+        var button = document.createElement('button');
+        button.className = 'copy-button';
+        button.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>Copy';
+        wrapper.appendChild(button);
+
+        button.addEventListener('click', function () {
+            var code = block.querySelector('code') || block.querySelector('pre');
+            var text = code ? code.textContent : block.textContent;
+            navigator.clipboard.writeText(text).then(function () {
+                button.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>Copied!';
+                setTimeout(function () {
+                    button.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>Copy';
+                }, 2000);
+            }).catch(function () {
+                button.textContent = 'Failed';
+                setTimeout(function () { button.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>Copy'; }, 2000);
+            });
+        });
+    });
+}
+
+/* --------------------------- Sidenote Reflow ---------------------------- */
+function initSidenoteReflow() {
+    var fnRefs = document.querySelectorAll("a.footnote-ref");
+    if (fnRefs.length === 0) return;
+
+    function reflow() {
+        if (window.innerWidth > 1024) {
+            cleanupDynamicFootnotes();
+            renderSidenotes(fnRefs);
+        }
+    }
+
+    var reflowTimer;
+    var debouncedReflow = function () {
+        clearTimeout(reflowTimer);
+        reflowTimer = setTimeout(reflow, 250);
+    };
+
+    document.querySelectorAll('article img').forEach(function (img) {
+        if (img.complete) return;
+        img.addEventListener('load', debouncedReflow);
+    });
+
+    if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(function () {
+            setTimeout(reflow, 100);
+        });
+    }
+
+    new ResizeObserver(function () {
+        debouncedReflow();
+    }).observe(document.querySelector('article'));
 }

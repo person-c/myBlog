@@ -182,16 +182,31 @@ function initFullwidth() {
     detectFullwidthElements();
     applyAllOffsets();
 
-    let resizeTimer;
-    window.addEventListener('resize', () => {
-        clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(applyAllOffsets, 150);
-    });
+    // Expose for TOC toggle to trigger recalculation
+    layout._fullwidthRecalc = function () {
+        requestAnimationFrame(function () {
+            requestAnimationFrame(applyAllOffsets);
+        });
+    };
+
+    var rafId = null;
+    function scheduleApply() {
+        if (rafId) return;
+        rafId = requestAnimationFrame(function () {
+            rafId = null;
+            applyAllOffsets();
+        });
+    }
+    window.addEventListener('resize', scheduleApply, { passive: true });
 
     const resizeObserver = new ResizeObserver(() => {
-        applyAllOffsets();
+        scheduleApply();
     });
     resizeObserver.observe(article);
 }
 
-document.addEventListener("DOMContentLoaded", initFullwidth);
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initFullwidth);
+} else {
+    initFullwidth();
+}

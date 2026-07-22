@@ -1,15 +1,82 @@
 <header>
+    <button class="theme-toggle" aria-label="Toggle color theme" title="Toggle color theme">☀</button>
     <nav class="nav-container">
-        <div class="nav-bar"></div>
+        <div class="nav-bar" tabindex="0" role="button" aria-label="Toggle navigation menu"></div>
         <ul class="nav-menu">
-            <li><a href="{{ "/" | relURL }}">Home</a></li>
-            <li><a href="{{ "/about/" | relURL }}">About</a></li>
-            <li><a href="{{ "/daily_work/" | relURL }}">Daily-Work</a></li>
-            <li><a href="{{ "/note/" | relURL }}">Note</a></li>
-            <li><a href="{{ "/slides/" | relURL }}">Slides</a></li>
+            <li><a href="{{ "/" | relURL }}"{{ if .IsHome }} class="active"{{ end }}>Home</a></li>
+            <li><a href="{{ "/about/" | relURL }}"{{ if eq .Section "about" }} class="active"{{ end }}>About</a></li>
+            <li><a href="{{ "/blog/" | relURL }}"{{ if eq .Section "blog" }} class="active"{{ end }}>Blog</a></li>
+            <li><a href="{{ "/note/" | relURL }}"{{ if eq .Section "note" }} class="active"{{ end }}>Note</a></li>
+            <li><a href="{{ "/slides/" | relURL }}"{{ if eq .Section "slides" }} class="active"{{ end }}>Slides</a></li>
             {{ if not hugo.IsProduction }}
-            <li><a href="{{ "/daily_life/" | relURL }}">Daily-Life</a></li>
+            <li><a href="{{ "/ramblings/" | relURL }}"{{ if eq .Section "ramblings" }} class="active"{{ end }}>Ramblings</a></li>
             {{ end }}
         </ul>
     </nav>
+    <script>
+    (function() {
+        var navBar = document.querySelector('.nav-bar');
+        var navContainer = document.querySelector('.nav-container');
+        var navMenu = document.querySelector('.nav-menu');
+        if (!navBar || !navMenu) return;
+
+        function openMenu() {
+            navMenu.classList.add('is-open');
+            navContainer.classList.add('is-open');
+        }
+
+        function closeMenu() {
+            navMenu.classList.remove('is-open');
+            navContainer.classList.remove('is-open');
+        }
+
+        navBar.addEventListener('click', function(e) {
+            e.stopPropagation();
+            if (navMenu.classList.contains('is-open')) {
+                closeMenu();
+            } else {
+                openMenu();
+            }
+        });
+
+        document.addEventListener('click', function(e) {
+            if (!navMenu.contains(e.target) && e.target !== navBar) {
+                closeMenu();
+            }
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeMenu();
+        });
+    })();
+    </script>
+    <script>
+    (function() {
+        var toggle = document.querySelector('.theme-toggle');
+        if (!toggle) return;
+
+        function updateIcon() {
+            var isDark = document.documentElement.classList.contains('dark');
+            toggle.textContent = isDark ? '☾' : '☀';
+            toggle.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
+        }
+        updateIcon();
+
+        toggle.addEventListener('click', function () {
+            var root = document.documentElement;
+            if (root.classList.contains('dark')) {
+                root.classList.remove('dark');
+                root.classList.add('light');
+                localStorage.setItem('theme', 'light');
+            } else if (root.classList.contains('light')) {
+                root.classList.remove('light');
+                localStorage.setItem('theme', 'auto');
+            } else {
+                root.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            }
+            updateIcon();
+        });
+    })();
+    </script>
 </header>

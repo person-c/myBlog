@@ -1,10 +1,14 @@
 {{ define "main" }}
-{{ if and hugo.IsProduction (eq .Section "daily_life") }}
+{{ if and hugo.IsProduction (eq .Section "ramblings") }}
 {{ else }}
 <div class="layout">
     <aside class="footnotes"></aside>
 
     <article>
+        <button class="toc-mobile-toggle" aria-expanded="false">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            Contents
+        </button>
         <h1>
             {{ .Title }}
             {{ with .Date }}
@@ -14,9 +18,11 @@
         <div class="content-wrapper">
             {{ .Content }}
         </div>
-        {{ with .Lastmod }}
+        {{ $lastmodStr := .Lastmod.Format "2006-01-02" }}
+        {{ $dateStr := .Date.Format "2006-01-02" }}
+        {{ if ne $lastmodStr $dateStr }}
         <div class="last-modified">
-            Last-modified in {{ .Format "2006-01-02" }}
+            Last-modified in {{ .Lastmod.Format "2006-01-02" }}
         </div>
         {{ end }}
     </article>
@@ -34,6 +40,8 @@
 它只会在 single 页面被加载，而不会影响 list 或 index 页面。
 */}}
 {{ define "scripts" }}
-<script src="{{ "js/article-page.js" | relURL }}" defer></script>
-<script src="{{ "js/fullwidth.js" | relURL }}" defer></script>
+{{ $articleJs := resources.Get "js/article-page.js" | resources.Minify | resources.Fingerprint }}
+{{ $fullwidthJs := resources.Get "js/fullwidth.js" | resources.Minify | resources.Fingerprint }}
+<script src="{{ $articleJs.RelPermalink }}" defer></script>
+<script src="{{ $fullwidthJs.RelPermalink }}" defer></script>
 {{ end }}

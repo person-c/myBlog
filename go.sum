@@ -30,3 +30,5 @@ github.com/person-c/Nothing v3.0.0+incompatible h1:eEmR6+8PorFXp1hUaMXDm3ZjM0nQx
 github.com/person-c/Nothing v3.0.0+incompatible/go.mod h1:tSfsUfzcg4W05IPJofdqxDF4KEXPGgb1+HawLzw1qmI=
 github.com/person-c/Nothing v3.0.1+incompatible h1:vmHCka3X6msW/q46/gAAWU6RjOMYWrzQgpnFLpo+B58=
 github.com/person-c/Nothing v3.0.1+incompatible/go.mod h1:tSfsUfzcg4W05IPJofdqxDF4KEXPGgb1+HawLzw1qmI=
+github.com/person-c/Nothing v3.1.0+incompatible h1:4LeFgUM3ZhmYRk6pafP0ZyETzak0H7B9TSiLbSuxVTU=
+github.com/person-c/Nothing v3.1.0+incompatible/go.mod h1:tSfsUfzcg4W05IPJofdqxDF4KEXPGgb1+HawLzw1qmI=
