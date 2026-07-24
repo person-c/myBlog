@@ -7,12 +7,23 @@
     "headers": [
         {
             "source": "/(.*\\.epub)",
-            "headers": [
-                {
-                    "key": "Content-Type",
-                    "value": "application/epub+zip"
-                }
-            ]
+            "headers": [{"key": "Content-Type", "value": "application/epub+zip"}]
+        },
+        {
+            "source": "/(.*\\.mobi)",
+            "headers": [{"key": "Content-Type", "value": "application/x-mobipocket-ebook"}]
+        },
+        {
+            "source": "/(.*\\.azw3?)",
+            "headers": [{"key": "Content-Type", "value": "application/vnd.amazon.ebook"}]
+        },
+        {
+            "source": "/(.*\\.fb2)",
+            "headers": [{"key": "Content-Type", "value": "application/x-fictionbook+xml"}]
+        },
+        {
+            "source": "/(.*\\.cbz)",
+            "headers": [{"key": "Content-Type", "value": "application/vnd.comicbook+zip"}]
         }
     ]
 }
