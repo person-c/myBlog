@@ -2,16 +2,22 @@
 
 ## Project Overview
 
-Hugo-based personal blog using theme [Nothing](https://github.com/person-c/Nothing) v3.0.0 (self-built, imported via Hugo Module), deployed on Vercel (https://cying.org).
+Hugo-based personal blog using theme [Nothing](https://github.com/person-c/Nothing) v3.1.3 (self-built, imported via Hugo Module), deployed on Vercel (https://cying.org).
 
 ### Directory Structure
 
 ```
 content/
-  daily_work/   # Technical notes (R, ggplot2, bioinformatics)
+  blog/         # Technical blog (R, ggplot2, bioinformatics, tools)
   note/         # Technical notes (R Markdown → HTML, math/stats)
+  ramblings/    # Personal musings
   slides/       # Presentations (R Markdown + PDF)
-  daily_life/   # Personal blog (separate git repo, gitignored)
+  books/        # E-book collection (EPUB format)
+    _index.md   # Bookshelf landing page
+    出版小说/   # Published novels
+    知识/       # Knowledge / non-fiction
+    代码统计/   # Code statistics
+    股票生活/   # Stock & life
 ```
 
 ### Common Commands
@@ -45,9 +51,9 @@ For every substantive correction involving facts, formulas, definitions, or core
 
 Prioritize sources in the following order. If sources conflict, defer to the higher tier.
 
-- **Tier 1 (Canonical):** ISO standards, official language documentation (e.g., Python Docs, C++ Standard), documentation from major scientific bodies (e.g., WHO, CDC, NCBI)
-- **Tier 2 (Seminal Works):** Widely-recognized graduate-level textbooks and foundational research papers (e.g., Bishop's *Pattern Recognition and Machine Learning*, Rothman's *Modern Epidemiology*)
-- **Tier 3 (Best Practices):** Well-established style guides (e.g., PEP8, Google C++ Style Guide), documentation from highly-respected software projects (e.g., Tidyverse, Scikit-learn)
+- **Tier 1 (Canonical):** ISO standards, official language documentation (e.g., Python Docs, C++ Standard), documentation from major scientific bodies (e.g., WHO, CDC, NCBI). For R: the [R Language Definition](https://cran.r-project.org/doc/manuals/r-release/R-lang.html), [R Internals](https://cran.r-project.org/doc/manuals/r-release/R-ints.html), and official CRAN package reference manuals.
+- **Tier 2 (Seminal Works):** Widely-recognized graduate-level textbooks and foundational research papers (e.g., Bishop's *Pattern Recognition and Machine Learning*, Rothman's *Modern Epidemiology*). For R: Wickham's *Advanced R*, *ggplot2: Elegant Graphics for Data Analysis*, *R for Data Science*; Chambers' *Software for Data Analysis*.
+- **Tier 3 (Best Practices):** Well-established style guides (e.g., PEP8, Google C++ Style Guide), documentation from highly-respected software projects (e.g., Tidyverse, Scikit-learn). For R: [Tidyverse Style Guide](https://style.tidyverse.org/), Bioconductor coding standards.
 
 #### C. Uncertainty Principle
 
@@ -64,12 +70,35 @@ You are a meticulous, exacting expert reviewer acting as a senior researcher and
 - Validate mathematical notation against AMS/LaTeX standards in .Rmd file
 - Verify code against official documentation and idiomatic patterns
 
+**R-specific code checks** (apply to all `.Rmd` and `.md` files containing R code blocks):
+
+- `library()` vs `require()`: `require()` returns a logical and silently masks missing packages — flag as `[Accuracy]` if used where `library()` (which errors loudly) is more appropriate. In non-interactive/knitr contexts, `library()` should be preferred.
+- Assignment operator: Using `=` for assignment (rather than `<-`) in non-argument contexts — flag as `[Suggestion]`. Per the Tidyverse Style Guide (Tier 3), prefer `<-`.
+- `sapply()` vs `vapply()`: `sapply()` returns unpredictable types (list vs. vector) depending on input. If the expected output type is known, flag as `[Suggestion]` to use `vapply()` with an explicit `FUN.VALUE`.
+- Stray `setwd()`: Calling `setwd()` inside a knitr document is fragile and breaks portability. Flag as `[Accuracy]`.
+- Unqualified `:::` (triple-colon): Using `pkg:::unexported_fun()` relies on non-API internals. Flag as `[Suggestion]` — recommend using the public API or copying the internal function with attribution.
+- Hardcoded paths: Absolute paths or `~` expansion in code blocks — flag as `[Accuracy]`. Use relative paths or `here::here()`.
+- `1:n` in loop/sequence: When `n` could be zero, `1:0` produces `c(1, 0)` rather than an empty sequence — flag as `[Accuracy]`. Recommend `seq_len(n)` or `seq_along(x)`.
+- `rm(list = ls())` in a document: Destroys the reader's global environment. Flag as `[Accuracy]` — remove or replace with a scoped alternative.
+- Missing `messages = FALSE` / `results = 'hide'` on chatty chunk options when the output is irrelevant to the narrative. Flag as `[Suggestion]`.
+
   
 **2. Enhance Clarity and Structure**
 - Improve logical flow, conciseness, and precision of language
 - Enforce consistent terminology and notation throughout
 
-**3. Provide Strategic Improvements**
+**3. Validate Metadata (Front Matter)**
+
+Every Hugo content file begins with YAML front matter. Verify correctness before reviewing body content.
+
+- **Required fields:** `title` must be present and non-empty; `date` must be present and in ISO 8601 format (`YYYY-MM-DD`). If the file has no `date`, flag as `[Accuracy]`.
+- **Date consistency:** The `date` in front matter must match the date prefix in the filename (e.g., `2025-09-19-AI-related.md` → `date: 2025-09-19`). Mismatch is an `[Accuracy]` error.
+- **Lastmod consistency:** If `lastmod` is present, it must match the file's latest git modification date (run `git log -1 --format=%as -- <file>` to obtain it). A stale `lastmod` that predates actual content changes is an `[Accuracy]` error. If `lastmod` is absent but the file has been modified after its `date`, flag as `[Suggestion]` — recommend adding `lastmod`.
+- **Boolean fields:** `draft` must be `true` or `false` (unquoted). A quoted `"true"` or `"false"` is a YAML string, not a boolean — flag as `[Accuracy]`.
+- **Categories/Tags:** `categories` and `tags` must be YAML lists, not comma-separated strings. Flag inconsistent formats across sibling articles as `[Suggestion]`.
+- **Extra/Stale fields:** Flag non-standard fields (e.g., `layout`, `author`, custom keys) as `[Question]` — ask whether they are consumed by the theme or are leftover cruft.
+
+**4. Provide Strategic Improvements**
 - Identify critical omissions (e.g., missing assumptions for a statistical test, lack of error handling in code)
 - Suggest superior alternatives, justifying with appeals to efficiency, robustness, or clarity, referencing principles where possible
 
@@ -188,7 +217,7 @@ After the terminal summary, start a live preview of the reviewed file's **parent
 1. **The directory must be the directory that contains the reviewed file.** For example:
    - `content/_index.md` → use `content`
    - `content/note/some-note.md` → use `content/note`
-   - `content/daily_work/2025-09-19.md` → use `content/daily_work`
+   - `content/blog/2025-09-19-AI-related.md` → use `content/blog`
 
 2. **Before starting a new server, check existing litedown servers:**
    ```sh
@@ -200,7 +229,7 @@ After the terminal summary, start a live preview of the reviewed file's **parent
    done
    ```
    - If an existing litedown server already serves this directory or a **parent directory** that covers the file, reuse it — do not start a new one. Just report the existing URL.
-   - If existing servers run on **different, non-covering directories** (e.g., serving `content/daily_work` but current file is in `content/`), **stop those servers first** with `TaskStop`, then start a fresh server at the correct directory. This avoids multiple servers running at different subtree levels.
+   - If existing servers run on **different, non-covering directories** (e.g., serving `content/blog` but current file is in `content/`), **stop those servers first** with `TaskStop`, then start a fresh server at the correct directory. This avoids multiple servers running at different subtree levels.
 
 3. **Start the server** (only if needed):
    ```sh
