@@ -3,5 +3,16 @@
         "env": {
             "HUGO_VERSION": "0.147.8"
         }
-    }
+    },
+    "headers": [
+        {
+            "source": "/(.*\\.epub)",
+            "headers": [
+                {
+                    "key": "Content-Type",
+                    "value": "application/epub+zip"
+                }
+            ]
+        }
+    ]
 }
