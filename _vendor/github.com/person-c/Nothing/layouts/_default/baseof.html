@@ -1,9 +1,12 @@
 <!DOCTYPE html>
 <html lang="{{ .Lang | default .Site.Language.Lang | default "en" }}">
-
+<head>
 {{ partial "head.html" . }}
+    {{ block "head_extras" . }}{{ end }}
+</head>
 
-<body>
+<body{{ block "body_attrs" . }}{{ end }}>
+    {{ block "body_content" . }}
     <a href="#main-content" class="skip-to-content">Skip to content</a>
     {{ partial "header.html" . }}
 
@@ -14,15 +17,9 @@
     {{ block "footer" . }}
     {{ partial "footer.html" . }}
     {{ end }}
+    {{ end }}
 
     {{ block "scripts" . }}{{ end }}
-
-    <script>
-    document.querySelector('.back-to-top')?.addEventListener('click', function(e) {
-        e.preventDefault();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-    </script>
 </body>
 
 </html>

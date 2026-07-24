@@ -1,5 +1,4 @@
-<head>
-    <meta charset="UTF-8">
+<meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ if .IsHome }}{{ .Site.Title }}{{ else }}{{ .Title }} | {{ .Site.Title }}{{ end }}</title>
 
@@ -31,16 +30,40 @@
             rel="stylesheet">
     </noscript>
 
-    {{ $css := resources.Get "css/styles.css" | resources.Minify | resources.Fingerprint }}
+    {{ $critical := resources.Get "css/modules/critical.css" }}
+    {{ $header := resources.Get "css/modules/header.css" }}
+    {{ $headerBadge := resources.Get "css/modules/header-badge.css" }}
+    {{ $articleList := resources.Get "css/modules/article-list.css" }}
+    {{ $toc := resources.Get "css/modules/toc.css" }}
+    {{ $footnotes := resources.Get "css/modules/footnotes.css" }}
+    {{ $article := resources.Get "css/modules/article.css" }}
+    {{ $typography := resources.Get "css/modules/typography.css" }}
+    {{ $codeTables := resources.Get "css/modules/code-tables.css" }}
+    {{ $home := resources.Get "css/modules/home.css" }}
+    {{ $copyFooter := resources.Get "css/modules/copy-footer.css" }}
+    {{ $bookshelf := resources.Get "css/modules/bookshelf.css" }}
+    {{ $darkMode := resources.Get "css/modules/dark-mode.css" }}
+    {{ $responsive := resources.Get "css/modules/responsive.css" }}
+    {{ $print := resources.Get "css/modules/print.css" }}
+    {{ $css := slice $critical $header $headerBadge $articleList $toc $footnotes $article $typography $codeTables $home $copyFooter $bookshelf $darkMode $responsive $print | resources.Concat "css/bundle.css" | resources.Minify | resources.Fingerprint }}
     <link rel="stylesheet" href="{{ $css.RelPermalink }}">
 
     <script>
         (function() {
             var t = localStorage.getItem('theme');
-            if (t === 'dark') document.documentElement.classList.add('dark');
-            else if (t === 'light') document.documentElement.classList.add('light');
+            if (t === 'dark') {
+                document.documentElement.classList.add('dark');
+            } else if (t === 'light') {
+                document.documentElement.classList.add('light');
+            } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.documentElement.classList.add('dark');
+            }
         })();
     </script>
 
-    {{ block "head" . }}{{ end }}
-</head>
+    {{ $navJs := resources.Get "js/nav.js" }}
+    {{ $themeJs := resources.Get "js/theme.js" }}
+    {{ $backToTopJs := resources.Get "js/back-to-top.js" }}
+    {{ $commonJs := slice $navJs $themeJs $backToTopJs | resources.Concat "js/common.js" | resources.Minify | resources.Fingerprint }}
+    <script src="{{ $commonJs.RelPermalink }}" defer></script>
+
