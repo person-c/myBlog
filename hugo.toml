@@ -1,17 +1,53 @@
 baseURL = "https://cying.org/"
 languageCode = "en-us"
-title = "Nightingale "
+title = "Nightingale"
+enableGitInfo = true
+
+[params]
+  description = "A personal blog about bioinformatics, R programming, statistics, and programming notes."
 
 [markup]
   [markup.goldmark.renderer]
     unsafe = true
   [markup.highlight]
-    noClasses = false       # 使用 CSS 类名，方便自定义样式
-    style = "monokai"       # 设置代码高亮主题（可选：monokai、dracula、github 等）
-    lineNumbers = true      # 显示行号
-    lineNumbersInTable = true # 行号显示在表格中
-    guessSyntax = true      # 自动猜测代码语言
+    anchorLineNos = false
+    codeFences = true
+    guessSyntax = true
+    lineNos = true
+    lineNumbersInTable = true
+    noClasses = false
+    style = "monokai"
 
 [module]
   [[module.imports]]
-    path = "github.com/person-c/Nothing" 
+    path = "github.com/person-c/Nothing"
+
+[menu]
+  [[menu.main]]
+    name = "Home"
+    url = "/"
+    weight = 1
+  [[menu.main]]
+    name = "About"
+    url = "/about/"
+    weight = 2
+  [[menu.main]]
+    name = "Blog"
+    url = "/blog/"
+    weight = 3
+  [[menu.main]]
+    name = "Note"
+    url = "/note/"
+    weight = 4
+  [[menu.main]]
+    name = "Slides"
+    url = "/slides/"
+    weight = 5
+  [[menu.main]]
+    name = "Books"
+    url = "/books/"
+    weight = 6
+  [[menu.main]]
+    name = "Search"
+    url = "/search/"
+    weight = 7

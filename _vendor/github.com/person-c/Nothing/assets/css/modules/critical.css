@@ -5,9 +5,9 @@
    ========================================================================== */
 
 :root {
-    --primary-color: #007bff;
+    --primary-color: #0066cc;
     --text-color: #333;
-    --text-color-light: #555;
+    --text-color-light: #444;
     --bg-color-light: #f8f9fa;
     --border-color: #ddd;
     --link-border-color: #ccc;
@@ -40,6 +40,8 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
 }
 
 
@@ -55,7 +57,7 @@ main {
 
 .layout {
     display: grid;
-    grid-template-columns: 20% auto 15%;
+    grid-template-columns: 1fr minmax(0, 800px) 1fr;
     gap: 1rem;
     align-items: flex-start;
     max-width: 1400px;
@@ -66,7 +68,6 @@ article {
     max-width: 800px;
     margin: 0 auto;
     padding: 1rem;
-    font-size-adjust: 0.49;
     min-width: 0;
 }
 

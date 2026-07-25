@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
-    initResponsiveFootnotes();
+    initSidenotes();
     initTableOfContents();
     initTocInteractivity();
     initTOCScrollSpy();
@@ -7,141 +7,72 @@ document.addEventListener("DOMContentLoaded", function () {
     initCodeCopyButtons();
 });
 
-function initResponsiveFootnotes() {
-    const footnoteRefs = document.querySelectorAll("a.footnote-ref");
-    const originalFootnotesDiv = document.querySelector("div.footnotes");
-    if (footnoteRefs.length === 0) return;
-    let resizeTimer;
-    function handleFootnotesLayout() {
-        if (originalFootnotesDiv) originalFootnotesDiv.style.display = "none";
-        cleanupDynamicFootnotes();
-        if (window.innerWidth > 1024) {
-            renderSidenotes(footnoteRefs);
-        } else {
-            renderInlineFootnotes(footnoteRefs);
+function initSidenotes() {
+    var refs = document.querySelectorAll("a.footnote-ref");
+    var footnotesDiv = document.querySelector("div.footnotes");
+    var container = document.querySelector("aside.footnotes");
+    if (refs.length === 0 || !footnotesDiv || !container) return;
+
+    function render() {
+        if (window.innerWidth <= 1024) {
+            footnotesDiv.style.display = "";
+            container.innerHTML = '';
+            return;
         }
-    }
-    window.addEventListener('resize', () => {
-        clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(handleFootnotesLayout, 250);
-    });
-    const article = document.querySelector("article");
-    if (article) {
-        let observerInitialized = false;
-        new ResizeObserver(() => {
-            if (!observerInitialized) {
-                observerInitialized = true;
-                return;
-            }
-            clearTimeout(resizeTimer);
-            resizeTimer = setTimeout(handleFootnotesLayout, 250);
-        }).observe(article);
-    }
+        footnotesDiv.style.display = "none";
+        container.innerHTML = '';
 
-    // Reflow after images load (they may shift sidenote positions)
-    document.querySelectorAll('article img').forEach(function (img) {
-        if (img.complete) return;
-        img.addEventListener('load', function () {
-            clearTimeout(resizeTimer);
-            resizeTimer = setTimeout(handleFootnotesLayout, 250);
-        });
-    });
+        var list = document.createElement("ul");
+        list.id = "dynamic-footnotes";
+        container.appendChild(list);
 
-    // Reflow after fonts are ready
-    if (document.fonts && document.fonts.ready) {
-        document.fonts.ready.then(function () {
-            setTimeout(handleFootnotesLayout, 100);
-        });
-    }
+        var items = [];
+        var containerTop = container.getBoundingClientRect().top + container.scrollTop;
 
-    handleFootnotesLayout();
-}
-function cleanupDynamicFootnotes() {
-    const leftSidenotesContainer = document.querySelector("aside.footnotes");
-    if (leftSidenotesContainer) leftSidenotesContainer.innerHTML = '';
-    document.querySelectorAll('.inserted-footnotes-container').forEach(c => c.remove());
-    document.querySelectorAll("a.footnote-ref").forEach(ref => ref.style.pointerEvents = 'auto');
-}
-function renderSidenotes(footnoteRefs) {
-    const container = document.querySelector("aside.footnotes");
-    if (!container) return;
-    const dynamicList = document.createElement("ul");
-    dynamicList.id = "dynamic-footnotes";
-    container.appendChild(dynamicList);
+        refs.forEach(function (ref, i) {
+            if (!ref.id) ref.id = 'fnref-' + (i + 1);
+            var footnoteId = ref.getAttribute("href").substring(1);
+            var fn = document.getElementById(footnoteId);
+            if (!fn) return;
 
-    // Assign IDs to refs for back-linking
-    footnoteRefs.forEach(function (ref, index) {
-        if (!ref.id) ref.id = 'fnref-' + (index + 1);
-    });
-
-    // First pass: create all items with their natural positions
-    const items = [];
-    const containerRect = container.getBoundingClientRect();
-    var containerTop = containerRect.top + container.scrollTop;
-    footnoteRefs.forEach(ref => {
-        const footnoteId = ref.getAttribute("href").substring(1);
-        const footnoteElement = document.getElementById(footnoteId);
-        if (footnoteElement) {
-            const listItem = document.createElement("li");
-            const contentClone = footnoteElement.cloneNode(true);
-            const backLink = contentClone.querySelector('.footnote-return');
+            var li = document.createElement("li");
+            var clone = fn.cloneNode(true);
+            var backLink = clone.querySelector('.footnote-backref');
             if (backLink) backLink.remove();
-            listItem.innerHTML = contentClone.innerHTML.trim();
-            listItem.style.position = "absolute";
-            dynamicList.appendChild(listItem);
+            li.innerHTML = clone.innerHTML.trim();
+            li.style.position = "absolute";
+            list.appendChild(li);
 
-            var backToRef = document.createElement('a');
-            backToRef.href = '#' + ref.id;
-            backToRef.className = 'sidenote-backlink';
-            backToRef.textContent = '↩';
-            backToRef.title = 'Back to reference';
-            listItem.appendChild(backToRef);
+            var back = document.createElement('a');
+            back.href = '#' + ref.id;
+            back.className = 'sidenote-backlink';
+            back.textContent = '↩';
+            back.title = 'Back to reference';
+            li.appendChild(back);
 
-            const refRect = ref.getBoundingClientRect();
-            const desiredTop = refRect.top - containerTop;
-            items.push({ li: listItem, desiredTop: desiredTop });
-        }
+            var refTop = ref.getBoundingClientRect().top;
+            items.push({ li: li, top: refTop - containerTop });
+        });
+
+        // Prevent overlap
+        var minGap = 10;
+        var prevBottom = -Infinity;
+        items.forEach(function (item) {
+            var h = item.li.getBoundingClientRect().height;
+            var t = item.top;
+            if (t < prevBottom + minGap) t = prevBottom + minGap;
+            item.li.style.top = t + 'px';
+            prevBottom = t + h;
+        });
+    }
+
+    var timer;
+    window.addEventListener('resize', function () {
+        clearTimeout(timer);
+        timer = setTimeout(render, 200);
     });
-
-    // Second pass: enforce minimum gap to prevent overlap
-    const minGap = 12;
-    let prevBottom = -Infinity;
-    items.forEach(item => {
-        const height = item.li.getBoundingClientRect().height;
-        let top = item.desiredTop;
-        if (top < prevBottom + minGap) {
-            top = prevBottom + minGap;
-        }
-        item.li.style.top = `${top}px`;
-        prevBottom = top + height;
-    });
+    render();
 }
-function renderInlineFootnotes(footnoteRefs) {
-    footnoteRefs.forEach(ref => {
-        const paragraph = ref.closest('p');
-        if (!paragraph) return;
-        let container = paragraph.nextElementSibling;
-        if (!container || !container.matches('.inserted-footnotes-container')) {
-            container = document.createElement('div');
-            container.className = 'inserted-footnotes-container';
-            container.innerHTML = '<ol></ol>';
-            paragraph.after(container);
-        }
-        const list = container.querySelector('ol');
-        const footnoteId = ref.getAttribute("href").substring(1);
-        const footnoteElement = document.getElementById(footnoteId);
-        if (footnoteElement && list) {
-            const contentClone = footnoteElement.cloneNode(true);
-            const backLink = contentClone.querySelector('.footnote-return');
-            if (backLink) backLink.remove();
-            const newLi = document.createElement('li');
-            newLi.innerHTML = contentClone.innerHTML.trim();
-            list.appendChild(newLi);
-            ref.style.pointerEvents = 'none';
-        }
-    });
-}
-
 
 /**
  * 模块二：生成目录 (TOC) - 已重构
@@ -216,6 +147,15 @@ function initTableOfContents() {
 
     tocContainer.appendChild(tocList);
 
+    // Update mobile TOC toggle with heading count
+    var mobileToggle = document.querySelector('.toc-mobile-toggle');
+    if (mobileToggle) {
+        var svg = mobileToggle.querySelector('svg');
+        var svgHTML = svg ? svg.outerHTML : '';
+        var countStr = headings.length + ' section' + (headings.length !== 1 ? 's' : '');
+        mobileToggle.innerHTML = svgHTML + ' ' + countStr;
+    }
+
     tocContainer.querySelectorAll('.collapsible').forEach(function (li) {
         li.classList.add('is-open');
         var btn = li.querySelector('.toc-toggle');
@@ -248,7 +188,6 @@ function initTableOfContents() {
 
         function hideToc() {
             layout.classList.add('toc-hidden');
-            tocAside.classList.add('hidden');
             floatBtn.classList.add('visible');
             localStorage.setItem('toc-hidden', 'true');
             recalcFullwidth();
@@ -256,7 +195,6 @@ function initTableOfContents() {
 
         function showToc() {
             layout.classList.remove('toc-hidden');
-            tocAside.classList.remove('hidden');
             floatBtn.classList.remove('visible');
             localStorage.setItem('toc-hidden', 'false');
             recalcFullwidth();

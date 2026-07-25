@@ -22,13 +22,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
         href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Noto+Serif+SC:wght@200..900&display=swap"
-        rel="stylesheet"
-        media="print" onload="this.media='all'">
-    <noscript>
-        <link
-            href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Noto+Serif+SC:wght@200..900&display=swap"
-            rel="stylesheet">
-    </noscript>
+        rel="stylesheet">
 
     {{ $critical := resources.Get "css/modules/critical.css" }}
     {{ $header := resources.Get "css/modules/header.css" }}
@@ -39,14 +33,22 @@
     {{ $article := resources.Get "css/modules/article.css" }}
     {{ $typography := resources.Get "css/modules/typography.css" }}
     {{ $codeTables := resources.Get "css/modules/code-tables.css" }}
-    {{ $home := resources.Get "css/modules/home.css" }}
     {{ $copyFooter := resources.Get "css/modules/copy-footer.css" }}
-    {{ $bookshelf := resources.Get "css/modules/bookshelf.css" }}
     {{ $darkMode := resources.Get "css/modules/dark-mode.css" }}
     {{ $responsive := resources.Get "css/modules/responsive.css" }}
     {{ $print := resources.Get "css/modules/print.css" }}
-    {{ $css := slice $critical $header $headerBadge $articleList $toc $footnotes $article $typography $codeTables $home $copyFooter $bookshelf $darkMode $responsive $print | resources.Concat "css/bundle.css" | resources.Minify | resources.Fingerprint }}
+    {{ $css := slice $critical $header $headerBadge $articleList $toc $footnotes $article $typography $codeTables $copyFooter $darkMode $responsive $print | resources.Concat "css/bundle.css" | resources.Minify | resources.Fingerprint }}
     <link rel="stylesheet" href="{{ $css.RelPermalink }}">
+
+    {{/* Page-specific CSS */}}
+    {{ if .IsHome }}
+    {{ $homeCss := resources.Get "css/modules/home.css" | resources.Minify | resources.Fingerprint }}
+    <link rel="stylesheet" href="{{ $homeCss.RelPermalink }}">
+    {{ end }}
+    {{ if eq .Section "books" }}
+    {{ $bookshelfCss := resources.Get "css/modules/bookshelf.css" | resources.Minify | resources.Fingerprint }}
+    <link rel="stylesheet" href="{{ $bookshelfCss.RelPermalink }}">
+    {{ end }}
 
     <script>
         (function() {
@@ -58,6 +60,28 @@
             } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
                 document.documentElement.classList.add('dark');
             }
+
+            window.__cycleTheme = function() {
+                var root = document.documentElement;
+                if (root.classList.contains('dark')) {
+                    root.classList.remove('dark');
+                    root.classList.add('light');
+                    localStorage.setItem('theme', 'light');
+                    return 'light';
+                } else if (root.classList.contains('light')) {
+                    root.classList.remove('light');
+                    localStorage.setItem('theme', 'auto');
+                    return 'auto';
+                } else {
+                    root.classList.add('dark');
+                    localStorage.setItem('theme', 'dark');
+                    return 'dark';
+                }
+            };
+
+            window.__getThemeIcon = function() {
+                return document.documentElement.classList.contains('dark') ? '☾' : '☀';
+            };
         })();
     </script>
 
