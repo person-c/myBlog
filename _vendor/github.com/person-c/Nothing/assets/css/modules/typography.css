@@ -5,7 +5,7 @@
 
 p {
     margin-top: 0;
-    margin-bottom: 1rem;
+    margin-bottom: 0.5lh;
 }
 
 .highlight+p,
@@ -21,22 +21,23 @@ h5,
 h6 {
     color: var(--text-color);
     line-height: 1.2;
-    margin-top: 1.5em;
+    margin-top: 2em;
     margin-bottom: 0.5em;
 }
 
 h1 {
-    font-size: clamp(1.4rem, 3vw, 1.8rem);
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+    letter-spacing: -0.01em;
 }
 
 h2 {
-    font-size: clamp(1.1rem, 2.5vw, 1.35rem);
+    font-size: clamp(1.2rem, 2.2vw, 1.5rem);
     padding-bottom: 0.3em;
     border-bottom: 1px solid var(--border-color);
 }
 
 h3 {
-    font-size: clamp(1rem, 2vw, 1.1rem);
+    font-size: clamp(1.05rem, 1.8vw, 1.2rem);
 }
 
 article>h1 {
@@ -82,7 +83,7 @@ article ol ul {
     display: flex;
     justify-content: flex-end;
     font-size: 0.8em;
-    color: #666;
+    color: var(--text-color-light);
     margin-top: 2em;
     font-style: italic;
 }
