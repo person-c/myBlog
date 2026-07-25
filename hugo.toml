@@ -1,22 +1,31 @@
 baseURL = "https://cying.org/"
 languageCode = "en-us"
 title = "Nightingale"
-enableGitInfo = true
 
-[params]
-  description = "A personal blog about bioinformatics, R programming, statistics, and programming notes."
+ignoreFiles = ["\\.Rmd$"]
 
 [markup]
   [markup.goldmark.renderer]
     unsafe = true
+  [markup.goldmark.extensions]
+    footnote = true
   [markup.highlight]
-    anchorLineNos = false
-    codeFences = true
-    guessSyntax = true
-    lineNos = true
-    lineNumbersInTable = true
     noClasses = false
     style = "monokai"
+    lineNumbers = true
+    lineNumbersInTable = true
+    guessSyntax = true
+
+[server]
+  watch = true
+
+enableGitInfo = true
+
+[outputs]
+  home = ["HTML", "RSS", "JSON"]
+
+[params]
+  description = "A personal blog about bioinformatics, R programming, statistics, and programming notes."
 
 [module]
   [[module.imports]]
@@ -51,3 +60,5 @@ enableGitInfo = true
     name = "Search"
     url = "/search/"
     weight = 7
+
+paginate = 10
