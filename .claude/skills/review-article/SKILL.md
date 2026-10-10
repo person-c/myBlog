@@ -131,6 +131,7 @@ Every block also carries `class="review-note"`, so annotations can be found and 
 - Separate the HTML block from surrounding Markdown with a blank line before and after
 - For multiple issues in the same section, use separate annotation blocks stacked together
 - Annotations are plain HTML to Hugo (`markup.goldmark.renderer.unsafe = true` in `hugo.toml`), so an annotation that gets committed becomes a **published** annotation. Clear them — or keep the review on a branch — before the change ships.
+- Quote the original in backticks, never as raw `$...$`: an annotation is published content, so math inside it obeys the litedown rules too — a snippet like `"$t_b \pm$"` will not render (see `docs/litedown.md`, "Math protection").
 
 #### Step 0: Run the deterministic checks
 
