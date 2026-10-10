@@ -51,6 +51,17 @@ Pipeline facts worth remembering:
 
 ---
 
+## Git conventions
+
+- **一个可独立验收或回滚的 task 一个提交。** 按 task 拆，不按文件拆：一个文件的改动若分属两个 task，用 hunk 级暂存分开（拆出只含目标 hunk 的部分补丁，`git apply --cached` 入索引，再用 `git diff --cached --stat` 对 `git diff --stat` 核对切分是否干净）。
+- **提交信息自带验收依据。** 首行 `type: 中文摘要`（`fix` / `docs` / `chore` / `content` …），正文用中文要点写清：改了什么、**怎么验证的**（命令、计数、渲染或预览结果）、还有什么遗留。任何一条提交都应能凭信息本身复核或回滚。AI 生成的提交以 `Co-Authored-By: Claude Code <noreply@anthropic.com>` 结尾。
+- **顺序：非 `content/` 先行，笔记/日志随后。** 工具、脚本、CI、CLAUDE.md 这类小改动先提交；`content/` 下的笔记、日志、文章正文单独成提交——重渲染过的 `.html` diff 动辄数千行，混在一起就没法单独回滚了。提交前用 `git status --short` 过一遍，别把生成产物（`public/`、`<input>__files/`）或临时文件带上。
+- **笔记的 `.Rmd` 与它的 `.html` 必须同一提交。** `hugo.toml` 忽略 `.Rmd`，线上页面就是那个 `.html`；只提交一边会让源文件与线上不一致。提交前跑 `scripts/check-math.R`、`scripts/check-meta.R`，需要看效果时用 `scripts/preview.sh`。
+- **有意保留的发布态批注要在提交信息里写明**（几块、在哪个文件）：批注是发布策略（见上文），写明才不会被后人误当成漏清理。
+- **不主动 push。** push 到 `main` 会触发 Vercel 生产发布（cying.org），属对外动作，等明确要求再做；本地先累积几个提交是常态。push 前想复核整站，用 `hugo server --noHTTPCache --disableFastRender`。
+
+---
+
 ## Writing conventions
 
 ### litedown math rules (`.Rmd`)
