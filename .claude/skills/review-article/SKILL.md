@@ -44,7 +44,7 @@ Review depth is determined by the content section. Apply the correct intensity b
 
 ## Checklist: code and metadata
 
-The per-language checklists (R, Python) and the front-matter rules are in `references/code-checks.md` — read it whenever the article contains code or YAML front matter, which is almost always. The litedown math rules are in CLAUDE.md, and `scripts/check-math.R` / `scripts/check-meta.R` implement both checks mechanically.
+The per-language checklists (R, Python) and the front-matter rules are in `references/code-checks.md` — read it whenever the article contains code or YAML front matter, which is almost always. The litedown math rules are in `docs/litedown.md` — read its "Math protection" section when a formula may not render; `scripts/check-math.R` and `scripts/check-meta.R` implement both checks mechanically.
 
 ## Workflow
 

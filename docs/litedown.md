@@ -1,6 +1,6 @@
 # litedown: rendering notes and slides
 
-Reference material for this repo's notes (`content/note/*.Rmd` → `.html`) and slide decks. `CLAUDE.md` keeps the rules; the recipes and gotchas live here.
+Reference material for this repo's notes (`content/note/*.Rmd` → `.html`) and slide decks. `CLAUDE.md` keeps the project-level rules and points here; everything litedown-specific — its option rules, the math-protection rules, recipes and gotchas — lives here. Read it when rendering a note or fixing a formula.
 
 Authoritative source: the source clone at `reference/litedown/` (gitignored; re-clone from https://github.com/yihui/litedown if missing).
 
@@ -18,6 +18,16 @@ Authoritative source: the source clone at `reference/litedown/` (gitignored; re-
 - The device is set with `reactor(dev = "svg")`.
 - Code folding is `meta: js: ["@fold-details"]` in the YAML header.
 - `fig.align` does not exist; figures are centred by default.
+
+## Math protection
+
+litedown delegates math protection to `xfun::protect_math()`, which shields only the math that matches xfun's heuristics. Anything else is handed to the Markdown parser as ordinary text and silently corrupted (`\\` → `\`, `\,` → `,`, `\|` → `|`, `^` → `<sup>`, `_` → `<em>`, `'` → `’`, and a lone `=` line turns the preceding lines into a setext heading). Since KaTeX auto-render accepts only `$$…$$`, `\(…\)` and `\[…\]`, the formula then fails to render at all in the browser. Flag every violation as `[Render]`.
+
+- Inline `$...$`: the opening `$` must be preceded by whitespace, an ASCII `(`, or the start of a line. Flag as `[Render]` — `、$LU$`、`：$C$`、`（$A$ 可逆）` are all broken, because a full-width `（` is not `(`, and CJK punctuation is not whitespace. The closing `$` must not be followed by a digit, and no space may sit just inside either delimiter. **Fix:** insert one space before the `$` (this is also the standard gap between Chinese text and Western symbols).
+- Display `$$...$$`: a multi-line block is protected only when the opening `$$` is glued to its content and the closing `$$` is glued to the end of the last content line — `$$\begin{aligned}` … `\end{aligned}$$`. A `$$` alone on its own line is never protected. Flag as `[Render]`. **Fix:** move the delimiters onto the content lines. (xfun's own documentation says multi-line `$$…$$` is supported, so this is a tool limitation to code around, not an error in the author's LaTeX.)
+- Never settle for repairing the rendered `.html` — it is generated output, and `litedown::roam()` re-renders the `.Rmd` live without writing `.html` at all. Fix the `.Rmd` and re-render.
+- Exact check: `Rscript scripts/check-math.R <file>` — the same rule, computed with `xfun::protect_math()` + `xfun::prose_index()`, plus the display blocks whose `$$` sits alone on its line.
+- Reference: `?xfun::protect_math` (Details) and `xfun:::escape_math()`; rules verified against litedown 0.10.1 / xfun 0.56 (an `.Rmd` that satisfies them renders with zero mis-converted formulas).
 
 ## Output files
 

@@ -43,7 +43,7 @@ sh scripts/preview.sh content/note/foo.Rmd     # reuse or start the litedown pre
 
 Pipeline facts worth remembering:
 
-- Notes are rendered by **litedown** (`litedown::fuse()` — knitr + markdown in one step), **not** Quarto or rmarkdown: chunk options are litedown's own and dotted, and global defaults go through `litedown::reactor()` — Quarto's equivalents are silently ignored. The authoritative reference is the source clone at `reference/litedown/` (gitignored; re-clone from https://github.com/yihui/litedown if missing). Recipes and gotchas — option names, devices, code folding, the plotly JS route, `<input>__files/` — are in `docs/litedown.md`.
+- Notes are rendered by **litedown** (`litedown::fuse()` — knitr + markdown in one step), **not** Quarto or rmarkdown: its chunk options and global defaults (`litedown::reactor()`) are its own, so Quarto's equivalents are silently ignored. Everything litedown-specific — option and device rules, code folding, the math-protection rules that decide whether a formula renders at all, the plotly JS route, `<input>__files/` — is in **`docs/litedown.md`**: read it when rendering a note or touching math or figures. The source clone is at `reference/litedown/` (gitignored; re-clone from https://github.com/yihui/litedown if missing).
 - `hugo.toml` sets `ignoreFiles = ["\\.Rmd$"]`: the `.Rmd` is never built, so the rendered **`.html` is the published page and has to be committed**. Editing the `.Rmd` alone changes nothing online until it is re-rendered.
 - Production builds run on Vercel, with the Hugo version pinned in `vercel.json`. `hugo mod get -u` upgrades every module including the theme; the pinned version lives in `go.mod`, not here.
 
@@ -61,16 +61,6 @@ Pipeline facts worth remembering:
 ---
 
 ## Writing conventions
-
-### litedown math rules (`.Rmd`)
-
-litedown delegates math protection to `xfun::protect_math()`, which shields only the math that matches xfun's heuristics. Anything else is handed to the Markdown parser as ordinary text and silently corrupted (`\\` → `\`, `\,` → `,`, `\|` → `|`, `^` → `<sup>`, `_` → `<em>`, `'` → `’`, and a lone `=` line turns the preceding lines into a setext heading). Since KaTeX auto-render accepts only `$$…$$`, `\(…\)` and `\[…\]`, the formula then fails to render at all in the browser. Flag every violation as `[Render]`.
-
-- Inline `$...$`: the opening `$` must be preceded by whitespace, an ASCII `(`, or the start of a line. Flag as `[Render]` — `、$LU$`、`：$C$`、`（$A$ 可逆）` are all broken, because a full-width `（` is not `(`, and CJK punctuation is not whitespace. The closing `$` must not be followed by a digit, and no space may sit just inside either delimiter. **Fix:** insert one space before the `$` (this is also the standard gap between Chinese text and Western symbols).
-- Display `$$...$$`: a multi-line block is protected only when the opening `$$` is glued to its content and the closing `$$` is glued to the end of the last content line — `$$\begin{aligned}` … `\end{aligned}$$`. A `$$` alone on its own line is never protected. Flag as `[Render]`. **Fix:** move the delimiters onto the content lines. (xfun's own documentation says multi-line `$$…$$` is supported, so this is a tool limitation to code around, not an error in the author's LaTeX.)
-- Never settle for repairing the rendered `.html` — it is generated output, and `litedown::roam()` re-renders the `.Rmd` live without writing `.html` at all. Fix the `.Rmd` and re-render.
-- Exact check: `Rscript scripts/check-math.R <file>` — the same rule, computed with `xfun::protect_math()` + `xfun::prose_index()`, plus the display blocks whose `$$` sits alone on its line.
-- Reference: `?xfun::protect_math` (Details) and `xfun:::escape_math()`; rules verified against litedown 0.10.1 / xfun 0.56 (an `.Rmd` that satisfies them renders with zero mis-converted formulas).
 
 ### Site conventions
 

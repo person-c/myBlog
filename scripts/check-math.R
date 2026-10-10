@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 
 # Check .Rmd files for math that litedown will not protect, and that therefore
-# will not render in the browser.  See CLAUDE.md, "litedown math checks".
+# will not render in the browser.  See docs/litedown.md, "Math protection".
 #
 # Usage: Rscript scripts/check-math.R [file-or-dir ...]      (default: content)
 # Exit status: 0 = clean, 1 = findings.
@@ -71,7 +71,7 @@ cat(sprintf(
   n_inline, n_display, length(files)
 ))
 if (n_inline + n_display > 0) {
-  cat("Fix the .Rmd (see CLAUDE.md), then re-render with litedown::fuse().\n")
+  cat("Fix the .Rmd (see docs/litedown.md), then re-render with litedown::fuse().\n")
   quit(status = 1)
 }
 cat("all clear\n")

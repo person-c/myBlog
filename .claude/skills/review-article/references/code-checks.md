@@ -48,4 +48,4 @@ Every Hugo content file begins with YAML front matter. Verify correctness before
 
 ## litedown math
 
-The rules are in CLAUDE.md ("litedown math rules") — always in context, so not duplicated here. `Rscript scripts/check-math.R <file>` runs the mechanical check.
+The rules are in `docs/litedown.md`, section "Math protection" — read it when a formula may not render; not duplicated here. `Rscript scripts/check-math.R <file>` runs the mechanical check.
