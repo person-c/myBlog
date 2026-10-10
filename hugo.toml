@@ -64,4 +64,8 @@ enableGitInfo = true
     url = "/search/"
     weight = 7
 
-paginate = 10
+# Hugo v0.128 removed the top-level `paginate` key: it is accepted and silently
+# ignored, and the paginator falls back to the built-in default of 10.  The two
+# happened to agree here, so the dead key looked correct.  This is the live form.
+[pagination]
+  pagerSize = 10

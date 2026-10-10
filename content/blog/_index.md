@@ -1,4 +1,3 @@
----
+﻿---
 layout: daily_work
 ---
-
