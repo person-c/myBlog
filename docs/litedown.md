@@ -15,9 +15,17 @@ Authoritative source: the source clone at `reference/litedown/` (gitignored; re-
 
 - Options are litedown's own and dotted — `fig.cap`, `fig.width`, `fig.height`. Quarto's `fig-cap:`, `code-fold:`, `fig-format:` are silently ignored; do not introduce them.
 - Global defaults go through `litedown::reactor()`, **not** `knitr::opts_chunk$set()` — litedown never consults the latter.
-- The device is set with `reactor(dev = "svg")`.
+- The device is set with `reactor(dev = "svglite::svglite")` — spelled out, never plain `"svg"`; see the SVG pitfall below.
 - Code folding is `meta: js: ["@fold-details"]` in the YAML header.
 - `fig.align` does not exist; figures are centred by default.
+
+### SVG figures must use svglite, not cairo
+
+`grDevices::svg()` (cairo) writes every glyph as a `<defs>` entry with an id such as `id="glyph-0-0"`. HTML ids have to be unique per document, and `fuse()` inlines each figure's SVG into the page as markup — so a note with several cairo figures repeats the same id set once per figure. Measured on the linear-algebra note: 7 figures, `id="glyph-0-0"` present 7 times, 432 `<use xlink:href="#glyph-…">` references resolving against just 42 distinct ids. Every figure then renders with the *first* figure's glyphs: titles and axis numbers come out garbled and overlapping.
+
+`svglite` writes `<text>` with a font family and no per-glyph ids, so inlining is safe. Set `dev = "svglite::svglite"` rather than `"svg"`: knitr maps `"svg"` to svglite *only when the package is installed* and silently falls back to cairo otherwise, so the explicit name turns a missing package into an error instead of a garbled page. svglite is therefore part of the environment for notes with figures; it also makes the files smaller (the linear-algebra page went from 592 KB to 388 KB).
+
+`litedown::roam()` does not inline resources (`embed_resources = FALSE` in `R/preview.R`), so figures there stay separate documents and look correct either way — **a page that looks right in roam can still be broken once fused**. Check the produced `.html`, not only the preview.
 
 ## Math protection
 
