@@ -14,6 +14,7 @@ Authoritative source: the source clone at `reference/litedown/` (gitignored; re-
 ## Chunk options and global defaults
 
 - Options are litedown's own and dotted — `fig.cap`, `fig.width`, `fig.height`. Quarto's `fig-cap:`, `code-fold:`, `fig-format:` are silently ignored; do not introduce them.
+- In the YAML, mark options go under `output: html: options:` — `toc: {depth: 3}`, `number_sections: true`, and so on. Quarto's `format: html: toc:` / `toc-depth:` / `number-sections:` sit at the wrong level *and* hyphenate, so they are silently ignored: a note asking for a TOC in that shape gets none and looks fine otherwise. `format: html: meta:` *is* honoured, which is where `js: ["@fold-details"]` goes.
 - Global defaults go through `litedown::reactor()`, **not** `knitr::opts_chunk$set()` — litedown never consults the latter.
 - The device is set with `reactor(dev = "svglite::svglite")` — spelled out, never plain `"svg"`; see the SVG pitfall below.
 - Code folding is `meta: js: ["@fold-details"]` in the YAML header.
