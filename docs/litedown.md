@@ -48,6 +48,14 @@ litedown builds TOC text from the heading's markdown and unescapes it, so `\(` �
 
 Workaround in use: keep math out of headings — write them as plain text (`## 任意矩阵（m×n）：行最简形、零空间与四个基本子空间`, `## A = U Σ Vᵀ`), which the TOC reproduces verbatim. Unicode (×, Σ, Λ, ⁻¹, ᵀ) renders in the default sans-serif stack; verify new symbols before relying on them.
 
+### Captions and in-figure labels
+
+Captions go through the same unescaping as headings, so `\(…\)` cannot appear in them either — a `fig.cap` string and a raw `<div class="caption">` both end up with the delimiters eaten. `$$…$$` survives (no backslashes), and KaTeX's auto-render (the settings @xiee/utils ships have no custom `delimiters`, so the defaults apply — `$$…$$`, `\[…\]`, `\(…\)`, and **no** single `$`) renders it as *display* math, which breaks a caption into lines. The note therefore carries a small CSS chunk: `.caption .katex-display { display: inline-block; margin: 0; }`.
+
+For a `fig.cap` **chunk option**, backslashes must be doubled (`$$x \\to V^{\\mathrm{T}} x$$`) — the option value is parsed as an R string, where a single `\t` is an unknown escape and kills the render. Inside a raw HTML caption block single backslashes are fine.
+
+Inside figures, **plotmath does not work with svglite**: `expression(V^"T" * x)` renders its glyphs superimposed, at any position (tested 2026-10-10). Plain Unicode text does work, spacing included — `Vᵀx`, `ΣVᵀx`, `x₁a₁`, `λ = 1.5`, `A e₁`, `|det A|` all measure and render correctly. So labels stay text: Unicode for sub/superscripts and Greek, and the *caption* carries anything that needs real typesetting.
+
 ## Math protection
 
 litedown delegates math protection to `xfun::protect_math()`, which shields only the math that matches xfun's heuristics. Anything else is handed to the Markdown parser as ordinary text and silently corrupted (`\\` → `\`, `\,` → `,`, `\|` → `|`, `^` → `<sup>`, `_` → `<em>`, `'` → `’`, and a lone `=` line turns the preceding lines into a setext heading). Since KaTeX auto-render accepts only `$$…$$`, `\(…\)` and `\[…\]`, the formula then fails to render at all in the browser. Flag every violation as `[Render]`.
