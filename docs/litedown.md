@@ -40,6 +40,14 @@ litedown::vest(css = '@article', js = c('@sidenotes', '@toc-highlight'))
 
 The assets arrive as `<link>`/`<script>` tags pointing at the CDN (like the plotly script), so nothing extra has to be committed; with no network the article is simply unstyled. `@article` only *moves* the TOC — the TOC itself comes from the `toc` mark option above.
 
+### TOC entries cannot carry math
+
+litedown builds TOC text from the heading's markdown and unescapes it, so `\(` … `\)` come back as `(` … `)`. A heading written `### $LU$ 分解` renders in the body as `\(LU\) 分解` (fine) while its TOC entry reads `(LU) 分解`; `$A_{m\times n}$` becomes `(A_{m\times n})`. The delimiters are gone, so KaTeX has nothing to render and the TOC shows parenthesised LaTeX. Literal `\(LU\)` in the source is worse — it is unescaped in the *heading* too.
+
+`$$…$$` is the only form that survives into the TOC (no backslash escapes to eat), but both the heading and the TOC entry then typeset it as *display* math: a centred, oversized block inside a TOC line.
+
+Workaround in use: keep math out of headings — write them as plain text (`## 任意矩阵（m×n）：行最简形、零空间与四个基本子空间`, `## A = U Σ Vᵀ`), which the TOC reproduces verbatim. Unicode (×, Σ, Λ, ⁻¹, ᵀ) renders in the default sans-serif stack; verify new symbols before relying on them.
+
 ## Math protection
 
 litedown delegates math protection to `xfun::protect_math()`, which shields only the math that matches xfun's heuristics. Anything else is handed to the Markdown parser as ordinary text and silently corrupted (`\\` → `\`, `\,` → `,`, `\|` → `|`, `^` → `<sup>`, `_` → `<em>`, `'` → `’`, and a lone `=` line turns the preceding lines into a setext heading). Since KaTeX auto-render accepts only `$$…$$`, `\(…\)` and `\[…\]`, the formula then fails to render at all in the browser. Flag every violation as `[Render]`.
