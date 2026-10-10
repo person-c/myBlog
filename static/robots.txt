@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+# The search page is a client-side shell: it renders results from /index.json
+# with JavaScript and has no content of its own, so there is nothing to index.
+Disallow: /search/
+
+Sitemap: https://cying.org/sitemap.xml

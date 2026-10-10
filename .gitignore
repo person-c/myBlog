@@ -1,4 +1,6 @@
 /public
+# Hugo writes this while building; it is a lock file, not a source
+/.hugo_build.lock
 # litedown writes plot files to <input>__files/ and inlines them in the HTML --
 # generated output, not a source (see docs/litedown.md)
 *__files/
