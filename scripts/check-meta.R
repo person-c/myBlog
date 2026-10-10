@@ -31,13 +31,18 @@ if (length(files) == 0) {
 }
 
 # Fields Hugo itself defines; anything else is reported for the reviewer to judge.
+# The tail of the list is not Hugo: 'output' / 'vignette' are litedown/R Markdown
+# header keys (docs/litedown.md -- mark options live under `output: html: options:`),
+# and 'author' / 'file' belong to the book pages.  Hugo ignores them, so reporting
+# them as unknown on every run only hides the fields that are genuinely new.
 known <- c(
   "title", "linkTitle", "subtitle", "date", "lastmod", "publishDate", "expiryDate",
   "draft", "categories", "tags", "keywords", "series", "description", "summary",
   "slug", "url", "aliases", "weight", "type", "layout", "menu", "params", "cascade",
   "outputs", "markup", "toc", "headless", "_build", "hidden", "lang", "format",
   "images", "cover", "license", "comment", "featured",
-  "translationKey", "math", "bibliography", "csl"
+  "translationKey", "math", "bibliography", "csl",
+  "output", "vignette", "author", "file"
 )
 
 n_err <- 0L
@@ -87,20 +92,32 @@ for (f in files) {
   }
 
   # date: present, ISO 8601 YYYY-MM-DD, and matching the filename prefix
+  #
+  # An .Rmd is exempt from the ISO 8601 rule: it is rendered by litedown, never
+  # by Hugo (hugo.toml ignores *.Rmd), and its date is routinely the evaluated
+  # expression `{r} Sys.Date()`, which litedown resolves at render time.  Only
+  # the rendered .html reaches Hugo, and that carries no front matter at all.
   d <- meta$date
   ds <- NULL
+  is_rmd <- grepl("[.][Rr]md$", f)
   if (is.null(d)) {
     err(f, "missing 'date'")
   } else {
     ds <- if (inherits(d, "Date")) format(d, "%Y-%m-%d") else as.character(d)
-    if (!grepl("^[0-9]{4}-[0-9]{2}-[0-9]{2}$", ds) || is.na(suppressWarnings(as.Date(ds)))) {
+    if (is_rmd && grepl("^`\\{r", ds)) {
+      note(f, sprintf("'date' is an evaluated litedown expression: %s", ds))
+      ds <- NULL
+    } else if (!grepl("^[0-9]{4}-[0-9]{2}-[0-9]{2}$", ds) || is.na(suppressWarnings(as.Date(ds)))) {
       err(f, sprintf("'date' is not ISO 8601 (YYYY-MM-DD): %s", ds))
       ds <- NULL
     }
   }
+  # A filename/date difference is a note, not an error: the filename records when
+  # the file was created, the front matter when the author dates the piece, and
+  # the two legitimately differ (2022-06-25-adr-fundataion.md is dated 2022-06-22).
   m <- regmatches(basename(f), regexpr("^[0-9]{4}-[0-9]{2}-[0-9]{2}", basename(f)))
   if (length(m) == 1 && !is.null(ds) && m != ds) {
-    err(f, sprintf("'date' (%s) does not match the filename (%s)", ds, m))
+    note(f, sprintf("'date' (%s) differs from the filename (%s)", ds, m))
   }
 
   # draft: must be a real boolean, not the string "true"

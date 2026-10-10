@@ -35,13 +35,20 @@ n_display <- 0L
 for (f in files) {
   x <- xfun::read_utf8(f)
 
-  # Inline math: after xfun::protect_math() the delimiters of every formula it
-  # protects are rewritten, so any single '$' still left in the prose is a
-  # formula litedown will hand to the Markdown parser.  prose_index() keeps the
-  # R code chunks out, where '$' is the extract operator.
+  # Inline math: xfun::protect_math() wraps every formula it protects in a code
+  # span, so a single '$' still left in the prose is a formula litedown will hand
+  # to the Markdown parser, where it degrades to literal text and is never
+  # typeset.  prose_index() keeps the R code chunks out, where '$' is the extract
+  # operator.
+  #
+  # Backtick code spans are masked first: a single '$' inside one is a literal
+  # character that KaTeX never sees, so it cannot be a rendering fault.  The
+  # review annotations discuss this rule in prose and quote the delimiters as
+  # (`$...$`), which would otherwise be reported as a finding on every run.
   prose <- xfun::prose_index(x)
   protected <- xfun::protect_math(x)
-  left <- gsub("[$][$]", "", protected[prose])
+  masked <- gsub("`[^`]*`", "", protected[prose])
+  left <- gsub("[$][$]", "", masked)
   hit <- which(grepl("[$]", left))
   if (length(hit) > 0) {
     lines <- prose[hit]

@@ -1,2 +1,7 @@
 # Git Bash chokes on CRLF in shell scripts; keep them LF in every checkout.
 *.sh text eol=lf
+
+# Same reason for the Rscript shebang scripts, and CI runs them on Linux: without
+# this pin a Windows checkout (core.autocrlf=true) rewrites them to CRLF and every
+# later edit reports the whole file as changed.
+*.R text eol=lf
