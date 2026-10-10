@@ -7,7 +7,8 @@ name: annotation guard
 #
 #   * .md files: Hugo renders raw HTML (markup.goldmark.renderer.unsafe = true),
 #     so every annotation block in a .md file is live on the site.
-#   * .Rmd files: litedown drops raw HTML, so those annotations never ship.
+#   * .Rmd files: litedown passes raw HTML through as well, so those annotations
+#     ship as soon as the .Rmd is re-rendered into the .html the site publishes.
 #
 # To remove them anyway: scripts/clear-review-notes.sh content
 
@@ -27,5 +28,5 @@ jobs:
             echo "::notice title=Published annotations::Annotation blocks in .md files are rendered on the site (intentional -- see CLAUDE.md)."
           fi
 
-      - name: Annotations in the sources (.Rmd, not published)
+      - name: Annotations in the sources (.Rmd)
         run: sh scripts/clear-review-notes.sh --check || true

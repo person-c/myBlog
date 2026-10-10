@@ -11,9 +11,9 @@
 #
 # Why .md is the one that matters: Hugo renders .md with
 # markup.goldmark.renderer.unsafe = true, so a committed annotation is a
-# *published* annotation.  litedown drops raw HTML when it renders .Rmd ->
-# .html, so annotations in an .Rmd never reach the site -- they only clutter the
-# source (and they carry the litedown math problem, see CLAUDE.md).
+# *published* annotation.  Raw HTML passes through litedown too, so annotations
+# in an .Rmd also reach the page once that .Rmd is re-rendered -- .md is simply
+# where they are guaranteed live already.
 #
 # An annotation is a <div> whose opening tag carries class="review-note" or the
 # palette signature of the review templates (border-left: 4px solid #<palette>).
