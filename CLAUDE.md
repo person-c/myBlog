@@ -48,6 +48,14 @@ make check-all                                 # + check-fresh (re-renders; read
 sh scripts/preview.sh content/note/foo.Rmd     # reuse or start the litedown preview server
 ```
 
+On Windows, `make` may pick up Rtools' `sh.exe` as its shell (measured here: `make -p`
+reports `SHELL := C:/rtools45/usr/bin/sh.exe`). The recipes are written to need no shell
+syntax at all, so pointing make at cmd is enough if that sh misbehaves:
+
+```powershell
+make SHELL=cmd.exe check
+```
+
 The individual scripts, if you want one at a time:
 
 ```sh
