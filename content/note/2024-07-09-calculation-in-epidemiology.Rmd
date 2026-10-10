@@ -1,6 +1,10 @@
 ---
 title: "Calculations in Epidemiology"
 date: "`{r} Sys.Date()`"
+output:
+  html:
+    meta:
+      lang: "zh-CN"
 ---
 
 ## 样本量估算 (Sample Size Calculation)

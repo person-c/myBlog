@@ -1,13 +1,13 @@
 ---
 title: "Introduction to linear algebra"
 date: "2025-09-02"
-lang: zh
 output:
   html:
     options:
       toc:
         depth: 3
     meta:
+      lang: "zh-CN"
       js: ["@fold-details"]
 ---
 

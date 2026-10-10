@@ -5,6 +5,7 @@ date: "`{r} Sys.Date()`"
 output:
   html:
     meta:
+      lang: "zh-CN"
       css: ["@default", "@snap", "@key-buttons", "@heading-anchor"]
       js: ["@snap", "@key-buttons", "@external-link", "@heading-anchor"]
     options:
