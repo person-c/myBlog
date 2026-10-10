@@ -12,7 +12,7 @@ date: "`{r} Sys.Date()`"
 **Critical issues:**
 1. Two-sample normal distribution mean: $\mu_1 - \mu_1$ should be $\mu_1 - \mu_2$ (Theorem 4)
 2. ANOVA decomposition uses $Y_i$ (ambiguous) instead of $\bar{Y}_i$ (group mean) throughout
-3. Incorrect LaTeX subscript placement in Dunnett-$t$ formula: `\frac{1}{n}_i` should be `\frac{1}{n_i}`
+3. Incorrect LaTeX subscript placement in Dunnett $t$ formula: `\frac{1}{n}_i` should be `\frac{1}{n_i}`
 
 **Annotations:** 9 issues flagged — see inline blocks below.
 
@@ -159,14 +159,14 @@ $P(A_1 \cap A_2 \cap ... \cap A_n) = P(A_1)P(A_2|A_1)P(A_3|A_1 \cap A_2) ... P(A
 
 ### 6. 全概率公式与贝叶斯定理：推断的核心
 
-*   **全概率公式:** 正是前述“事件投影”思想的概率体现。如果 {$B_i$} 是样本空间的一个分割 (一组完备正交基)，那么任何事件 A 的总概率等于其在各个基上的投影的概率之和—— $P(A|B_i)$ 是其在基 $B_i$ 上的投影概率，而 $P(B_i)$ 是基 $B_i$ 的权重。
+*   **全概率公式:** 正是前述“事件投影”思想的概率体现。如果 $B_i$ 是样本空间的一个分割 (一组完备正交基)，那么任何事件 A 的总概率等于其在各个基上的投影的概率之和—— $P(A|B_i)$ 是其在基 $B_i$ 上的投影概率，而 $P(B_i)$ 是基 $B_i$ 的权重。
     $P(A) = \sum_{i} P(A \cap B_i) = \sum_{i} P(A|B_i)P(B_i)$
 
 *   **贝叶斯定理:** 是统计推断的灵魂，它将“执果索因”的过程数学化。
     $P(B_i|A) = \frac{P(A \cap B_i)}{P(A)} = \frac{P(A|B_i)P(B_i)}{P(A)} = \frac{P(A|B_i)P(B_i)}{\sum_{j} P(A|B_j)P(B_j)}$
-    *   **$P(B_i)$: 先验概率 (Prior)**，在看到证据 A 之前，我们对原因 $B_i$ 的信念。
-    *   **$P(A|B_i)$: 似然 (Likelihood)**，在原因 $B_i$ 成立的条件下，观察到证据 A 的可能性。
-    *   **$P(B_i|A)$: 后验概率 (Posterior)**，在看到证据 A 之后，我们对原因 $B_i$ 更新后的信念。
+    *   <strong>先验概率 (Prior) $P(B_i)$</strong>，在看到证据 A 之前，我们对原因 $B_i$ 的信念。
+    *   <strong>似然 (Likelihood) $P(A|B_i)$</strong>，在原因 $B_i$ 成立的条件下，观察到证据 A 的可能性。
+    *   <strong>后验概率 (Posterior) $P(B_i|A)$</strong>，在看到证据 A 之后，我们对原因 $B_i$ 更新后的信念。
 
 > 贝叶斯更新过程的直观理解：这是一个信念迭代更新的循环。我们从一个初始的”先验”信念出发，当”新证据”出现时，我们利用”似然”来评估证据在不同假设下的支持度，最终得到一个融合了先验知识和新证据的、更可靠的”后验”信念——我们已知的条件是先验概率，以及似然概率；当结果 A 出现后就会更新我们的先验概率 $B_i$。
 
@@ -408,9 +408,7 @@ From [wikipedia](https://en.wikipedia.org/wiki/Student%27s_t-test#Assumptions):
 
 我们知道 $t$ 分布的构造定义如下：
 
-$$
-\frac{X}{\sqrt{\chi_{(n - 1)}/{(n-1)}}}, \text{where} X \sim \mathcal{N}(0, 1)
-$$
+$$ \frac{X}{\sqrt{\chi_{(n - 1)}/{(n-1)}}}, \text{where} X \sim \mathcal{N}(0, 1) $$
 
 从 $t$ 的构造中可知,我们需要一个 $X \sim \mathcal{N}(0, 1)$ 的正态变量；而在大样本情况下, 依据中心极限定理,样本均值总是符合正态分布。 进一步地,依据大数定理, $s^2 \approx \sigma^2$ , 所以直接用 $s$ 替代 $\sigma$ 可以进行 $z$ 检验。实际上,在大样本下如下公式总是成立的：
 
@@ -602,7 +600,7 @@ $t_D$ 统计量处理组与对照组的比较,该统计量的计算如下：
 
 <div style="border-left: 4px solid #e53e3e; padding: 0.5em 1em; margin: 1em 0; background: #fff5f5;">
 
-**[Accuracy]** The LaTeX subscript in the Dunnett-$t$ formula was misplaced: `\frac{1}{n}_i` renders the subscript $i$ on the entire fraction, not on $n$. Should be `\frac{1}{n_i}`.
+**[Accuracy]** The LaTeX subscript in the Dunnett $t$ formula was misplaced: `\frac{1}{n}_i` renders the subscript $i$ on the entire fraction, not on $n$. Should be `\frac{1}{n_i}`.
 
 **Principle:** In LaTeX math mode, `\frac{1}{n}_i` places the subscript after the fraction box, producing $(1/n)_i$, while `\frac{1}{n_i}` produces $1/n_i$, which is the intended notation for the reciprocal of the $i$-th group's sample size.
 
