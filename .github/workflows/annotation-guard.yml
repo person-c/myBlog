@@ -1,0 +1,25 @@
+name: annotation guard
+
+# Review annotations are written straight into content files.
+#   * In .md files Hugo renders them (markup.goldmark.renderer.unsafe = true),
+#     so a committed annotation is a PUBLISHED annotation -- this job blocks it.
+#   * In .Rmd files litedown drops raw HTML, so they never reach the site; the
+#     informational step just lists them.
+# See scripts/clear-review-notes.sh and .claude/skills/review-article/SKILL.md.
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  review-notes:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Annotations that the site would publish (.md)
+        run: sh scripts/clear-review-notes.sh --published
+
+      - name: Annotations elsewhere (informational)
+        if: always()
+        run: sh scripts/clear-review-notes.sh --check || true

@@ -12,11 +12,11 @@ Applies to every `.md`/`.Rmd` that contains code or front matter.
 - `library()` vs `require()`: `require()` returns a logical and silently masks missing packages — flag as `[Accuracy]` if used where `library()` (which errors loudly) is more appropriate. In non-interactive/knitr contexts, `library()` should be preferred.
 - Assignment operator: Using `=` for assignment (rather than `<-`) in non-argument contexts — flag as `[Suggestion]`. Per the Tidyverse Style Guide (Tier 3), prefer `<-`.
 - `sapply()` vs `vapply()`: `sapply()` returns unpredictable types (list vs. vector) depending on input. If the expected output type is known, flag as `[Suggestion]` to use `vapply()` with an explicit `FUN.VALUE`.
-- Stray `setwd()`: Calling `setwd()` inside a knitr document is fragile and breaks portability. Flag as `[Accuracy]`.
+- Stray `setwd()`: Calling `setwd()` inside a knitr document is fragile and breaks portability. Flag as `[Repro]`.
 - Unqualified `:::` (triple-colon): Using `pkg:::unexported_fun()` relies on non-API internals. Flag as `[Suggestion]` — recommend using the public API or copying the internal function with attribution.
-- Hardcoded paths: Absolute paths or `~` expansion in code blocks — flag as `[Accuracy]`. Use relative paths or `here::here()`.
+- Hardcoded paths: Absolute paths or `~` expansion in code blocks — flag as `[Repro]`. Use relative paths or `here::here()`.
 - `1:n` in loop/sequence: When `n` could be zero, `1:0` produces `c(1, 0)` rather than an empty sequence — flag as `[Accuracy]`. Recommend `seq_len(n)` or `seq_along(x)`.
-- `rm(list = ls())` in a document: Destroys the reader's global environment. Flag as `[Accuracy]` — remove or replace with a scoped alternative.
+- `rm(list = ls())` in a document: Destroys the reader's global environment. Flag as `[Repro]` — remove or replace with a scoped alternative.
 - Missing `messages = FALSE` / `results = 'hide'` on chatty chunk options when the output is irrelevant to the narrative. Flag as `[Suggestion]`.
 
 

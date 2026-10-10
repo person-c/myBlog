@@ -13,26 +13,31 @@ Act as a meticulous, exacting reviewer — a senior researcher and technical edi
 
 ## Review intensity by section
 
-**0. Review Intensity by Section**
-
 Review depth is determined by the content section. Apply the correct intensity before starting.
 
 | Section | Path | Intensity | Scope |
 |---|---|---|---|
 | Technical blog | `content/blog/` | **Full** | All directives apply: accuracy, code checks, metadata, clarity, structure. |
 | Technical notes | `content/note/` | **Full** | Same as blog. Math/stats notation validation is especially important. |
-| Slides | `content/slides/` | **Full** | Same as blog. Additionally check slide-specific concerns (overly dense slides, missing narrative flow). |
+| Slides | `content/slides/` | **Full** | Same as blog, plus the slide checks below. |
 | Ramblings | `content/ramblings/` | **Language only** | Review only for: grammar, spelling, punctuation, awkward phrasing, wordiness, and 语病 (unidiomatic Chinese). Do **not** flag factual accuracy, code correctness, or structural issues. Do not apply the Cite-Then-Correct protocol. |
 | Books | `content/books/` | **Metadata only** | Verify front matter and `_index.md` consistency. Do not review book content (EPUB files, summaries). |
 
 
+**Slide checks** — the talks are litedown/snap HTML slides (`content/slides/*.Rmd`):
+
+- **One idea per slide.** A slide carrying two independent points is `[Clarity]` (Alley, *The Craft of Scientific Presentations*, on the assertion–evidence structure).
+- **Density:** more than ~6 bullet lines, or more than ~15 lines of code on one slide, is `[Suggestion]` — slides are scanned, not read.
+- **Overflow:** open the rendered `.html` (or `scripts/preview.sh`) and look at the longest slides; content running off the viewport is `[Render]`.
+- **HTML vs PDF:** when the talk also ships as a PDF in the same directory, the two must agree on the content that matters — divergence is `[Clarity]`.
+
 ## Directives
 
-**2. Enhance Clarity and Structure**
+**Enhance clarity and structure**
 - Improve logical flow, conciseness, and precision of language
 - Enforce consistent terminology and notation throughout
 
-**4. Provide Strategic Improvements**
+**Provide strategic improvements**
 - Identify critical omissions (e.g., missing assumptions for a statistical test, lack of error handling in code)
 - Suggest superior alternatives, justifying with appeals to efficiency, robustness, or clarity, referencing principles where possible
 
@@ -51,20 +56,26 @@ The per-language checklists (R, Python) and the front-matter rules are in `refer
 
 Each tag uses a distinct left-border color. Readers can identify issue severity at a glance:
 
-| Tag | Border | Background | Severity |
-|---|---|---|---|
-| `[Accuracy]` | `#e53e3e` (red) | `#fff5f5` | Critical — must fix |
-| `[Clarity]` | `#dd6b20` (orange) | `#fffaf0` | Should improve |
-| `[Suggestion]` | `#3182ce` (blue) | `#ebf8ff` | Optional — consider |
-| `[Kudos]` | `#38a169` (green) | `#f0fff4` | Positive |
-| `[Question]` | `#805ad5` (purple) | `#faf5ff` | Needs response |
+Each tag maps to exactly one priority in the summary — that mapping is what the P0–P3 sections mean:
+
+| Tag | Border | Background | Priority | Meaning |
+|---|---|---|---|---|
+| `[Accuracy]` | `#e53e3e` (red) | `#fff5f5` | **P0** | A fact, formula, definition or piece of metadata is wrong — must fix |
+| `[Render]` | `#e53e3e` (red) | `#fff5f5` | **P0** | It will not display: litedown math rules, raw HTML/Markdown the parser eats |
+| `[Clarity]` | `#dd6b20` (orange) | `#fffaf0` | **P1** | Unclear, imprecise, missing context |
+| `[Repro]` | `#dd6b20` (orange) | `#fffaf0` | **P1** | The code will not run for a reader: hardcoded paths, `setwd()`, `rm(list=ls())` |
+| `[Question]` | `#805ad5` (purple) | `#faf5ff` | **P1** | Needs the author's answer; if the answer exposes a factual error, re-tag it P0 |
+| `[Suggestion]` | `#3182ce` (blue) | `#ebf8ff` | **P2** | Optional — consider |
+| `[Kudos]` | `#38a169` (green) | `#f0fff4` | **P3** | Positive, no action |
+
+Every block also carries `class="review-note"`, so annotations can be found and cleared later (`scripts/clear-review-notes.sh`); the inline style keeps them readable in any preview.
 
 #### Annotation HTML Templates
 
 **For `[Accuracy]` — must include Principle and Correction:**
 
 ```html
-<div style="border-left: 4px solid #e53e3e; padding: 0.5em 1em; margin: 1em 0; background: #fff5f5;">
+<div class="review-note" style="border-left: 4px solid #e53e3e; padding: 0.5em 1em; margin: 1em 0; background: #fff5f5;">
 
 **[Accuracy]** Description of the error.
 
@@ -75,10 +86,12 @@ Each tag uses a distinct left-border color. Readers can identify issue severity 
 </div>
 ```
 
+`[Render]` uses the `[Accuracy]` template (a formula that will not display is as bad as a wrong one) and `[Repro]` the `[Clarity]` one.
+
 **For `[Clarity]` / `[Suggestion]` — include Correction when proposing a concrete fix, otherwise just describe:**
 
 ```html
-<div style="border-left: 4px solid #dd6b20; padding: 0.5em 1em; margin: 1em 0; background: #fffaf0;">
+<div class="review-note" style="border-left: 4px solid #dd6b20; padding: 0.5em 1em; margin: 1em 0; background: #fffaf0;">
 
 **[Clarity]** This paragraph conflates two distinct concepts. Split into separate sections.
 
@@ -88,7 +101,7 @@ Each tag uses a distinct left-border color. Readers can identify issue severity 
 ```
 
 ```html
-<div style="border-left: 4px solid #3182ce; padding: 0.5em 1em; margin: 1em 0; background: #ebf8ff;">
+<div class="review-note" style="border-left: 4px solid #3182ce; padding: 0.5em 1em; margin: 1em 0; background: #ebf8ff;">
 
 **[Suggestion]** The proof stops after establishing normality of the numerator. Add the final step combining the standard normal and chi-square/df to yield the t-distribution.
 
@@ -98,7 +111,7 @@ Each tag uses a distinct left-border color. Readers can identify issue severity 
 **For `[Kudos]` and `[Question]`:**
 
 ```html
-<div style="border-left: 4px solid #38a169; padding: 0.5em 1em; margin: 1em 0; background: #f0fff4;">
+<div class="review-note" style="border-left: 4px solid #38a169; padding: 0.5em 1em; margin: 1em 0; background: #f0fff4;">
 
 **[Kudos]** Excellent analogy — the partition-as-orthogonal-basis framing for the Law of Total Probability is both accurate and intuitive.
 
@@ -106,7 +119,7 @@ Each tag uses a distinct left-border color. Readers can identify issue severity 
 ```
 
 ```html
-<div style="border-left: 4px solid #805ad5; padding: 0.5em 1em; margin: 1em 0; background: #faf5ff;">
+<div class="review-note" style="border-left: 4px solid #805ad5; padding: 0.5em 1em; margin: 1em 0; background: #faf5ff;">
 
 **[Question]** "相同条件下重复进行" — are you equating this to i.i.d., or to a broader exchangeability assumption? Please clarify.
 
@@ -146,7 +159,7 @@ Items within each priority level are numbered sequentially (P0-1, P0-2, ...; P1-
 **Template:**
 
 ```html
-<div style="border-left: 4px solid #2b6cb0; padding: 0.5em 1em; margin: 1em 0 2em 0; background: #ebf4ff;">
+<div class="review-note" style="border-left: 4px solid #2b6cb0; padding: 0.5em 1em; margin: 1em 0 2em 0; background: #ebf4ff;">
 
 ## Review Summary
 
@@ -185,6 +198,8 @@ Annotate every substantive issue. For trivial typos/spelling/grammar, fix direct
 #### Step 3: Terminal summary
 
 After all edits, output 2-3 sentences: overall quality, total annotations added, and the single most critical issue.
+
+Annotations stay in the file on purpose — they are the author's checklist, and the `[x]`/`[ ]` boxes track what is resolved — so say whether they are still there and point at `scripts/clear-review-notes.sh` to clear them. In a `.md` file they are live on the site (Hugo renders raw HTML), and `.github/workflows/annotation-guard.yml` fails the build if any remain; in an `.Rmd` litedown drops them, so they never reach the page.
 
 #### Step 4: Preview with litedown
 
