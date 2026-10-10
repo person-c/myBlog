@@ -5,3 +5,7 @@
 # this pin a Windows checkout (core.autocrlf=true) rewrites them to CRLF and every
 # later edit reports the whole file as changed.
 *.R text eol=lf
+
+# Workflow files: both are read by GitHub, and several keys are order- and
+# indent-sensitive, so they stay byte-stable across checkouts too.
+*.yml text eol=lf
