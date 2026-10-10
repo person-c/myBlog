@@ -1,11 +1,15 @@
 name: annotation guard
 
-# Review annotations are written straight into content files.
-#   * In .md files Hugo renders them (markup.goldmark.renderer.unsafe = true),
-#     so a committed annotation is a PUBLISHED annotation -- this job blocks it.
-#   * In .Rmd files litedown drops raw HTML, so they never reach the site; the
-#     informational step just lists them.
-# See scripts/clear-review-notes.sh and .claude/skills/review-article/SKILL.md.
+# Review annotations live inside the content files on purpose: some articles are
+# meant to show the review notes, so readers can judge the author's and the AI's
+# views side by side.  This job therefore never blocks -- it reports what is
+# currently public.
+#
+#   * .md files: Hugo renders raw HTML (markup.goldmark.renderer.unsafe = true),
+#     so every annotation block in a .md file is live on the site.
+#   * .Rmd files: litedown drops raw HTML, so those annotations never ship.
+#
+# To remove them anyway: scripts/clear-review-notes.sh content
 
 on:
   push:
@@ -17,9 +21,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Annotations that the site would publish (.md)
-        run: sh scripts/clear-review-notes.sh --published
+      - name: Annotations that are public (in .md)
+        run: |
+          if ! sh scripts/clear-review-notes.sh --published; then
+            echo "::notice title=Published annotations::Annotation blocks in .md files are rendered on the site (intentional -- see CLAUDE.md)."
+          fi
 
-      - name: Annotations elsewhere (informational)
-        if: always()
+      - name: Annotations in the sources (.Rmd, not published)
         run: sh scripts/clear-review-notes.sh --check || true

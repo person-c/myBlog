@@ -199,7 +199,7 @@ Annotate every substantive issue. For trivial typos/spelling/grammar, fix direct
 
 After all edits, output 2-3 sentences: overall quality, total annotations added, and the single most critical issue.
 
-Annotations stay in the file on purpose — they are the author's checklist, and the `[x]`/`[ ]` boxes track what is resolved — so say whether they are still there and point at `scripts/clear-review-notes.sh` to clear them. In a `.md` file they are live on the site (Hugo renders raw HTML), and `.github/workflows/annotation-guard.yml` fails the build if any remain; in an `.Rmd` litedown drops them, so they never reach the page.
+Annotations stay in the file on purpose: they are the author's checklist (`[x]`/`[ ]` tracks what is resolved), and the author deliberately publishes some of them so readers can judge the author's and the AI's views side by side. So report how many you left and where — do not strip them. In a `.md` file they are live on the site (Hugo renders raw HTML) and in an `.Rmd` litedown drops them; `scripts/clear-review-notes.sh` clears them if the clean version is wanted, and `.github/workflows/annotation-guard.yml` lists what is public.
 
 #### Step 4: Preview with litedown
 

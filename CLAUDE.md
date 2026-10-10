@@ -67,11 +67,11 @@ litedown delegates math protection to `xfun::protect_math()`, which shields only
 
 - **Annotation language: Chinese.** Annotation blocks and the review summary are written in Chinese; quoted 原文 stays as it is.
 - **Notation: consistent within an article — and an article that is already self-consistent keeps its own choice** (see the convention note in `.claude/skills/review-article/references/sources.md`). Do not rewrite notation wholesale; flag mixing as `[Clarity]` and name both forms.
-- **Annotations** carry `class="review-note"` and are cleared with `scripts/clear-review-notes.sh`. Hugo renders them in `.md` files (`unsafe = true`), so there they are **published** — `.github/workflows/annotation-guard.yml` fails the build for that — while litedown drops them in `.Rmd` files, where they are only the author's checklist.
+- **Annotations** carry `class="review-note"`, and publishing them is intentional — some articles are meant to show the review notes so readers can judge the author's and the AI's views side by side. Hugo renders them in `.md` files (`unsafe = true`), so there they are **live**; litedown drops them in `.Rmd` files, where they are only the author's checklist. Use `scripts/clear-review-notes.sh` when the clean version is wanted; `.github/workflows/annotation-guard.yml` just reports what is public.
 
 | Convention | Adopted form |
 | --- | --- |
-| 转置 | 待定 — `A^T` 或 `A^\top`（线代笔记目前两者混用），选定后全站统一 |
+| 转置 | `A^{\mathrm{T}}` —— 正体上标 T（依据 ISO 80000-2：转置即上标 T；描述性上标用正体，斜体留给变量）。三份线代笔记已于 2026-10-10 统一 |
 | 向量 | `\mathbf{x}`（正文已统一，保持一致） |
 | 科技术语 | 以全国科学技术名词审定委员会为准（如 若尔当标准形、奇异值分解） |
 
