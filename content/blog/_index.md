@@ -1,3 +1,3 @@
-﻿---
-layout: daily_work
+---
+title: Blog
 ---
