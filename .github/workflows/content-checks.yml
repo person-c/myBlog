@@ -1,15 +1,22 @@
 name: content checks
 
-# The two deterministic checks that were previously only run by hand, and only
-# when someone remembered to.  Both are hard gates -- unlike annotation-guard,
-# which deliberately never blocks.
+# Four deterministic checks that were previously only run by hand, and only when
+# someone remembered to.  All are hard gates -- unlike annotation-guard, which
+# deliberately never blocks.
 #
-#   * scripts/check-math.R -- formulas litedown will not protect, and which
+#   * scripts/check-math.R   -- formulas litedown will not protect, and which
 #     therefore never typeset in the browser (KaTeX auto-render has no single-$
 #     rule).  It catches broken *rendering*, not style.
-#   * scripts/check-meta.R -- YAML front matter: title, date, draft, tags.
+#   * scripts/check-meta.R   -- YAML front matter: title, date, draft, tags.
+#   * scripts/check-products.R -- every committed .html built by the same
+#     litedown, and not behind the installed one.
+#   * scripts/check-repo.R   -- layout names, the dead `paginate` key, workflow
+#     YAML, static assets.
 #
-# Both are run from the repository root, which is what they expect: the argument
+# The expensive check -- re-rendering each .Rmd and comparing -- is `make
+# check-fresh`, deliberately local-only.
+#
+# All are run from the repository root, which is what they expect: the argument
 # is `content`, resolved relative to the working directory.
 
 on:
@@ -27,13 +34,14 @@ jobs:
           r-version: 'release'
           use-public-rspm: true
 
-      # Only what the two scripts themselves require: xfun reads the files,
-      # yaml parses the front matter, jsonlite is used by ad-hoc probes.
+      # What the checks themselves require: xfun reads the files, yaml parses the
+      # front matter and the workflow files, litedown is needed only for its
+      # version (check-products compares it against each page's generator meta).
       # setup-r@v2 does not install packages (that is setup-r-dependencies).
       - name: Install dependencies
         run: |
-          install.packages(c("xfun", "yaml", "jsonlite"))
-          for (p in c("xfun", "yaml", "jsonlite")) {
+          install.packages(c("xfun", "yaml", "litedown"))
+          for (p in c("xfun", "yaml", "litedown")) {
             if (!requireNamespace(p, quietly = TRUE)) stop("missing: ", p)
           }
         shell: Rscript {0}
@@ -41,8 +49,19 @@ jobs:
       - name: Math that will not render (check-math.R)
         run: Rscript scripts/check-math.R content
 
-      # Runs even when check-math failed, so one push reports every problem
+      # Runs even when an earlier step failed, so one push reports every problem
       # rather than only the first.
       - name: Front matter (check-meta.R)
         if: always()
         run: Rscript scripts/check-meta.R content
+
+      # Product version drift: each committed .html records the litedown that
+      # built it, so this one needs litedown installed -- for its version only.
+      - name: Products built by this litedown (check-products.R)
+        if: always()
+        run: Rscript scripts/check-products.R content
+
+      # layout names, the dead `paginate` key, workflow YAML, static assets
+      - name: Repository invariants (check-repo.R)
+        if: always()
+        run: Rscript scripts/check-repo.R
