@@ -203,7 +203,7 @@ Annotations stay in the file on purpose: they are the author's checklist (`[x]`/
 
 #### Step 4: Preview with litedown
 
-After the terminal summary, run the preview script and report the URL it prints. It scans ports 4321–4330, reuses a server that already covers the file, and starts one otherwise:
+After the terminal summary, run the preview script and report the URL it prints. It scans ports 4321–4350 (roam's port is R's dynamic help-server port, handed out from 4321 by RStudio), reuses a server that already covers the file, and starts one otherwise:
 
 ```sh
 sh scripts/preview.sh <reviewed-file>     # a directory works too

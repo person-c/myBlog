@@ -43,7 +43,9 @@ Plot files land in `<input>__files/` (the default `fig.path`), e.g. `content/not
 
 ## Preview with roam
 
-`litedown::roam(<dir>)` serves the files in that directory over HTTP (port 4321 by default, incrementing when it is busy) and re-renders the `.Rmd` live — no `.html` is written. `scripts/preview.sh <file-or-dir>` reuses a running server that already covers the target, otherwise starts one.
+`litedown::roam(<dir>)` serves that directory over HTTP and re-renders the `.Rmd` live — no `.html` is written. The page lives at `/custom/litedown/`, **not** at `/`: the bare root belongs to R's built-in httpd and answers with an `R: httpd error` page, which is what a URL missing the prefix gets.
+
+The port is not roam's own — `xfun::new_app()` starts (or reuses) R's dynamic help server (`tools::startDynamicHelp`) and mounts the app under it, so the port is whatever that R session got. Measured here: 4322 and 4323, assigned sequentially from 4321 by RStudio, one per R session. `scripts/preview.sh <file-or-dir>` scans 4321–4350, reuses a server that already covers the target (it requires litedown's listing markup, so an httpd error page cannot be mistaken for one) and starts one otherwise.
 
 ## plotly
 

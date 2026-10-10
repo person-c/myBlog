@@ -35,7 +35,10 @@ case "$file" in
     ;;
 esac
 
-for port in $(seq 4321 4330); do
+# The port is R's dynamic help-server port, which xfun::new_app() mounts the app
+# on -- RStudio hands those out from 4321 upwards, one per R session, so scan a
+# window rather than assuming 4321.
+for port in $(seq 4321 4350); do
   index=$(curl -s --connect-timeout 2 "http://127.0.0.1:$port/custom/litedown/" 2>/dev/null) || continue
   [ -n "$index" ] || continue
   served_raw=$(printf '%s' "$index" |
