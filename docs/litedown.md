@@ -28,6 +28,18 @@ Authoritative source: the source clone at `reference/litedown/` (gitignored; re-
 
 `litedown::roam()` does not inline resources (`embed_resources = FALSE` in `R/preview.R`), so figures there stay separate documents and look correct either way — **a page that looks right in roam can still be broken once fused**. Check the produced `.html`, not only the preview.
 
+### Article layout: `vest('article')` links a dead script
+
+The documented way to get the article format (frontmatter and body in separate boxes, body in an 800px column, TOC sticky in the margin) is `litedown::vest('article')` — but that bundle expands to css `@article` plus js `@sidenotes, @appendix`, and at `@xiee/utils@1.14.37` the file on the CDN is `appendix.min.js`; there is no `@appendix.min.js`. jsdelivr's `combine` endpoint fails the *whole* request when one member is missing, so `sidenotes.js` never loads either: no margin TOC, no margin footnotes, and nothing in the page says why.
+
+Request the assets explicitly, dropping the appendix script unless the note actually has an appendix:
+
+```r
+litedown::vest(css = '@article', js = c('@sidenotes', '@toc-highlight'))
+```
+
+The assets arrive as `<link>`/`<script>` tags pointing at the CDN (like the plotly script), so nothing extra has to be committed; with no network the article is simply unstyled. `@article` only *moves* the TOC — the TOC itself comes from the `toc` mark option above.
+
 ## Math protection
 
 litedown delegates math protection to `xfun::protect_math()`, which shields only the math that matches xfun's heuristics. Anything else is handed to the Markdown parser as ordinary text and silently corrupted (`\\` → `\`, `\,` → `,`, `\|` → `|`, `^` → `<sup>`, `_` → `<em>`, `'` → `’`, and a lone `=` line turns the preceding lines into a setext heading). Since KaTeX auto-render accepts only `$$…$$`, `\(…\)` and `\[…\]`, the formula then fails to render at all in the browser. Flag every violation as `[Render]`.
