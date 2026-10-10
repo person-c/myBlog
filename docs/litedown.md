@@ -64,8 +64,8 @@ litedown delegates math protection to `xfun::protect_math()`, which shields only
 - Display `$$...$$`: a multi-line block is protected only when the opening `$$` is glued to its content and the closing `$$` is glued to the end of the last content line — `$$\begin{aligned}` … `\end{aligned}$$`. A `$$` alone on its own line is never protected. Flag as `[Render]`. **Fix:** move the delimiters onto the content lines. (xfun's own documentation says multi-line `$$…$$` is supported, so this is a tool limitation to code around, not an error in the author's LaTeX.)
 - Never settle for repairing the rendered `.html` — it is generated output, and `litedown::roam()` re-renders the `.Rmd` live without writing `.html` at all. Fix the `.Rmd` and re-render.
 - Annotation blocks are published content too, so these rules apply inside them: quote the original in backticks (`` `"$t_b \pm$"` ``) rather than leaving raw `$` — the review templates say the same.
-- Exact check: `Rscript scripts/check-math.R <file>` — the same rule, computed with `xfun::protect_math()` + `xfun::prose_index()`, plus the display blocks whose `$$` sits alone on its line.
-- Reference: `?xfun::protect_math` (Details) and `xfun:::escape_math()`; rules verified against litedown 0.10.1 / xfun 0.56 (an `.Rmd` that satisfies them renders with zero mis-converted formulas).
+- Exact check: `Rscript scripts/check-math.R <file>` — the same rule, computed with `xfun::protect_math()` + `xfun::prose_index()`, plus the display blocks whose `$$` sits alone on its line. A single `$` inside a backtick code span is masked out first: KaTeX never sees code text, and the review annotations quote the delimiters as `` `$...$` `` when discussing this very rule.
+- Reference: `?xfun::protect_math` (Details) and `xfun:::escape_math()`; rules verified against litedown 0.11 / xfun 0.56 (an `.Rmd` that satisfies them renders with zero mis-converted formulas).
 
 ## Output files
 
@@ -76,6 +76,23 @@ Plot files land in `<input>__files/` (the default `fig.path`), e.g. `content/not
 `litedown::roam(<dir>)` serves that directory over HTTP and re-renders the `.Rmd` live — no `.html` is written. The page lives at `/custom/litedown/`, **not** at `/`: the bare root belongs to R's built-in httpd and answers with an `R: httpd error` page, which is what a URL missing the prefix gets.
 
 The port is not roam's own — `xfun::new_app()` starts (or reuses) R's dynamic help server (`tools::startDynamicHelp`) and mounts the app under it, so the port is whatever that R session got. Measured here: 4322 and 4323, assigned sequentially from 4321 by RStudio, one per R session. `scripts/preview.sh <file-or-dir>` scans 4321–4350, reuses a server that already covers the target (it requires litedown's listing markup, so an httpd error page cannot be mistaken for one) and starts one otherwise.
+
+## Two things every re-render rewrites
+
+Both bite on a version bump, and both are invisible in the `.Rmd` diff because they live in the generated file.
+
+**`date` is evaluated, so it changes on every render.** The notes carry ``date: "`{r} Sys.Date()`"``, and `fuse()` runs it — the `.html` gets the render day. Editing a note therefore changes the date inside its own output even when nothing else does. The date the **site** shows is unaffected: it comes from the filename prefix (the theme falls back to it when `.Date` is empty, see `layouts/_default/single.html` and `note/list.html`). Pin a literal date in the YAML if a stable one is wanted, as `2025-09-02-introduction-to-linear-algebra.Rmd` does.
+
+**`<html lang>` comes from the system locale and ignores the obvious field.** `litedown` fills the template's `$lang$` with `litedown:::locale_lang()`, which takes the first 2–3 letters of `Sys.getlocale('LC_CTYPE')`; on this machine that is `Chinese_China`, so it emits `lang="chi"` — not a valid BCP 47 tag (Chinese is `zh`). Setting a top-level `lang:` in the YAML does **not** override it (measured 2026-10-10). The variable is a *meta* option, so it goes under `output: html: meta:`:
+
+```yaml
+output:
+  html:
+    meta:
+      lang: "zh-CN"
+```
+
+All five notes and decks set `lang: "zh-CN"` as of 2026-10-10. With the key absent — or set at the top level, which is silently ignored — the page ships `lang="chi"`.
 
 ## plotly
 

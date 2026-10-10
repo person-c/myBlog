@@ -10,7 +10,7 @@ Hugo-based personal blog using theme [Nothing](https://github.com/person-c/Nothi
 content/
   blog/         # Technical blog (R, ggplot2, bioinformatics, tools)
   note/         # Technical notes (R Markdown → HTML, math/stats)
-  ramblings/    # Personal musings
+  ramblings/    # Personal musings — NOT a normal directory, see below
   slides/       # Presentations (R Markdown + PDF)
   books/        # E-book collection (EPUB format)
     _index.md   # Bookshelf landing page
@@ -33,6 +33,13 @@ Render a note (`.Rmd` → `.html`) **in the file's own directory** — image pat
 cd content/note && Rscript -e 'litedown::fuse("2025-09-02-introduction-to-linear-algebra.Rmd")'
 ```
 
+**PowerShell eats the inner double quotes** — the command above fails there with
+`Error: object '…Rmd' not found` (measured 2026-10-10). Swap the quoting:
+
+```powershell
+cd content/note; Rscript -e "litedown::fuse('2025-09-02-introduction-to-linear-algebra.Rmd')"
+```
+
 Deterministic checks and preview (what they enforce is in the review directives):
 
 ```sh
@@ -46,6 +53,7 @@ Pipeline facts worth remembering:
 - Notes are rendered by **litedown** (`litedown::fuse()` — knitr + markdown in one step), **not** Quarto or rmarkdown: its chunk options and global defaults (`litedown::reactor()`) are its own, so Quarto's equivalents are silently ignored. Everything litedown-specific — option and device rules, code folding, the math-protection rules that decide whether a formula renders at all, the plotly JS route, `<input>__files/` — is in **`docs/litedown.md`**: read it when rendering a note or touching math or figures. The source clone is at `reference/litedown/` (gitignored; re-clone from https://github.com/yihui/litedown if missing).
 - `hugo.toml` sets `ignoreFiles = ["\\.Rmd$"]`: the `.Rmd` is never built, so the rendered **`.html` is the published page and has to be committed**. Editing the `.Rmd` alone changes nothing online until it is re-rendered.
 - Production builds run on Vercel, with the Hugo version pinned in `vercel.json`. `hugo mod get -u` upgrades every module including the theme; the pinned version lives in `go.mod`, not here.
+- **`content/ramblings/` is a gitlink, not a directory.** Git records it as `160000 … content/ramblings` — a submodule commit — and there is **no `.gitmodules`**: that file was deleted on 2025-06-15 (commit `9ab3741`, "Migrate theme from Git Submodule to Hugo Modules"), and it had only ever declared `themes/Nothing`, never this path. Consequences: `git archive HEAD` and a fresh clone carry nothing for that path (verified), so the 22 files exist only in a working copy that still has the submodule; the recorded commit is `1b7da20`; the declared remote is `https://github.com/person-c/daily_life.git`, whose page returns 404 as of 2026-10-10. `git submodule status` prints nothing, because without `.gitmodules` git does not treat it as a submodule at all. Do not edit files under it expecting the change to be tracked by this repository — commit inside it, or convert it to ordinary content first.
 
 ---
 

@@ -32,8 +32,8 @@ if (length(files) == 0) {
 
 # Fields Hugo itself defines; anything else is reported for the reviewer to judge.
 # The tail of the list is not Hugo: 'output' / 'vignette' are litedown/R Markdown
-# header keys (docs/litedown.md -- mark options live under `output: html: options:`),
-# and 'author' / 'file' belong to the book pages.  Hugo ignores them, so reporting
+# header keys (docs/litedown.md -- mark options live under `output: html: options:`,
+# and `lang` lives under `output: html: meta:`).  Hugo ignores them, so reporting
 # them as unknown on every run only hides the fields that are genuinely new.
 known <- c(
   "title", "linkTitle", "subtitle", "date", "lastmod", "publishDate", "expiryDate",
@@ -42,7 +42,7 @@ known <- c(
   "outputs", "markup", "toc", "headless", "_build", "hidden", "lang", "format",
   "images", "cover", "license", "comment", "featured",
   "translationKey", "math", "bibliography", "csl",
-  "output", "vignette", "author", "file"
+  "output", "vignette"
 )
 
 n_err <- 0L
@@ -84,6 +84,18 @@ for (f in files) {
   if (tolower(basename(f)) == "_index.md") {
     note(f, "section index -- title/date not required")
     next
+  }
+
+  # a book page is <book>/index.md beside its .epub: its front matter is a cover
+  # description (title/author/file), not an article header, so title and date are
+  # not required.  Detected by the sibling .epub rather than by path, so a section
+  # index and a book page are not confused.
+  if (tolower(basename(f)) == "index.md") {
+    sibling <- list.files(dirname(f), pattern = "[.]epub$", ignore.case = TRUE)
+    if (length(sibling) > 0) {
+      note(f, sprintf("book page (%s) -- title/date not required", sibling[1]))
+      next
+    }
   }
 
   # title
