@@ -2,6 +2,8 @@
 
 Reference material for this repo's notes (`content/note/*.Rmd` → `.html`) and slide decks. `CLAUDE.md` keeps the project-level rules and points here; everything litedown-specific — its option rules, the math-protection rules, recipes and gotchas — lives here. Read it when rendering a note or fixing a formula.
 
+The build tooling is a separate subject: the Makefile, the four checks and this checkout's environment quirks are in `docs/build.md`.
+
 Authoritative source: the source clone at `reference/litedown/` (gitignored; re-clone from https://github.com/yihui/litedown if missing).
 
 | Topic | Where in the clone |
