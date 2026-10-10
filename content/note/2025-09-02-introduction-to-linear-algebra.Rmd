@@ -1,621 +1,942 @@
 ---
 title: "Introduction to linear algebra"
-format: 
-    html:
-        toc: true
+date: "2025-09-02"
+lang: zh
+output:
+  html:
+    options:
+      toc:
+        depth: 3
+    meta:
+      js: ["@fold-details"]
 ---
+
+```{r}
+#| label: setup
+#| include: false
+#| fig.path: NA
+# 需要的包：plotly（交互式三维图，仅 HTML 输出有效）；MASS（文末伪逆示例，R 自带）；svglite（SVG 图设备）
+# litedown 用 reactor() 管理 chunk 选项，knitr::opts_chunk$set 无效（见 reference/litedown/docs/02-fuse.Rmd）
+# litedown 不走 htmlwidgets 框架，plotly 图改用 plotly.js 的 JS API 渲染（见 reference/litedown/docs/06-widgets.Rmd）
+# 设备必须用 svglite：cairo 的 svg() 把字形写成 <defs> 里的 id="glyph-*"，多张图内联进同一页时 id 冲突，
+# 标题与坐标轴文字会错位重叠（roam 不内联，所以只看 roam 发现不了）。svglite 用 <text>、不写 id，详见 docs/litedown.md
+litedown::reactor(dev = "svglite::svglite", message = FALSE, warning = FALSE)
+
+# 全文统一的颜色约定：b 黑色，a 蓝色，p（投影/拟合值）红色，e（误差）灰色虚线
+col_a <- "royalblue"; col_p <- "firebrick"; col_e <- "grey40"
+
+
+
+
+
+# 画向量（从 from 出发，可选标签）
+draw_vec <- function(v, from = c(0, 0), col = "black", lwd = 2, lab = NULL, pos = 3, cex = 1) {
+  arrows(from[1], from[2], from[1] + v[1], from[2] + v[2],
+         col = col, lwd = lwd, length = 0.1)
+  if (!is.null(lab)) text(from[1] + v[1], from[2] + v[2], lab, pos = pos, col = col, cex = cex)
+}
+
+# 在 corner 处画直角标记，d1、d2 为两条边的方向
+right_angle <- function(corner, d1, d2, s = 0.15) {
+  d1 <- d1 / sqrt(sum(d1^2)); d2 <- d2 / sqrt(sum(d2^2))
+  lines(rbind(corner + s * d1, corner + s * d1 + s * d2, corner + s * d2))
+}
+```
+
+```{css, echo = FALSE}
+/* 图注里只能写 $$...$$（markdown 会把 \( \) 反转义成括号），这里把 KaTeX 的
+   display 版式压回行内，免得公式在图注句子里另起一行 */
+.caption .katex-display { display: inline-block; margin: 0; }
+```
 
 # 前言
 
-下面的内容摘抄自一篇[知乎回答](https://www.zhihu.com/question/311724817/answer/695067704)。整篇笔记主要参考了该[笔记](https://zhuanlan.zhihu.com/p/45707832)的内容。
+> 以下内容摘抄自[知乎回答](https://www.zhihu.com/question/311724817/answer/695067704)（个别表述已按严谨性做了修订）。整篇笔记主要参考[这篇笔记](https://zhuanlan.zhihu.com/p/45707832)以及 MIT 18.06（Gilbert Strang）的线性代数课程。
+>
+> 要学好线性代数，最重要的是抓住线性代数的主线。线性代数的主线就是线性空间以及线性映射。整个线性代数的概念、公式、定义、定理都是围绕着线性空间以及线性映射展开的。你要做的，就是紧紧抓住这条主线，把线性代数的所有知识点串联起来，然后融会贯通，自然就能学好线性代数了。
+>
+> **1. 线性空间**
+>
+> 线性空间的定义比较抽象，简单地说，就是向量组成的一个集合，这个集合上定义了加法以及数乘，并且满足交换律、结合律、分配律等公理（包括存在零向量、每个向量有负向量等）。这个集合以及定义在集合上的代数运算就是线性空间。研究线性空间有几个途径：一是基与维数，二是同构，三是子空间与直和以及商空间，四是线性映射。
+>
+> 先讲讲基与维数。一个线性空间必定存在基，线性空间的任意元素都可以由基线性表出，且表出方式唯一，这个唯一的表出的组合就是这个元素在这个基下的坐标。线性表出且表出方式唯一的充分必要条件是什么？这里又引出了线性无关以及极大线性无关组的概念，极大线性无关组元素的个数又能引出秩的概念。由秩又能引出维数的概念。以上这些概念都是为了刻画线性空间的基与维数而衍生出来的，并不是凭空出现无中生有的。
+>
+> 下面再谈谈同构。线性空间千千万，应如何研究呢？同构就是这样一个强大的概念：同一个数域上，任何维数相同的线性空间之间都是同构的。空间的维数是简单而深刻的，简单的自然数居然能够刻画空间最本质的性质。借助于同构，要研究任意一个实数域上的 $n$ 维线性空间，只要研究 $\mathbb{R}^n$ 就行了。
+>
+> $n$ 维线性空间作为一个整体，我们自然想到能不能先研究它的局部性质？所以自然而然地导出了子空间的概念以及整个空间的直和分解。直和分解要求把整个空间分解为若干子空间之和，且这些子空间之间“互不重叠”（交集只有零向量）。通过研究各个简单的子空间的性质，从而得出整个空间的性质。
+>
+> **2. 线性映射**
+>
+> 前面讲了线性空间，舞台搭好了，轮到主角：线性映射登场了。
+>
+> 线性映射的定义这里就不赘述了。我们小学就学过正比例函数 $y=kx$，这是一个最简单的一维线性映射，也是一个具体的线性映射“模型”，线性映射的所有性质对比着正比例函数来看，一切都是那么简单易懂。现在把定义域从一维升级到多维，值域也从一维升级到多维，然后正比例系数 $k$ 也升级为一个矩阵，那么这个正比例函数就升级为一个线性映射了。
+>
+> 线性映射的核空间。这是线性映射的一个重要的概念，什么是线性映射的核空间呢？简单地说，就是映射到零的原像的集合，记作 $\ker$。用正比例函数来类比，显然当 $k$ 不等于 0 时，它的核是零空间，当 $k$ 为零时，它的核空间是整个 $\mathbb{R}$。有时候需要判定一个线性映射是不是单射，按照定义来还是没那么好证的，这时我们可以从它的核来判定：只要它的核是零，那么这个线性映射必然是单射。
+>
+> 线性映射的像。当自变量取遍整个定义域时，它的像的取值范围成为一个线性子空间，称为像空间，记作 $\operatorname{Im}$。
+>
+> 线性映射的矩阵表示。一个抽象的线性映射应如何“解析”地表达出来呢？这个表达式写出来就是一个矩阵，且这个矩阵依赖于基的选择。也就是说在不同的基下，线性映射有不同的矩阵。基有无穷个，相应的矩阵有无穷个。这就给用矩阵研究线性映射带来了麻烦。幸好我们有相似矩阵：同一个线性变换在不同的基下的矩阵是相似关系，相似不变量有秩、行列式、迹、特征值、特征多项式等。所以可以通过相似矩阵来研究线性变换的秩、行列式、迹、特征值、特征多项式等性质。线性变换的矩阵有无穷多，那么这其中有哪些是值得关注的呢？第一就是标准基下的矩阵了，这也是最常见的。然而一个线性变换的矩阵在标准基下可能特别复杂，所以需要选择一组特殊的基，让它的矩阵在这个基下有最简单的矩阵表示。如果存在这样的基，使得线性变换的矩阵为对角矩阵，则称这个线性变换可对角化。然而是不是所有线性变换都可以对角化呢？遗憾的是，并不是。那么就要问，如果一个线性变换不能对角化，那么它的最简矩阵是什么？这个问题的答案是若尔当标准形。可以证明，在复数域上，任何方阵（线性变换）都相似于一个若尔当标准形，且在不计若尔当块排列顺序的意义下是唯一的。
 
-要学好线性代数, 最重要的是抓住线性代数的主线。线性代数的主线就是线性空间以及线性映射。整个线性代数的概念, 公式, 定义, 定理都是围绕着线性空间以及线性映射展开的。你要做的, 就是紧紧抓住这条主线, 把线性代数的所有知识点串联起来, 然后融会贯通, 自然就能学好线性代数了。
+## 本笔记的路线
 
-1. 线性空间。
+上面的内容从线性空间以及线性映射的脉络理解线性代数。MIT 18.06 则是从解线性方程组入手，侧重矩阵的内容，本笔记也沿着这条路线展开：
 
-线性空间的定义比较抽象, 简单的说, 就是向量组成的一个集合, 这个集合可以定义加法以及纯量乘法, 并且对加法以及乘法满足交换律, 结合律以及分配律。这个集合以及定义在集合上的代数运算就是线性空间。研究线性空间有几个途径, 一是基与维数, 二是同构, 三是子空间与直和以及商空间, 四是线性映射。
-
-先讲讲基与维数。一个线性空间必定存在基, 线性空间的任意元素都可以由基线性表出, 且表出方式唯一, 这个唯一的表出的组合就是这个元素在这个基下的坐标。线性表出且表出方式唯一的充分必要条件是什么？这里又引出了线性无关以及极大线性无关组的概念, 极大线性无关组元素的个数又能引出秩的概念。由秩又能引出维度的概念。以上这些概念都是为了刻画线性空间的基与维数而衍生出来的, 并不是凭空出现无中生有的。
-
-下面再谈谈同构。线性空间千千万, 应如何研究呢？同构就是这样一个强大的概念, 任何维数相同的线性空间之间是同构的, 空间的维数是简单而深刻的, 简单的自然数居然能够刻画空间最本质的性质。借助于同构, 要研究任意一个n维线性空间, 只要研究 $R^n$ 就行了。
-
-$n$ 维线性空间作为一个整体, 我们自然想到能不能先研究它的局部性质？所以自然而然的导出了子空间的概念以及整个空间的直和分解。直和分解要求把整个空间分解为两两不交的子空间之和, 通过研究各个简单的子空间的性质, 从而得出整个空间的性质。
-
-2. 线性映射。
-
-前面讲了线性空间, 舞台搭好了, 轮到主角: 线性映射登场了。
-
-线性映射的定义这里就不赘述了。我们小学就学过正比例函数 $y=kx$, 这是一个最简单的一维线性映射, 也是一个具体的线性映射“模型”, 线性映射的所有性质对比着正比例函数来看, 一切都是那么简单易懂。现在把定义域从一维升级到多维, 值域也从一维升级到多维, 然后正比例系数k也升级为一个矩阵, 那么这个正比例函数就升级为一个线性映射了。
-
-线性映射的核空间。这是线性映射的一个重要的概念, 什么是线性映射的核空间呢？简单的说, 就是映射到零的原像的集合, 记作 $KER$。用正比例函数来类比, 显然当 $k$ 不等于 0 时, 它的核是零空间, 当 $k$ 为零时, 它的核空间是整个 $R$。有时候需要判定一个线性映射是不是单射, 按照定义来还是没那么好证的, 这时我们可以从它的核来判定, 只要它的核是零, 那么这个线性映射必然是单射。
-
-线性映射的像。当自变量取遍整个定义域时, 它的像的取值范围成为一个线性子空间, 称为像空间, 记作IM。
-
-线性映射的矩阵表示。一个抽象的线性映射应如何“解析”的表达出来呢？这个表达式写出来就是一个矩阵, 且这个矩阵依赖于基的选择。也就是说在不同的基下, 线性映射有不同的矩阵。基有无穷个, 相应的矩阵有无穷个。这就给用矩阵研究线性映射带来了麻烦。幸好我们有相似矩阵。同一个线性映射在不同的基下的矩阵是相似关系, 相似不变量有秩, 行列式, 迹, 特征值, 特征多项式等。所以可以通过相似矩阵来研究线性映射的秩, 行列式, 迹, 特征值, 特征多项式等性质。线性映射的矩阵有无穷多, 那么这其中有哪些是值得关注的呢？第一就是标准正交基下的矩阵了, 这也是最常见的。然而一个线性映射的矩阵在标准正交基下可能特别复杂, 所以需要选择一组特殊的基, 让它的矩阵在这个基下有最简单的矩阵表示。如果存在这样的基, 使得线性映射的矩阵为对角矩阵, 则称这个线性映射可对角化。然而是不是所有线性映射都可以对角化呢, 遗憾的是, 并不是。那么就要问, 如果一个线性映射不能对角化, 那么它的最简矩阵是什么？这个问题的答案是若尔当标准型。可以证明, 在复数域上, 任何线性映射都存在唯一的若尔当标准型。
-
-
-上面的内容从线性空间以及线性映射的脉络理解线性代数。MIT 的线性代数则是从解线性方程组入手, 侧重矩阵的内容。从一开始引入线性方程组的消元, 到消元矩阵, 置换矩阵,  $LU$ 分解, 到行最简形矩阵。考虑行最简形矩阵各种不同的情形, 如何解线性方程组, 尤其是无解的情况下, 在列满秩的情况可通过投影解决, 这里涉及到正交以及投影矩阵的概念, 而列不满秩下的无解可通过更广义的伪逆解出, 这里涉及到奇异值分解的概念。
-
-方阵则是一类比较特殊的矩阵, 涉及到特征值, 特征向量, 正交矩阵等概念, 因为列满秩无解的情况下涉及 $A^TA$ 为方阵, 所以其和解线性方程组有密切地联系。
-
+1. **消元**：从线性方程组的消元，到消元矩阵、置换矩阵、 $LU$ 分解、行最简形矩阵，以及零空间与四个基本子空间。
+2. **无解怎么办**：考虑行最简形的各种情形，在列满秩的情况下无解可通过投影（最小二乘）解决，这里涉及正交、投影矩阵与 $QR$ 分解。
+3. **方阵**：行列式、特征值、特征向量、对角化。方阵是一类比较特殊的矩阵；而列满秩无解时涉及的 $A^{\mathrm{T}}A$ 恰好是方阵（且对称），所以它和解线性方程组有密切联系。
+4. **对称矩阵与 SVD**：正定矩阵、若尔当标准形、奇异值分解；列不满秩下的无解可通过更广义的伪逆解出，这里涉及奇异值分解。
+5. **视角统一**：把各种分解放回“线性变换 / 基变换”的框架下理解。
 
 # 消元的矩阵表示
 
-$$
-\begin{aligned}
+$$\begin{aligned}
 2x_1 + 3x_2 &= 8 \\
-x_1 - x_2 &= 1 \\
-\end{aligned}
-$$
+x_1 - x_2 &= 1
+\end{aligned}$$
 
-上面的线性方程组用矩阵表示为 $Ax = b$:
+上面的线性方程组用矩阵表示为 $A\mathbf{x} = \mathbf{b}$：
 
 $$\begin{bmatrix}
 2 & 3 \\
-1 & -1 \\\end{bmatrix}
+1 & -1
+\end{bmatrix}
 \begin{bmatrix}
 x_1 \\
-x_2 \\
+x_2
 \end{bmatrix}
 =
 \begin{bmatrix}
 8 \\
-1 \\
+1
 \end{bmatrix}$$
 
+对线性方程组的求解有两种几何视角：
 
-对线性方程组的求解有两种思路: 
+1. **行视角**：每个方程 $\mathbf{r}_i \cdot \mathbf{x} = b_i$ 代表一条直线（高维中是超平面），方程组的解就是这些直线（超平面）的交集。
 
-1. 行视角, 每一个方程代表一条直线, 直线的交集即为方程组的解, 其本质是把每一行看成一个基向量, 然后把目标向量投影, 取投影长度。
-   
-2. 列视角, 对列向量寻找合适的线性组合, 得到新向量,  其本质是在标准基空间中, 取对应的列向量, 然后线性组合出目标向量。
-   
->
-$$ 
-x_1\begin{bmatrix} 
-2 \\ 
-1 \\
-\end{bmatrix} +
-x_2 \begin{bmatrix} 
-3 \\
--1 \\
-\end{bmatrix} = 
-\begin{bmatrix} 
-8 \\
-1 \\
-\end{bmatrix}
-$$
+2. **列视角**：寻找合适的线性组合系数，用 $A$ 的列向量组合出目标向量 $\mathbf{b}$：
 
-从列视角的观点来看, 线性方程组有解的条件显然是当目标向量 $b$ 处于所有列向量张成的空间之中之时才有解。
+$$x_1\begin{bmatrix} 2 \\ 1 \end{bmatrix} +
+x_2 \begin{bmatrix} 3 \\ -1 \end{bmatrix} =
+\begin{bmatrix} 8 \\ 1 \end{bmatrix}$$
 
+从列视角看，线性方程组有解的条件显然是：目标向量 $\mathbf{b}$ 位于 $A$ 的所有列向量张成的空间（列空间）之中。
 
-> 这里涉及到矩阵的乘法, 对矩阵的乘法有四种理解: 
-> 
-> 1. 左乘为行变换, 为行的线性组合。
-> 2. 右乘为列变换, 为列的线性组合。
-> 3. 行与列点积得到单个元素,  $C_{ij} = a_i * c_j$, 元素 $c_{ij}$ 为行 $i$ 与 列 $j$ 的点积。
-> 4. 列与行乘积得到矩阵。
-> 5. 分块矩阵。
-> 
-> 其中最常用的为列视角, 应时刻记住；行视角的观点主要用于用矩阵描述高斯消元法, 因为高斯消元法涉及到行的组合。
+下面把开头的例子画出来：左图是行视角（两条直线的交点），右图是列视角（用 $\mathbf{a}_1, \mathbf{a}_2$ 的线性组合拼出 $\mathbf{b}$）。
 
+```{r}
+#| label: fig-row-col
+#| fig.width: 7
+#| fig.height: 3.4
+#| fig.cap: "行视角（左）与列视角（右）"
+A <- matrix(c(2, 3, 1, -1), 2, byrow = TRUE); b <- c(8, 1)
+x <- solve(A, b)
+par(mfrow = c(1, 2), mar = c(2.5, 2.5, 2, 1))
 
-对于线性方程组的求解而言, 消元法是最常见的方法。**高斯消元法**为将系数矩阵 $A$ 的对角线元素视为为主元(pivot), 将主元下方的所有元素通过变换之后为 0, 具体的操作方法为用主元之后的每一行减去主元行适当的倍数。
+# 行视角：每个方程是一条直线
+plot(NA, xlim = c(0, 5), ylim = c(-1, 3.5), asp = 1,
+     xlab = "x1", ylab = "x2", main = "row picture")
+abline(a = 8/3, b = -2/3, col = col_a, lwd = 2)   # 2 x1 + 3 x2 = 8
+abline(a = -1,  b = 1,    col = col_p, lwd = 2)   # x1 - x2 = 1
+points(x[1], x[2], pch = 19)
+text(x[1], x[2], "(2.2, 1.2)", pos = 4)
 
+# 列视角：x1 * a1 + x2 * a2 = b
+plot(NA, xlim = c(-0.5, 9), ylim = c(-1.8, 3), asp = 1,
+     xlab = "", ylab = "", main = "column picture")
+draw_vec(x[1] * A[, 1], col = col_a, lab = "x₁a₁", pos = 3)
+draw_vec(x[2] * A[, 2], from = x[1] * A[, 1], col = col_p, lab = "x₂a₂", pos = 1)
+draw_vec(b, col = "black", lab = "b", pos = 3)
+```
 
-**若系数矩阵为方阵且可逆**: 
+## 矩阵乘法的几种理解
 
-我们首先讨论系数矩阵为方阵且可逆的简单情形: 
+设 $AB = C$，矩阵乘法有五种常用的理解：
 
+1. **行视角（左乘）**： $C$ 的每一行是 $B$ 的各行的线性组合，系数来自 $A$ 的对应行。所以左乘就是行变换。
+2. **列视角（右乘）**： $C$ 的每一列是 $A$ 的各列的线性组合，系数来自 $B$ 的对应列。所以右乘就是列变换。
+3. **行乘列（点积）**： $c_{ij}$ 是 $A$ 的第 $i$ 行与 $B$ 的第 $j$ 列的点积。
+4. **列乘行**： $C = \sum_k (A \text{ 的第 } k \text{ 列})(B \text{ 的第 } k \text{ 行})$，每一项都是秩为 1 的矩阵。
+5. **分块矩阵**：把矩阵分块后按“元素”的方式相乘。
 
-1. 每一步消元操作可按消去的元素记为 **消元矩阵** $E_{ij}$(参考矩阵乘法的行视角),  该矩阵为初等矩阵(Elementary Matrix), 为下三角矩阵。
+其中最常用的是列视角，应时刻记住；行视角主要用于用矩阵描述高斯消元法，因为高斯消元法涉及行的组合。
 
-2. 若出现主元为 0 时, 则通过行交换与下面的行进行交换, 该操作可用矩阵记为 **置换矩阵** $P$,  置换矩阵 $P^T = P^{-1}$。如果主元 0 的下方没有对等位置为非 0 数字的行, 则消元终止, 说明该矩阵为不可逆矩阵, 该线性方程组没有唯一解。
+## 高斯消元法
 
-3. 消元以后原矩阵 $A$ 得到上三角阵 $U$(Upper-triangular matrix)。
+对于线性方程组的求解而言，消元法是最常见的方法。**高斯消元法**把系数矩阵 $A$ 的主元（pivot）下方的所有元素通过行变换消为 0，具体的操作方法是用主元下方的每一行减去主元行的适当倍数。（对一般的 $m \times n$ 矩阵，主元不一定落在对角线上。）
+
+**若系数矩阵为方阵且可逆**，这是最简单的情形：
+
+1. 每一步消元操作可记为 **消元矩阵** $E_{ij}$（参考矩阵乘法的行视角），它是初等矩阵（elementary matrix），也是（单位）下三角矩阵。例如 $r_2 \leftarrow r_2 - \ell_{21} r_1$ 对应
+$$E_{21} = \begin{bmatrix} 1 & 0 & 0 \\ -\ell_{21} & 1 & 0 \\ 0 & 0 & 1 \end{bmatrix}$$
+
+2. 若出现主元为 0，则通过行交换与下面的行互换，该操作记为 **置换矩阵** $P$，且 $P^{\mathrm{T}} = P^{-1}$。如果主元 0 的下方没有对应位置非 0 的行，则消元终止，说明该方阵不可逆，线性方程组没有唯一解。
+
+3. 消元以后原矩阵 $A$ 变成上三角矩阵 $U$（upper triangular matrix）：
 
 $$\begin{bmatrix}
 * & * & * \\
- & * & * \\
- &  &  *\\
+0 & * & * \\
+0 & 0 & *
 \end{bmatrix}$$
 
+对于计算机而言，是先对系数矩阵 $A$ 进行消元，然后对 $\mathbf{b}$ 进行同样的操作。手工计算时，可将 $\mathbf{b}$ 作为最后一列并入 $A$，同时进行操作，该矩阵称为 **增广矩阵**（augmented matrix）。
 
-对于计算机而言, 在进行高斯消元时, 是先对系数矩阵 $A$ 进行消元, 然后对 $b$ 进行同样的操作。手工计算时, 可将 $b$ 插入 $A$ 最后一列同时进行操作,  该矩阵称为 **增广矩阵**(augmented matrix)。
+通过消元，我们求解的方程经历了如下变换：
 
+$$A\mathbf{x} = \mathbf{b} \rightarrow U\mathbf{x} = \mathbf{c}$$
 
-通过消元, 我们求解的方程经历了如下变换: 
+### 逆矩阵与高斯-若尔当消元
 
-$$
-Ax = b \rightarrow Ux = c
-$$
+**逆矩阵** 是抵消原操作的矩阵。对方阵 $A$，若存在 $A^{-1}$ 使得 $A^{-1}A = I = AA^{-1}$，则称 $A$ 可逆（非奇异）。
 
+消元矩阵的逆矩阵总是容易求得的，就是抵消原操作 $E_{ij}$ 的矩阵（把 $-\ell_{ij}$ 换成 $+\ell_{ij}$）。对于一般矩阵的逆，可以使用 **高斯-若尔当消元法**（Gauss-Jordan elimination），其本质是同时对多个线性方程组（ $A\mathbf{x}=\mathbf{e}_i$）进行消元：
 
-**逆矩阵**为进行抵消原操作的矩阵, 其定义为如下: 
+$$E \left[\, A \mid I \,\right] = \left[\, EA \mid EI \,\right] = \left[\, I \mid A^{-1} \,\right]$$
 
-如果矩阵 $A$ 为方阵, 若存在逆矩阵 $A^{-1}$, 使得 $A^{-1}A = I = AA^{-1}$, 我们称矩阵 $A$ 可逆或者非奇异的。
+### LU 分解
 
-消元矩阵的逆矩阵总是容易求得的, 即为抵消原操作 $E_{ij}$ 的矩阵。对于一般矩阵的逆矩阵的求法, 可以使用 **高斯-若尔当消元法**(Gauss-Jordan Elimination), 其本质是同时对多个线性方程组进行消元。
+在不涉及行交换的情况下：
 
-$$
-E \begin{bmatrix} A | I \end{bmatrix} =  \begin{bmatrix} EA | EI \end{bmatrix} = \begin{bmatrix} I | A^{-1} \end{bmatrix}
-$$
+$$EA = U \rightarrow A = LU \rightarrow A = LDU$$
 
-在不涉及行交换的情况下: 
+其中 $L = E^{-1}$ 是 $E$ 的逆（下三角矩阵），这就是矩阵的 $LU$  分解；再把 $U$ 的主元提出来得到对角矩阵 $D$，就是 $A = LDU$（此时 $U$ 的对角线全为 1）。
 
-$$
-EA = U \rightarrow A = LU \rightarrow A = LDU
-$$
+若涉及行交换，先把所需的行交换合并成置换矩阵 $P$，则：
 
-从上式中可以看到矩阵的 $LU$ 分解实际上其中的 $L$ 矩阵就是消元矩阵 $E$ 的逆,  该形式称之为矩阵的 **LU 分解**。
+$$E(PA) = U \Rightarrow PA = LU \quad (L = E^{-1})$$
 
-若涉及行交换,  则 :
+$LU$ 形式优于 $EA = U$ 的地方在于： $L$ 可以直接写入每一步的消元乘数 $\ell_{ij}$，而没有交叉项。
 
-$$
-EPA = U \Rightarrow PA = LU (L = E^{-1})
-$$ 
+原线性方程组可写为 $LU\mathbf{x} = \mathbf{b}$，设 $U\mathbf{x} = \mathbf{y}$，则先解 $L\mathbf{y} = \mathbf{b}$（前代），再解 $U\mathbf{x} = \mathbf{y}$（回代）。消元本身的代价是 $n^3$ 量级，而分解之后，每换一个新的 $\mathbf{b}$ 只需 $O(n^2)$ 的前代回代，这正是 $LU$ 分解的价值。
 
+NOTE：
 
-$LU$ 形式优于 $EA$ 的点在于可以直接写入每一步的消元系数, 而没有交叉项。
+1. 消元矩阵 $E_{m\times m}$ 以及置换矩阵 $P_{m\times m}$ 总是可逆的。对矩阵左乘一个可逆矩阵就是对行进行线性组合，该操作不改变矩阵的零空间以及行空间（但一般会改变列空间和左零空间），即 $CA\mathbf{x} = C\mathbf{b} \rightarrow A\mathbf{x} = \mathbf{b}$（ $C$ 可逆）。
 
-原线性方程组可写为: 
+2. 实际上对于任意 $m \times n$ 矩阵，其消元操作以及行交换也都可以用 $E_{m\times m}$ 以及 $P_{m\times m}$ 表示，此时 $EPA = U$，这里 $U$ 则为阶梯形矩阵。
 
-$$
-LUx = b
-$$
+## 任意矩阵（m×n）：行最简形、零空间与四个子空间
 
-设 $Ux$ 为 $y$,  则可先解出 $y$, 然后再解出 $x$。
+### Ax = 0
 
+系数矩阵 $A$ 消元以后得到阶梯形矩阵 $U$，然后进一步化简为 **行最简形矩阵** $R$（reduced row echelon form, rref）。主元列的数目 $r$ 就是矩阵的 **秩**（rank），自由列的数目为 $n - r$。为书写方便，假设主元列排在前面（否则对列作置换 $\Pi$，即对变量重新排序）：
 
-NOTE: 
+$$R = \begin{bmatrix} I & F \\
+0 & 0
+\end{bmatrix}$$
 
-1. 消元矩阵 $E_{mm}$ 以及置换矩阵 $P_{mm}$ 总是可逆的, 实际上对矩阵左乘一个可逆矩阵就是对行进行线性组合, 该操作不改变矩阵的零空间以及行空间 $CAx = Cb  \rightarrow Ax = b$。
+原方程 $A\mathbf{x} = \mathbf{0}$ 等价于 $R\mathbf{x} = \mathbf{0}$：
 
-2. 实际上对于任意 $m * n$ 矩阵, 其消元操作以及交换行也都可以用消元矩阵 $E_{m*m}$ 以及置换矩阵 $P_{m*m}$ 表示,  此时 $EPA = U$, 这里 $U$ 则为阶梯型矩阵
+$$\begin{bmatrix} I & F \end{bmatrix} \begin{bmatrix} \mathbf{x}_{\text{pivot}} \\ \mathbf{x}_{\text{free}} \end{bmatrix} = \mathbf{0}$$
 
+于是零空间矩阵 $N = \begin{bmatrix} -F \\ I \end{bmatrix}$（ $RN=0$）。对自由变量依次取一个为 1、其余为 0，就得到一个特解，这 $n-r$ 个特解（ $N$ 的列）构成了零空间的一组基。
 
-**若对任意矩阵 $A_{mn}$**:
+NOTE： $U \rightarrow R$ 只需要行变换。如果为了写成上面的标准块形式而对列做过置换 $\Pi$，则求得 $N$ 之后，要按 $\Pi$ 把各分量还原到原来的变量位置。
 
-$Ax = 0$: 
+### 向量空间与四个基本子空间
 
-系数矩阵 $A$ 消元以后得到阶梯型矩阵 $U$, 然后进一步简化为 **行最简形矩阵** $R$ (Reduced row echelon form, rref), 其中主元列数目为 $r$,  自由列数目为 $n - r$。
+**向量空间** 是对线性运算封闭的向量集合，任何向量空间一定包含零向量。向量空间的 **子空间** 是包含于该空间内、自身也是向量空间的集合。“子空间”与“子集”的区别在于：所有元素在原空间之内就可以称为子集，但只有对线性运算封闭的子集才是子空间。
 
-$$
-R = \begin{bmatrix} I & F \\
- &  \\
-\end{bmatrix}
-$$
+对于 $A\mathbf{x} = \mathbf{b}$（ $A$ 为 $m \times n$，秩为 $r$），涉及四个基本子空间：
 
+| 子空间 | 记号 | 位于 | 维数 | 基的求法 |
+| --- | --- | --- | --- | --- |
+| 列空间 | $C(A)$ | $\mathbb{R}^m$ | $r$ | $A$ 的主元列 |
+| 零空间 | $N(A)$ | $\mathbb{R}^n$ | $n-r$ | 特解（ $N$ 的列） |
+| 行空间 | $C(A^{\mathrm{T}})$ | $\mathbb{R}^n$ | $r$ | $R$ 的前 $r$ 行 |
+| 左零空间 | $N(A^{\mathrm{T}})$ | $\mathbb{R}^m$ | $m-r$ | $E$ 中对应 $R$ 零行的那些行 |
 
-原方程 $Ax = 0$ 的求解变为: 
+![矩阵 $A$ 的四个基本子空间](../../static/images-note/four_subspace.png)
 
-$$
-\begin{bmatrix} I & F \end{bmatrix} \begin{bmatrix} x_{\text{pivot}} \\ x_{\text{free}}  \end{bmatrix} = 0
-$$
+其中 $\dim C(A) + \dim N(A) = r + (n-r) = n$，这就是 **秩-零化度定理**（rank–nullity theorem）。
 
-那么该方程的零空间矩阵 $N = \begin{bmatrix} -F \\ I \end{bmatrix}$,  对自由变量其中任意一个赋值为 1, 其它赋值为 0, 则可得到一个特解, 这些特解的线性空间构成了其零空间。
+所谓零空间是使得列的线性组合为 0 的向量空间，而所谓左零空间是使得行的线性组合为 0 的向量空间（ $\mathbf{y}^{\mathrm{T}}A = \mathbf{0}^{\mathrm{T}}$），参照上面对矩阵乘法的不同理解。各个子空间位于哪个维度的空间，完全取决于其向量的长度。
 
-NOTE: 在由 $U \rightarrow R$ 的过程中一般涉及到了列的变化, 其解的位置也出现了对应的变化, 即在得到了零空间矩阵中也要进行对应的行变换。
+对于向量空间，最重要的就是其基与维数，如何找到这些子空间的基与维数就是我们需要关注的。下面两个式子给出了关于四个子空间的全部信息：
 
-> 关于向量空间: 
-> 
-> **向量空间**是对于线性运算封闭的向量集合, 并且任何向量空间一定包含零向量。 向量空间的子空间为包含于向量空间内的一个向量空间, “子空间”与“子集”的区别在于所有元素在原空间之内就可以称为子集, 但是要满足对线性运算封闭的子集才能成为子空间。
+$$E_{m\times m}A_{m\times n}= R = \begin{bmatrix} I_{r\times r} & F_{r\times(n-r)} \\ 0_{(m-r)\times r} & 0_{(m-r)\times(n-r)} \end{bmatrix}, \quad \operatorname{rank} = r$$
+
+$$R_{m\times n} N_{n\times(n-r)} = 0$$
+
+$EA=R$ 中， $R$ 的零行对应的 $E$ 的那几行满足 $(\text{该行})A = \mathbf{0}^{\mathrm{T}}$，它们构成左零空间的基。
+
+### Ax = b
+
+对增广矩阵 $[A \mid \mathbf{b}]$ 消元得到 $[R \mid \mathbf{d}]$。方程有解的充要条件是： $R$ 的每个零行对应的 $\mathbf{d}$ 的分量也为 0，即 $\mathbf{b} \in C(A)$。有解时，通解为：
+
+$$\mathbf{x}_\text{complete} = \mathbf{x}_p + \mathbf{x}_n, \quad \text{其中 } A\mathbf{x}_p = \mathbf{b},\ A\mathbf{x}_n = \mathbf{0} \ \Rightarrow\ A(\mathbf{x}_p + \mathbf{x}_n) = \mathbf{b}$$
+
+$\mathbf{x}_p$ 是把所有自由变量取 0 得到的特解（此时主元变量就等于 $\mathbf{d}$ 的前 $r$ 个分量）， $\mathbf{x}_n$ 是零空间 $N(A)$ 中的任意向量。
+
+总结（按 $r$ 与 $m, n$ 的关系分为四种情形）：
+
+| 情形 | 秩的关系 | $R$ 的形状 | 解的情况 |
+| --- | --- | --- | --- |
+| 1 | $r = m = n$ | $R = I$ | 既没有多余的行也没有多余的列，唯一解（ $A$ 可逆） |
+| 2 | $r = n < m$ | $R = \begin{bmatrix} I \\ 0 \end{bmatrix}$ | 有多余的行，无解或唯一解 |
+| 3 | $r = m < n$ | $R = \begin{bmatrix} I & F \end{bmatrix}$ | 有多余的列，恒有解且有无穷多解 |
+| 4 | $r < m,\ r < n$ | $R = \begin{bmatrix} I & F \\ 0 & 0 \end{bmatrix}$ | 有多余的行与列，无解或无穷多解 |
+
+在情形 2 和 4 的无解情形下（表现在线性方程组中，就是消元以后出现了左侧为 0 而右侧不为 0 的方程），我们无法精确解出线性方程组。但对于情形 2，我们可以把 $\mathbf{b}$ 投影到 $A$ 的列空间中，得到一个最优的近似解（最小二乘解），而投影则涉及正交的概念。
+
+## 正交与投影
+
+> 两个向量 $\mathbf{x}, \mathbf{y}$ **正交** 当且仅当 $\mathbf{x}^{\mathrm{T}}\mathbf{y} = \mathbf{y}^{\mathrm{T}}\mathbf{x} = 0$，也当且仅当 $\|\mathbf{x}\|^2 + \|\mathbf{y}\|^2 = \|\mathbf{x}+\mathbf{y}\|^2$（勾股定理），其中 $\|\mathbf{x}\|^2 = \mathbf{x}^{\mathrm{T}}\mathbf{x}$。
 >
-> 关于 $Ax = b, \space dim(A) = m * n$ 涉及到的向量空间: 
->
-> 1. 列空间 $C(A)$ 是其列向量线性组合所构成的空间, 为 $R^m$ 空间中的子空间。
-> 2. 零空间 $N(A)$ 是指满足 $Ax = 0$ 的所有解的集合,  为 $R^n$ 空间中的子空间。
->![Four subspace of $A$ ](../../static/images-note/four_subspace.png)
->
-> 所谓零空间是使得列的线性组合为 0 的向量空间, 而所谓左零空间实际上是使得行的线性组合为 0 的向量空间, 参照上面对矩阵乘法的不同理解。
-> 
-> 至于各个子空间是哪个维度空间的子空间实际上完全取决于其向量的长度。
->
-> 对于向量空间, 最重要的就是其基与维数, 如何找到这些子空间的基与维数就是我们需要关注的。
-> 下面的式子给出了关于矩阵 $A$ 四个子空间所有的信息。
-> $$E_{mm}A_{mn}= R = \begin{bmatrix} I_{r*r} & F_{r*(n-r)} \\ _{(m-r)*r} & _{(m-r)*(n-r)} \\ \end{bmatrix}, rank = r$$
->
-> $$R_{m*n} N_{n*(n-r)} = 0$$
+> 之前提到矩阵的四个子空间，实际上矩阵的行空间和它的零空间互为正交补，列空间与左零空间互为正交补。
 
+### 投影到一条直线
 
-$Ax = b$:
+考虑向量 $\mathbf{b}$ 在 $\mathbf{a}$ 方向上的投影 $\mathbf{p}$。既然 $\mathbf{p}$ 在 $\mathbf{a}$ 的方向上，则 $\mathbf{p} = \hat{x}\mathbf{a}$，误差 $\mathbf{e} = \mathbf{b} - \mathbf{p}$ 与 $\mathbf{a}$ 正交：
 
-$$
-\mathbf{x}_\text{complete} = \mathbf{x}_p + \mathbf{x}_n, \text{其中} Ax_p = b, Ax_n = 0 \rightarrow A(x_p + x_n) = b
-$$
+$$\mathbf{a}^{\mathrm{T}}(\mathbf{b}-\mathbf{p}) = 0 \rightarrow \mathbf{a}^{\mathrm{T}}(\mathbf{b}-\hat{x}\mathbf{a}) = 0 \rightarrow \mathbf{a}^{\mathrm{T}}\mathbf{a}\,\hat{x} = \mathbf{a}^{\mathrm{T}}\mathbf{b}$$
 
-$x_p$ 为将所有自由变量赋值为 0 得到的特解,  $x_n$ 为 $Ax = 0$ 为 $A$ 的零空间的一般向量。
+解得 $\hat{x} = \frac{\mathbf{a}^{\mathrm{T}}\mathbf{b}}{\mathbf{a}^{\mathrm{T}}\mathbf{a}}$， $\mathbf{p} = \mathbf{a}\frac{\mathbf{a}^{\mathrm{T}}\mathbf{b}}{\mathbf{a}^{\mathrm{T}}\mathbf{a}}$。从 $\mathbf{p}$ 中可以分离出矩阵 $P = \frac{\mathbf{a}\mathbf{a}^{\mathrm{T}}}{\mathbf{a}^{\mathrm{T}}\mathbf{a}}$，称为 **投影矩阵**，它把向量 $\mathbf{b}$ 投影到 $\mathbf{a}$ 的方向。
 
+几何上， $\mathbf{p}$ 是 $\mathbf{b}$ 在直线上“垂直落下”的点，误差 $\mathbf{e}$ 与 $\mathbf{a}$ 成直角：
 
-总结: 
+```{r}
+#| label: fig-proj-line
+#| fig.width: 5
+#| fig.height: 3.8
+#| fig.cap: "b 在 a 方向上的投影 p 与误差 e"
+a <- c(3, 1); b <- c(2, 3)
+p <- sum(a * b) / sum(a * a) * a      # 投影
+e <- b - p                            # 误差，与 a 正交
 
-1. 若 $r = m = n \rightarrow R = I$, 即既没有多余的行, 也没有多余的列, 只有唯一解。
-2. 若 $r = n < m \rightarrow R = \begin{bmatrix} I \\ 0 \end{bmatrix}$, 有多余的行, 无解或唯一解。
-3. 若 $r = m < n \rightarrow R = \begin{bmatrix} I & F \end{bmatrix}$, 即有多余的列, 无穷多解。
-4. 若 $r < n, r < m \rightarrow R = \begin{bmatrix} I & F \\ &  \\\end{bmatrix}$ , 即有多余的行与列, 无解或者无穷多解。
+par(mar = c(2, 2, 1, 1))
+plot(NA, xlim = c(0, 4), ylim = c(0, 3.5), asp = 1, xlab = "", ylab = "",
+     main = "projection of b onto a")
+abline(0, a[2] / a[1], col = "grey80")                  # a 所在的直线
+draw_vec(a, col = col_a, lab = "a", pos = 4)
+draw_vec(b, col = "black", lab = "b", pos = 3)
+draw_vec(p, col = col_p)
+text(p[1] + 0.18, p[2] - 0.28, "p", col = col_p)                  # 让开直角标记
+segments(p[1], p[2], b[1], b[2], lty = 2, lwd = 2, col = col_e)   # e
+text((p[1] + b[1]) / 2, (p[2] + b[2]) / 2, "e", pos = 4, col = col_e)
+right_angle(p, -a, e)
+```
 
+右乘一个向量是列的线性组合，所以 $P\mathbf{b}$ 一定落在 $P$ 的列空间里，而 $P$ 的列都是 $\mathbf{a}$ 的倍数，因此 $C(P) = C(\mathbf{a})$， $P$ 的秩为 1。另一方面，投影两次与投影一次结果相同，即 $P^2\mathbf{b} = P\mathbf{b}$。因此投影矩阵满足：
 
-从上可以看出对于在2或者4的无解情形下(表现在线性方程组中实际上就是消元以后出现了左侧为0, 然而右侧不为0的方程式), 我们是无法解出线性方程组的；但是实际上对于情况2 , 我们可以通过将向量 $b$ 投影到 $A$ 的列空间之中得出一个最优解, 而对于投影则涉及到正交的概念。
+$$P^2 = P, \quad P^{\mathrm{T}} = P$$
 
-> 对于两个 **向量正交** 则 $x^Ty = y^Tx =  \rightarrow ||x||^2 + ||y||^2 = ||x+y||^2$, 其中 $||x||^2 = x^Tx$.
-> 之前我们曾提到矩阵的四个子空间, 实际上矩阵的行空间和它的零空间是互为正交补的, 列空间与左零空间互为正交补。
+### Gram-Schmidt 正交化与 QR 分解
 
+长度为 1 并且彼此正交的向量称为标准正交向量。如果矩阵 $Q$ 的列向量是标准正交向量，则 $Q^{\mathrm{T}}Q = I$。标准正交的方阵称为 **正交矩阵**（orthogonal matrix）。
 
-对于情形2无解的情况, 要得到最优解, 我们需要将 $b$ 投影到 $a/A$ 的方向, 下面介绍如何进行投影。
+设 $\mathbf{a}_1, \mathbf{a}_2, \mathbf{a}_3$ 线性无关，目标是找到一组标准正交向量 $\mathbf{q}_1, \mathbf{q}_2, \mathbf{q}_3$，使它们张成同样的空间。思路是：先得到一组正交向量 $\mathbf{w}_i$，再除以各自的长度。
 
-考虑 向量 $b$ 在 $a$ 方向上投影的向量为 $p$, 既然其在 $a$ 的方向上, 则 $p = ax$,  那么 $e = b - p$ 则与 $a$ 向量正交: 
+- $\mathbf{w}_1 = \mathbf{a}_1$。
+- 用 $\mathbf{a}_2$ 减去它在 $\mathbf{w}_1$ 上的投影，得到与 $\mathbf{w}_1$ 垂直的向量（也就是前面的误差 $\mathbf{e}$ 的方向）：
 
-$$
-a^T(b-p) = 0 \rightarrow a^T(b-xa) = 0 \rightarrow a^Tax = a^Tb
-$$
+$$\mathbf{w}_2 = \mathbf{a}_2 - \frac{\mathbf{w}_1\mathbf{w}_1^{\mathrm{T}}}{\mathbf{w}_1^{\mathrm{T}}\mathbf{w}_1}\mathbf{a}_2$$
 
-解得 $x = \frac{a^Tb}{a^Ta}, p = ax = a\frac{a^Tb}{a^Ta}$,  从 $p$ 中我们可以分离出 矩阵 $P = \frac{aa^T}{a^Ta}$,  该矩阵我们称之为 **投影矩阵**, 它将向量 $b$ 投影到 $a$ 的方向。
+- 从 $\mathbf{a}_3$ 中减去它在 $\mathbf{w}_1, \mathbf{w}_2$ 上的投影（注意要用已经正交化的 $\mathbf{w}_1, \mathbf{w}_2$，两个投影才能直接相加）：
 
-投影矩阵 $P$ 是一个对称矩阵。考虑右乘一个矩阵为列的线性组合, 投影矩阵既然是把 $b$ 投影到 $a$ 的方向, 其显然和 $a$ 有相同的列空间, 其秩为1。另一方面, 如果做两次投影则有 $P^2b = Pb$, 因为投影一次之后再投影, 显然还是在原来的位置。因此矩阵 $P$ 有如下性质: 
+$$\mathbf{w}_3 = \mathbf{a}_3 - \frac{\mathbf{w}_1\mathbf{w}_1^{\mathrm{T}}}{\mathbf{w}_1^{\mathrm{T}}\mathbf{w}_1}\mathbf{a}_3 - \frac{\mathbf{w}_2\mathbf{w}_2^{\mathrm{T}}}{\mathbf{w}_2^{\mathrm{T}}\mathbf{w}_2}\mathbf{a}_3$$
 
-$$
-P^2 = P, P^T = P
-$$
+- 最后单位化： $\mathbf{q}_i = \mathbf{w}_i / \|\mathbf{w}_i\|$。
 
-> **Gram-SChmidt 正交化**: 
-> 
-> 单位长度为 1,  并且彼此正交的向量称之为标准正交向量。如果矩阵 $Q$ 的列向量为标准正交向量, 则 $Q^TQ = I$ 。一个标准正交的方阵我们称之为“**正交矩阵**”(orthogonal matrix)。
->
-> 从两个线性无关的向量 $a$,  $b$ 开始其张成了一个空间, 我们的目标就是找到一组标准正交的向量 $q1$, $q2$ 能张成同样的空间。Schmidt提出如果有一组正交基 $A$, $B$, 那么我们令它们除以自己的长度就得到标准正交基。
->
-> $$
-> q_1 = \frac{A}{||A||}, q_2 = \frac{B}{||B||}
-> $$
->
->  Gram 提出了只要用向量 $b$ 减去投影到 $a$ 上的向量, 即可得到一个与 $a$ 垂直的向量, 也就是上面提到的 $e$ 的方向。
->
-> $$
-> B = \frac{aa^T}{a^Ta}b
-> $$
->
-> 如果从三个线性无关的向量 $a, b, c$ 出发, 则可以通过从 $c$ 中减去其在 $a, b$ 向量上的投影得到与 $a, b$ 垂直的向量 $C$。
->
-> $$
-> C = c - \frac{aa^Tc}{a^Ta} - \frac{bb^Tc}{b^Tb}
-> $$
->
-> 施密特正交化的过程可以用矩阵运算的方式表示为 $A = QR$, 此处 $R$ 为上三角矩阵,  称之为 **正交分解**。
->
-> $$
-> \begin{bmatrix} a_1 & a_2 \end{bmatrix} = \begin{bmatrix} q_1 & q_2 \end{bmatrix} \begin{bmatrix} a_1^Tq_1 & a_2^Tq_1 \\ a_1^Tq_2 & a_2^Tq_2 \end{bmatrix}
-> $$
->
-> $R$ 矩阵每个元素都是向量点积的值, 而实际上点积代表的几何意义是 $a$ 向量 在 $q$ 向量上的投影长度与 $q$ 的长度的乘积。如果  $q$ 为 单位向量 则点积就是 $a$ 在 $q$ 方向的投影长度, 如果 $a$ 也为 单位向量, 则点积就是两个向量夹角的余弦值。
->
-> 结合右乘一个矩阵为列的线性组合, 可以看到 $R$ 矩阵每列的元素就是原每个 $a$ 向量在 $q$ 方向的投影长度, 称之为权。
-> 
-> 为什么 $R$ 矩阵是上三角矩阵呢?
->
-> $A = QR \rightarrow R = Q^TA \rightarrow R_{ij} = {Q_i}^TA_j$.
->
-> 根据 Gram-Schmidt 的构造过程, 向量 $a_j$ 是由 $q_1, q_2, ..., q_j$ 线性组合而成的。因此, 当 $i > j$ 时, $q_i, q_1, ..., q_j$ 中的任何一个都正交, 所以 $q_i$ 也必然与它们的线性组合 $a_j$ 正交。这意味着, 当 $i > j$ 时, $R_ij = q_i^T a_j = 0$。这就是 $R$ 矩阵主对角线下方元素全为零的原因, 即它是一个上三角矩阵。
+二维情形的图示： $\mathbf{w}_2$ 就是 $\mathbf{a}_2$ 减去它在 $\mathbf{a}_1$ 上的投影，再单位化得到 $\mathbf{q}_1, \mathbf{q}_2$。
 
-将 $b$ 向量投影到 $A$ 矩阵的列空间,  则 $p = Ax$
+```{r}
+#| label: fig-gram-schmidt
+#| fig.width: 5
+#| fig.height: 3.8
+#| fig.cap: "Gram-Schmidt：从 a₁、a₂ 得到标准正交的 q₁、q₂"
+a1 <- c(3, 1); a2 <- c(2, 3)
+p  <- sum(a1 * a2) / sum(a1 * a1) * a1       # a2 在 a1 上的投影
+w2 <- a2 - p
+q1 <- a1 / sqrt(sum(a1^2)); q2 <- w2 / sqrt(sum(w2^2))
 
-$$
-A^T(b - Ax) =  \rightarrow  A^TAx = A^Tb
-$$
+par(mar = c(2, 2, 2, 1))
+plot(NA, xlim = c(-1.5, 4), ylim = c(-0.5, 3.5), asp = 1, xlab = "", ylab = "",
+     main = "Gram-Schmidt")
+abline(h = 0, v = 0, col = "grey90")
+draw_vec(a1, col = col_a, lab = "a₁", pos = 4)
+draw_vec(a2, col = "black", lab = "a₂", pos = 3)
+draw_vec(p, col = col_p, lab = "p", pos = 1)
+segments(p[1], p[2], a2[1], a2[2], lty = 2, col = col_e)   # a2 - p
+draw_vec(w2, col = col_e, lab = "w₂", pos = 2)
+draw_vec(q1, col = col_a, lwd = 4)
+draw_vec(q2, col = col_e, lwd = 4)
+text(q1[1], q1[2], "q₁", pos = 1, col = col_a)
+text(q2[1], q2[2], "q₂", pos = 2, col = col_e)
+right_angle(c(0, 0), q1, q2)
+```
 
-解得 $x = (A^TA)^{-1}A^Tb, p = A(A^TA)^{-1}A^Tb$, 则投影矩阵 $P = A(A^TA)^{-1}A^T → rank(P) = rank(A)$
+这个过程用矩阵语言表示就是 $QR$  分解 $A = QR$，其中 $R$ 为上三角矩阵（要求 $A$ 的列线性无关）。以两个向量为例：
 
-将向量 $b$ 投影到列空间 $A$ 与 投影到向量 $a$ 的方向的一个特殊点在于, 实际上 $b$ 向量是在一个 $m$ 空间之中, 而之前提到是四个子空间, 列空间与左零空间为正交补, 为 $m$ 维空间的子空间,  所以将 $b$ 投影到 $A$ 的列空间之中, 实际是将 $b$ 分解为两个向量, 其中 $p$ 向量在 $A$ 列空间之中,  而 $e$ 则在 左零空间之中, 而将 $b$ 投影到左零空间的矩阵为 $I-P$ 为将其投影到左零空间的投影矩阵。
+$$\begin{bmatrix} \mathbf{a}_1 & \mathbf{a}_2 \end{bmatrix} = \begin{bmatrix} \mathbf{q}_1 & \mathbf{q}_2 \end{bmatrix} \begin{bmatrix} \mathbf{q}_1^{\mathrm{T}}\mathbf{a}_1 & \mathbf{q}_1^{\mathrm{T}}\mathbf{a}_2 \\ \mathbf{q}_2^{\mathrm{T}}\mathbf{a}_1 & \mathbf{q}_2^{\mathrm{T}}\mathbf{a}_2 \end{bmatrix}$$
 
-从 $x$ 解的形式中, 我们可以看到, 用投影的方法求解线性方程组, 需要 $A^TA$ 存在逆矩阵, 而其存在逆矩阵的条件就是 $A$ 是列满秩的, 这就是该方法只能用于情形 2 无解以及最小二乘法能够直接使用公式 $x = (A^TA)^{-1}A^Tb$ 的原因。当 $A$ 不是列满秩时, $A^TA$不可逆, 就需要求助于伪逆(SVD)。
+$R$ 的每个元素都是向量点积，其几何意义是 $\mathbf{a}$ 在 $\mathbf{q}$ 方向上的投影长度与 $\mathbf{q}$ 的长度的乘积。如果 $\mathbf{q}$ 是单位向量，则点积就是 $\mathbf{a}$ 在 $\mathbf{q}$ 方向的投影长度；如果 $\mathbf{a}$ 也是单位向量，则点积就是两个向量夹角的余弦值。
+
+结合“右乘一个矩阵是列的线性组合”， $R$ 的第 $j$ 列就是 $\mathbf{a}_j$ 在标准正交基 $\mathbf{q}_1, \mathbf{q}_2, \dots$ 下的坐标（各个“权”）。
+
+**为什么 $R$ 是上三角矩阵？** 由 $A = QR$ 以及 $Q^{\mathrm{T}}Q = I$ 得 $R = Q^{\mathrm{T}}A$，即 $R_{ij} = \mathbf{q}_i^{\mathrm{T}}\mathbf{a}_j$。根据 Gram-Schmidt 的构造过程， $\mathbf{a}_j$ 只是 $\mathbf{q}_1, \dots, \mathbf{q}_j$ 的线性组合。因此当 $i > j$ 时， $\mathbf{q}_i$ 与 $\mathbf{q}_1, \dots, \mathbf{q}_j$ 中的每一个都正交，也就与它们的线性组合 $\mathbf{a}_j$ 正交，即 $R_{ij} = \mathbf{q}_i^{\mathrm{T}}\mathbf{a}_j = 0$。这就是 $R$ 主对角线下方元素全为零的原因。
+
+### 投影到列空间与最小二乘
+
+把 $\mathbf{b}$ 投影到 $A$ 的列空间，则 $\mathbf{p} = A\hat{\mathbf{x}}$，误差 $\mathbf{e} = \mathbf{b} - A\hat{\mathbf{x}}$ 与 $A$ 的每一列正交：
+
+$$A^{\mathrm{T}}(\mathbf{b} - A\hat{\mathbf{x}}) = \mathbf{0} \rightarrow A^{\mathrm{T}}A\hat{\mathbf{x}} = A^{\mathrm{T}}\mathbf{b}$$
+
+当 $A$ 列满秩时， $A^{\mathrm{T}}A$ 可逆，解得 $\hat{\mathbf{x}} = (A^{\mathrm{T}}A)^{-1}A^{\mathrm{T}}\mathbf{b}$， $\mathbf{p} = A(A^{\mathrm{T}}A)^{-1}A^{\mathrm{T}}\mathbf{b}$。投影矩阵为：
+
+$$P = A(A^{\mathrm{T}}A)^{-1}A^{\mathrm{T}}, \quad P^2 = P,\ P^{\mathrm{T}} = P,\ \operatorname{rank}(P) = \operatorname{rank}(A)$$
+
+（ $A^{\mathrm{T}}A$ 可逆的原因： $A^{\mathrm{T}}A\mathbf{x} = \mathbf{0} \Rightarrow \mathbf{x}^{\mathrm{T}}A^{\mathrm{T}}A\mathbf{x} = \|A\mathbf{x}\|^2 = 0 \Rightarrow A\mathbf{x} = \mathbf{0}$，所以 $N(A^{\mathrm{T}}A) = N(A)$， $A$ 列满秩时即为 $\{\mathbf{0}\}$。）
+
+与投影到一条直线相比，这里的特别之处在于： $\mathbf{b}$ 位于 $\mathbb{R}^m$ 中，而列空间 $C(A)$ 与左零空间 $N(A^{\mathrm{T}})$ 互为 $\mathbb{R}^m$ 中的正交补。所以把 $\mathbf{b}$ 投影到 $C(A)$，实际上是把 $\mathbf{b}$ 分解为两部分： $\mathbf{p}$ 在列空间中， $\mathbf{e}$ 在左零空间中；而投影到左零空间的投影矩阵就是 $I - P$。
+
+三维中的情形如下（可以用鼠标拖动旋转、滚轮缩放）：蓝色平面是 $A$ 的两列张成的列空间， $\mathbf{b}$ 被分解为落在平面内的 $\mathbf{p}$ 和垂直于平面的 $\mathbf{e}$，而 $\mathbf{e}$ 位于左零空间中。
+
+```{r}
+# 载入 plotly.js：vest() 解析 npm 别名并把资源缓存到本地（默认 embed_resources = "local" 不内嵌 https 资源，页面仍引用 CDN）
+litedown::vest(js = '@npm/plotly.js@2.11.1/dist/plotly.min.js')
+```
+
+```{r}
+#| label: fig-proj-plane
+library(plotly)
+A <- cbind(c(1, 0, 0.5), c(0, 1, 0.5))            # 两列张成列空间（一个平面）
+b <- c(2, 1.5, 3)
+p <- drop(A %*% solve(t(A) %*% A, t(A) %*% b))    # 投影 p = A (A^{\mathrm{T}} A)^{-1} A^{\mathrm{T}} b
+e <- b - p                                        # 误差
+
+ss <- seq(-1, 3.5, length.out = 20)
+PX <- outer(ss, ss, function(u, v) u * A[1, 1] + v * A[1, 2])
+PY <- outer(ss, ss, function(u, v) u * A[2, 1] + v * A[2, 2])
+PZ <- outer(ss, ss, function(u, v) u * A[3, 1] + v * A[3, 2])
+
+fig <- plot_ly() %>%
+  add_surface(x = PX, y = PY, z = PZ, opacity = 0.5, showscale = FALSE,
+              colorscale = list(c(0, 1), c("lightblue", "lightblue")),
+              name = "C(A)", hoverinfo = "skip") %>%
+  add_trace(type = "scatter3d", mode = "lines+markers+text", name = "b",
+            x = c(0, b[1]), y = c(0, b[2]), z = c(0, b[3]),
+            text = c("", "b"), textposition = "top center",
+            line = list(color = "black", width = 6), marker = list(size = 3, color = "black")) %>%
+  add_trace(type = "scatter3d", mode = "lines+markers+text", name = "p",
+            x = c(0, p[1]), y = c(0, p[2]), z = c(0, p[3]),
+            text = c("", "p"), textposition = "bottom center",
+            line = list(color = "firebrick", width = 6), marker = list(size = 3, color = "firebrick")) %>%
+  add_trace(type = "scatter3d", mode = "lines", name = "e",
+            x = c(p[1], b[1]), y = c(p[2], b[2]), z = c(p[3], b[3]),
+            line = list(color = "grey40", width = 6, dash = "dash")) %>%
+  layout(scene = list(aspectmode = "data",
+                      xaxis = list(title = "x"), yaxis = list(title = "y"), zaxis = list(title = "z")),
+         legend = list(orientation = "h"))
+
+# 验证：e 与平面内的每个方向（A 的每一列）都正交，即 A^{\mathrm{T}} e = 0
+round(crossprod(A, e), 10)
+
+# 交给 plotly.js 的 JS API 渲染（litedown 不走 htmlwidgets），
+# 写法见 reference/litedown/examples/022-dygraphs.Rmd
+spec <- plotly::plotly_build(fig)$x[c("data", "layout")]
+```
+
+```{js, type = 'module', echo = FALSE, fill = xfun::tojson}
+const spec = `{ spec }`;
+Plotly.newPlot(document.getElementById('la-proj-plane'), spec.data, spec.layout,
+              {responsive: true});
+```
+
+::: {#la-proj-plane style="width: 100%; height: 430px;"}
+:::
+
+<div class="caption">b 投影到列空间（平面）：$$\mathbf{b} = \mathbf{p} + \mathbf{e}$$，e 垂直于平面（可旋转）</div>
+
+最小二乘拟合直线可以看作同样的投影：数据向量 $\mathbf{b}$ 被投影到 $A$ 的列空间，拟合值 $\mathbf{p}=A\hat{\mathbf{x}}$ 就是图中直线上的点，残差 $\mathbf{e}$ 就是竖直的虚线段。
+
+```{r}
+#| label: fig-ls-fit
+#| fig.width: 4.8
+#| fig.height: 3.8
+#| fig.cap: "最小二乘拟合直线：数据点、拟合值与残差"
+tt <- c(0, 1, 2); y <- c(1, 2, 2)
+X <- cbind(1, tt)
+beta <- solve(t(X) %*% X, t(X) %*% y)     # 正规方程
+fit <- drop(X %*% beta)                   # p = X beta
+
+par(mar = c(3, 3, 1, 1))
+plot(tt, y, pch = 19, xlim = c(-0.3, 2.3), ylim = c(0.5, 2.7), xlab = "t", ylab = "y",
+     main = "least squares fit")
+abline(a = beta[1], b = beta[2], col = col_a, lwd = 2)
+segments(tt, fit, tt, y, lty = 2, col = col_e)
+points(tt, fit, pch = 1, col = col_p, cex = 1.5)
+legend("topleft", bty = "n", cex = 0.8,
+       legend = c("data (b)", "fitted (p)", "residual (e)"),
+       pch = c(19, 1, NA), lty = c(NA, NA, 2), col = c("black", col_p, col_e))
+```
+
+用 $QR$ 分解可以简化计算： $A = QR$ 时 $A^{\mathrm{T}}A = R^{\mathrm{T}}R$，正规方程化为 $R\hat{\mathbf{x}} = Q^{\mathrm{T}}\mathbf{b}$（回代即可），投影矩阵化为 $P = QQ^{\mathrm{T}}$。
+
+从 $\hat{\mathbf{x}}$ 的形式可以看到，用投影的方法求解，需要 $A^{\mathrm{T}}A$ 可逆，其条件就是 $A$ 列满秩。这就是该方法只适用于情形 2 的无解情况、最小二乘能直接使用 $\hat{\mathbf{x}} = (A^{\mathrm{T}}A)^{-1}A^{\mathrm{T}}\mathbf{b}$ 的原因。当 $A$ 不是列满秩时， $A^{\mathrm{T}}A$ 不可逆，就需要求助于伪逆（SVD）。
 
 # 方阵、行列式、特征值、对角化
 
-方阵与线性方程组的联系在于上面提到的投影的最小二乘法涉及到矩阵 $A^TA$, 而该矩阵为对称的方阵。
+方阵可以看作 $\mathbb{R}^n \rightarrow \mathbb{R}^n$ 的线性变换，可以被反复作用（ $A^k$），因此值得单独研究。它与线性方程组的联系在于：上面最小二乘中出现的 $A^{\mathrm{T}}A$ 就是一个对称的方阵。
 
+## 行列式
 
-以下三个性质定义了行列式: 
+以下三个性质定义了行列式：
 
-1. $det(I) = 1$
-2. 如果交换行列式的两行, 行列式的数值会反号。
-3. a) 如果矩阵某行乘以 $t$, 则行列式的值要乘上 $t$。b)行列式是“矩阵的行”的线性函数。
+1. $\det(I) = 1$。
+2. 如果交换行列式的两行，行列式的数值会反号。
+3. 行列式对每一行分别是线性的：a) 如果矩阵某一行乘以 $t$，则行列式的值乘以 $t$；b) 某一行是两个向量之和时，行列式等于分别取这两个向量得到的两个行列式之和。
 
-从以上三个性质可以推导出下面七条性质: 
+性质 3b) 的例子如下（注意：一般 $\det(A+B) \neq \det A + \det B$，线性只针对某一行）：
 
-4. 如果矩阵的两行完全相同, 则它的行列式为 0。
-5. 从矩阵的某行 $k$ 减去某一行 $i$ 的倍数, 并不改变行列式的数值。
-6. 如果矩阵 $A$ 的某一行都是 0,  则其行列式为 0。
-7. 三角阵行列式的值等于其对角线上数值(主元)的乘积。
-8. 当且仅当矩阵 $A$ 为奇异矩阵时, 其行列式为 0。
-9. $det(AB) = det(A)det(B)$.
-1. $det(A^T) = det(A)$.
+$$\begin{vmatrix} a+a' & b+b' \\ c & d \end{vmatrix} = \begin{vmatrix} a & b \\ c & d \end{vmatrix} + \begin{vmatrix} a' & b' \\ c & d \end{vmatrix}$$
 
-从性质 1, 2,  3 可以推出 **行列式公式** (Formula for the determinant): 
+从以上三个性质可以推导出下面七条性质：
 
-通过性质 3 对 $n$ 阶矩阵进行拆分, 我们可以得到所有只包含 $n$ 个非零元素的行列式, 对于二阶行列式, 我们从一个拆分为两个, 然后拆分为四个。对于三阶方阵, 则从一个拆分成三个, 然后拆分成九个, 最后拆分为27个。然而, 这些行列式中有很大一部分为 0。
+4. 如果矩阵的两行完全相同，则它的行列式为 0。
+5. 从矩阵的某行 $k$ 减去另一行 $i$ 的倍数，并不改变行列式的数值。
+6. 如果矩阵 $A$ 的某一行全是 0，则其行列式为 0。
+7. 三角矩阵行列式的值等于其对角线元素的乘积（对 $U$ 来说就是主元的乘积）。
+8. 当且仅当矩阵 $A$ 为奇异矩阵时，其行列式为 0。
+9. $\det(AB) = \det(A)\det(B)$。
+10. $\det(A^{\mathrm{T}}) = \det(A)$。
 
-每一个拆分出来的非 0 行列式都是在每行每列只有一个元素, 就如同置换矩阵的元素分布, 利用性质 3 可以将元素从行列式中提取出来, 而置换矩阵的行列式值为 1,  或 -1, 因此可以给出行列式公式；对于 $n$ 阶方阵, 其非 0 行列式的元素个数为 $n!$。
+### 行列式公式与代数余子式
 
-$$
-det(A) = \sum_{n!}\pm{a_{1\alpha}a_{2\beta}...a_{n\omega}}
-$$
+通过性质 3 对 $n$ 阶矩阵的每一行进行拆分：二阶行列式先拆成两个、再拆成 $2^2 = 4$ 个；三阶则拆成 $3^3 = 27$ 个，每个拆出来的行列式每行只剩一个元素。其中大部分因为有两个元素落在同一列而为 0；剩下的非零项，其元素分布每行每列恰有一个，就如同置换矩阵，而置换矩阵的行列式为 $+1$ 或 $-1$。因此非零项共有 $n!$ 个，得到 **行列式公式**（Formula for the determinant）：
 
-将上面的行列式公式把某一行的元素提取, 例如 $a_{11}, a_{12}...$, 则每个元素的系数即为 **代数余子式**, 是一个低阶行列式的值, 这个低阶行列式是由原矩阵去掉 $a_{1j}$ 所在行和列组成的。
+$$\det(A) = \sum_{\sigma \in S_n} \operatorname{sgn}(\sigma)\, a_{1\sigma(1)}a_{2\sigma(2)}\cdots a_{n\sigma(n)}$$
 
-对矩阵中的任意元素 $a_{ij}$ 而言, 其代数余子式(cofactor)  $C_{ij}$ 就是矩阵的行列式的公式中 $a_{ij}$ 的系数。 $C_{ij}$ 等于原矩阵移除第 $i$ 行, 第 $j$ 列后剩余元素组成的 $n - 1$ 矩阵的行列式数值乘以 $(-1)^{i + j}$ 。由矩阵 $A$ 每个元素对应的 代数余子式构成的矩阵的转置称为 **伴随矩阵** —— 为什么要转置的原因是因为 $AC^T$ , 矩阵的乘法为行乘以列,  $A$ 矩阵与 $C^T$ 矩阵相乘正好是 $A$ 的每个元素和其代数余子式的乘积。
+把上式中某一行的元素提取出来，例如 $a_{11}, a_{12}, \dots$，则每个元素的系数就是它的 **代数余子式**（cofactor）。具体地， $a_{ij}$ 的代数余子式 $C_{ij}$ 等于原矩阵删去第 $i$ 行、第 $j$ 列后剩下的 $n-1$ 阶矩阵的行列式，再乘以 $(-1)^{i+j}$。于是 **按第一行展开** 的公式为：
 
-对于 $n$ 阶方阵, 其 **行列式的代数余子式公式** 为(按第一行展开): 
+$$\det(A) = a_{11}C_{11} + a_{12}C_{12} + \dots + a_{1n}C_{1n}$$
 
-$$
-det(A) = a_{11}C_{11} + a_{12}C_{12} + \dots + a_{1n}C_{1n}
-$$
+不过，由于“用一行减去另一行的倍数”不改变行列式的值（行交换只改变符号），实际计算时，通过消元把矩阵化为三角矩阵，再取主元之积（并记住行交换次数）一般更简单高效。
 
-然而由于实际上消元不改变行列式的值, 对于行列式的求解, 通过消元将矩阵转换三角矩阵一般更简单高效。
+### 逆矩阵公式与克莱姆法则
 
-利用行列式以及其伴随矩阵, 我们可以得到 **逆矩阵公式** $\mathbf{AC^T} = det(\mathbf{A})\mathbf{I}$:
+把由 $A$ 的每个元素的代数余子式构成的矩阵 $C$ 转置，得到 **伴随矩阵** $C^{\mathrm{T}}$（adjugate）。为什么要转置？因为 $AC^{\mathrm{T}}$ 是行乘以列，转置之后， $A$ 的第 $i$ 行恰好与 $C^{\mathrm{T}}$ 的第 $i$ 列（即第 $i$ 行元素的代数余子式）相乘。于是有 **逆矩阵公式** $AC^{\mathrm{T}} = \det(A)I$：
 
-$$
-\mathbf{A}\mathbf{C}^T = \begin{bmatrix} a_{11} & \dots & a_{1n} \\
-                                         \vdots & \ddots & \vdots \\
-                                         a_{n1} & \dots & a_{nn} 
-                         \end{bmatrix}\begin{bmatrix}
-                         C_{11} & \dots & C_{n1} \\
-                         \vdots & \ddots & \vdots \\
-                         C_{n1} & \dots & C_{nn} 
-                          \end{bmatrix}
-$$
+$$A C^{\mathrm{T}} = \begin{bmatrix} a_{11} & \dots & a_{1n} \\
+\vdots & \ddots & \vdots \\
+a_{n1} & \dots & a_{nn}
+\end{bmatrix}
+\begin{bmatrix}
+C_{11} & \dots & C_{n1} \\
+\vdots & \ddots & \vdots \\
+C_{1n} & \dots & C_{nn}
+\end{bmatrix}
+= \det(A)\, I$$
 
-从上式中可以看到对角线上的元素就是行列式按行展开的公式, 其值就是行列式 $\lambda$,  而对于其它元素, 例如第二行第一列的元素值, 则相当于用 $A$ 的第二行替代第一行得到矩阵 $\mathbf{A}_s$ 的行列式, 而由于其有两行相同所以其行列式的值为 0。
+对角线上的元素就是行列式按行展开的公式，其值是 $\det(A)$；而对于其他位置的元素，例如第二行第一列，相当于用 $A$ 的第二行替换第一行得到矩阵 $A_s$，按第一行展开的行列式，由于 $A_s$ 有两行相同，其行列式为 0。因此当 $\det(A) \neq 0$ 时：
 
+$$A^{-1} = \frac{C^{\mathrm{T}}}{\det(A)}$$
 
-通过逆矩阵的公式, 我们可以推出 **克莱姆法则**(Cramer's Rule for $\mathbf{x} = \mathbf{A^{-1}b}$): 
+由逆矩阵公式可以推出 **克莱姆法则**（Cramer's rule）：
 
-对于可逆矩阵 $A$, 方程 $\mathbf{Ax} = \mathbf{b}$ 必然有解 $\mathbf{x} = \mathbf{A^{-1}b}$ , 将逆矩阵的公式代入其中有:  $\mathbf{x} = \mathbf{A^{-1}b} = \frac{\mathbf{C^T b}}{det(\mathbf{A})}$ 。
+对于可逆矩阵 $A$，方程 $A\mathbf{x} = \mathbf{b}$ 必然有解 $\mathbf{x} = A^{-1}\mathbf{b} = \frac{C^{\mathrm{T}}\mathbf{b}}{\det(A)}$。将 $C^{\mathrm{T}}$ 的每一行视为一个行向量 $\mathbf{c}_j$，则 $x_j = \frac{\mathbf{c}_j\mathbf{b}}{\det(A)}$。而 $\mathbf{c}_j$ 是 $A$ 的第 $j$ 列元素的代数余子式，所以 $\mathbf{c}_j\mathbf{b}$ 可视为把 $A$ 的第 $j$ 列替换为 $\mathbf{b}$ 得到矩阵 $B_j$，再按该列展开得到的行列式。因此：
 
-将 $C^T$ 每一行视为一个行向量 $\mathbf{c}_j$ , 观测该式子可以看到:  $\mathbf{x}$ 的每个分量 $x_j = \frac{\mathbf{c}_j\mathbf{b}}{det(\mathbf{A})}$。而 $\mathbf{c}_j$ 实际上是 $A$ 矩阵第 $j$ 列的代数余子式, 所以 $\mathbf{c}_j\mathbf{b}$ 可以视为将 $A$ 的第 $j$ 列替换为 $b$ 得到 $B_j$ , 然后按该列展开得到的 $B_j$ 行列式的值; 所以 $\mathbf{x_j} = \frac{det(\mathbf{B}_j)}{det(\mathbf{A})}$。
+$$x_j = \frac{\det(B_j)}{\det(A)}$$
 
+克莱姆法则主要有理论价值，实际求解线性方程组时计算量远大于消元。
 
-最后, 行列式在几何上代表了该矩阵向量构成的平行六面体的体积。
+### 几何意义
 
+行列式的绝对值 $|\det A|$ 是由 $A$ 的行向量（或列向量）构成的平行体（二维为平行四边形，三维为平行六面体）的体积，符号则表示定向（是否翻转）。
 
-将左乘一个矩阵看作对向量的变换, 那么, 如果一个变换不改变向量 $x$ 的方向该向量称为 **特征向量**, 那么有: 
+```{r}
+#| label: fig-det-area
+#| fig.width: 5
+#| fig.height: 3.6
+#| fig.cap: "单位正方形经 A 变成平行四边形，面积为 $$|\det A|$$"
+A <- matrix(c(2, 0.5, 1, 1.5), 2)           # 列为 (2, 0.5) 和 (1, 1.5)
+a1 <- A[, 1]; a2 <- A[, 2]
+par(mar = c(2, 2, 2, 1))
+plot(NA, xlim = c(-0.3, 3.5), ylim = c(-0.3, 2.3), asp = 1, xlab = "", ylab = "",
+     main = paste0("|det A| = ", abs(det(A))))
+polygon(c(0, 1, 1, 0), c(0, 0, 1, 1), col = "#e5e5e5", border = "grey50")
+polygon(c(0, a1[1], a1[1] + a2[1], a2[1]), c(0, a1[2], a1[2] + a2[2], a2[2]),
+        col = adjustcolor(col_a, alpha.f = 0.15), border = col_a, lwd = 2)
+draw_vec(a1, col = col_a, lwd = 3, lab = "A e₁", pos = 1)
+draw_vec(a2, col = col_a, lwd = 3, lab = "A e₂", pos = 2)
+text(0.5, 0.5, "1", col = "grey30")
+text(1.5, 1, "A(unit square)", col = col_a)
+```
 
-$$
-A\mathbf{x} = \lambda \mathbf{x}
-$$
+## 特征值与特征向量
 
-上式的含义就是一个矩阵操作, 只对一个向量进行放缩, 如果上式存在非零解, 那么: 
+把左乘一个矩阵看作对向量的变换，如果某个非零向量 $\mathbf{x}$ 经过变换后方向不变（只被放缩， $\lambda$ 为负时方向反向），则称它为 **特征向量**， $\lambda$ 为对应的 **特征值**：
 
-$$
-det(A- \lambda I) = 0
-$$
+$$A\mathbf{x} = \lambda \mathbf{x}$$
 
+上式的含义就是该矩阵操作只对这个向量进行放缩。上式存在非零解的充要条件是：
 
-对于任意的 $n \cdot n$ 矩阵, 其具有 $n$ 个特征值(可能存在重复的特征值), 其和等于矩阵对角线元素之和, 称为迹。其乘积等于矩阵的行列式。
+$$\det(A - \lambda I) = 0$$
 
-对于对称矩阵而言, 其永远具有实数的特征值, 并且其特征向量正交；而对于反对称矩阵而言, 具有纯虚数的特征值。
+下图中，虚线是单位圆，实线是它被 $A$ 变换后的椭圆。蓝色是特征向量，红色是变换后的结果：它们方向不变，只被放缩了 $\lambda$ 倍。
 
-如果矩阵没有重特征值, 那么其一定有 $n$ 个线性无关的特征向量；如果有重特征值, 那么它可能有 $n$ 个线性无关的特征向量, 也可能没有,  这就是所谓的代数重数大于几何重数。
+```{r}
+#| label: fig-eigen
+#| fig.width: 4.6
+#| fig.height: 4.2
+#| fig.cap: "特征向量只被放缩：蓝色为 x，红色为 Ax"
+A <- matrix(c(2, 1, 1, 2), 2)
+ev <- eigen(A)
+th <- seq(0, 2 * pi, length.out = 200); circ <- rbind(cos(th), sin(th))
 
-**矩阵对角分解**: 如果矩阵 $A$ 具有 $n$ 个线性无关的的特征向量, 将它们作为列向量可以组成一个可逆方阵 $S$, 并且有: 
+par(mar = c(2, 2, 2, 1))
+plot(t(circ), type = "l", asp = 1, xlim = c(-3, 3), ylim = c(-3, 3),
+     col = "grey60", lty = 2, xlab = "", ylab = "", main = "A x for the unit circle")
+lines(t(A %*% circ), lwd = 2)
+for (i in 1:2) {
+  v <- ev$vectors[, i]
+  draw_vec(v, col = col_a)
+  draw_vec(ev$values[i] * v, col = col_p)
+  text(1.15 * ev$values[i] * v[1], 1.15 * ev$values[i] * v[2],
+       paste0("λ = ", round(ev$values[i], 2)), col = col_p, pos = 3)   # 标签挪到箭头之外
+}
+```
+
+对于任意的 $n \times n$ 矩阵，在复数范围内（重根计重数）有 $n$ 个特征值，其和等于矩阵对角线元素之和，称为迹（trace），其乘积等于矩阵的行列式。
+
+对于实对称矩阵而言，其特征值永远是实数，并且存在一组标准正交的特征向量；而对于实反对称矩阵而言，其特征值为纯虚数（或 0）。
+
+如果矩阵没有重特征值，那么其一定有 $n$ 个线性无关的特征向量。如果有重特征值，则要比较每个特征值的 **代数重数**（作为特征多项式的根的重数）与 **几何重数**（对应特征空间的维数）：几何重数总是不大于代数重数，当某个特征值的几何重数小于代数重数时，线性无关的特征向量不足 $n$ 个，矩阵不可对角化。例如 $\begin{bmatrix} 1 & 1 \\ 0 & 1 \end{bmatrix}$，特征值 1 的代数重数为 2，几何重数为 1。
+
+### 矩阵对角分解
+
+如果矩阵 $A$ 具有 $n$ 个线性无关的特征向量，将它们作为列向量可以组成一个可逆方阵 $S$，并且有：
 
 $$\begin{aligned}
-A\mathbf{S} &=  A \begin{bmatrix} \mathbf{x}_1 & \mathbf{x}_2 & \dots & \mathbf{x}_n \end{bmatrix} \\
-   &= \begin{bmatrix} \lambda_1\mathbf{x}_1 & \lambda_2\mathbf{x}_2 &  \dots & \lambda_n\mathbf{x}_n \end{bmatrix}\\
-   & = \mathbf{S}\begin{bmatrix} 
-        \lambda_1 &          & \dots  &          \\
-                 & \lambda_2 &        &          \\ 
-        \vdots    &           & \ddots & \vdots    \\
-                 & \dots     &       & \lambda_n  
-       \end{bmatrix}  \\
-  &= \mathbf{S} \Lambda
+AS &= A \begin{bmatrix} \mathbf{x}_1 & \mathbf{x}_2 & \dots & \mathbf{x}_n \end{bmatrix} \\
+   &= \begin{bmatrix} \lambda_1\mathbf{x}_1 & \lambda_2\mathbf{x}_2 & \dots & \lambda_n\mathbf{x}_n \end{bmatrix} \\
+   &= S \begin{bmatrix}
+        \lambda_1 &           &        &           \\
+                  & \lambda_2 &        &           \\
+                  &           & \ddots &           \\
+                  &           &        & \lambda_n
+       \end{bmatrix} \\
+   &= S \Lambda
 \end{aligned}$$
 
-那么有: 
+那么有：
 
 $$A = S \Lambda S^{-1}$$
 
+特征值为矩阵的幂计算提供了方法：如果 $A\mathbf{x} = \lambda\mathbf{x}$，则 $A^2\mathbf{x} = \lambda A\mathbf{x} = \lambda^2\mathbf{x}$，说明 $A^2$ 与 $A$ 有一样的特征向量，而特征值为 $\lambda^2$。写成对角化的形式则有 $A^2 = S\Lambda S^{-1} S\Lambda S^{-1} = S\Lambda^2S^{-1}$。同样的处理可以得到：
 
-特征值给矩阵的幂计算提供了方法: 
+$$A^k = S\Lambda^kS^{-1}$$
 
-如果 $A\mathbf{x} = \lambda\mathbf{x}$, 则有 $A^2\mathbf{x} = \lambda A\mathbf{x} = \lambda^2\mathbf{x}$, 说明矩阵 $A^2$ 有着和 $A$ 一样的特征向量, 而特征值为 $\lambda^2$。写成对角化的形式则有: $A^2 = S\Lambda S^{-1} S\Lambda S^{-1}$。同样的处理可以得到 $A^{k} = S\Lambda^{k}S^{-1}$。这说明 $A^k$ 和 $A$ 有相同的特征向量, 而特征值为 $\lambda^{k}$。
+这说明 $A^k$ 和 $A$ 有相同的特征向量，特征值为 $\lambda^k$。
 
+# 正定矩阵（二次型）、若尔当标准形、奇异值分解、伪逆
 
-# 正定矩阵(二次型)、若尔当矩阵、 奇异值分解、 伪逆
+## 对称矩阵与谱定理
 
-对称矩阵的特征值为实数且有一套正交的特征向量；
+实对称矩阵的特征值为实数，且有一套标准正交的特征向量。
 
-如果 $A$ 具有 $n$ 个线性无关的特征向量, 则可以对角化得到 $A = S\Lambda S^{-1}$ 。而对于对称矩阵有:  $A = Q\Lambda Q^{-1} = Q\Lambda Q^{T}$ , 该分解也叫做 "**谱定理**" 。
+一般地，如果 $A$ 具有 $n$ 个线性无关的特征向量，则可以对角化得到 $A = S\Lambda S^{-1}$；而对于实对称矩阵则有 $A = Q\Lambda Q^{-1} = Q\Lambda Q^{\mathrm{T}}$，该分解称为 **谱定理**（spectral theorem）。
 
-对称矩阵具有下面两个性质: 
+对称矩阵具有下面两个性质：
 
-1. 具有实数的特征值(包括共轭对称复矩阵)。
-   
-2. 主元的符号与特征值符号匹配。
+1. 具有实数的特征值（对共轭对称的复矩阵，即厄米矩阵，同样成立）。
 
-性质 2 可以用惯性定理证明: 
+2. 正主元的个数等于正特征值的个数（负的同理）。这里的主元指无需行交换时 $A = LDL^{\mathrm{T}}$ 中 $D$ 的对角元素。
 
-> **惯性定理**:  若存在可逆矩阵 $C$ 满足  $A = CBC^{T}$ , 称 $A$ 与 $B$ 合同, 惯性定理指矩阵的特征值符号经过合同变换后不发生变化。
->  对称矩阵 $A$ 经过消元以后 $A = LDL^{T}$, 而经过对角化处理得到 $A = Q\Lambda Q^T$, 两者比较可知 $D = (L^{-1}Q)\Lambda (L^{-1}Q)^T$, 因此两个对角阵为合同矩阵, 主元和特征值符号匹配。
+性质 2 可以用惯性定理证明：
 
+> **惯性定理**（Sylvester's law of inertia）：若存在可逆矩阵 $C$ 满足 $A = CBC^{\mathrm{T}}$，称 $A$ 与 $B$ 合同。惯性定理指出：合同变换不改变对称矩阵的正、负、零特征值的 **个数**（各个特征值本身是会变的）。
+>
+> 对称矩阵 $A$ 经过消元以后 $A = LDL^{\mathrm{T}}$，而经过对角化处理得到 $A = Q\Lambda Q^{\mathrm{T}}$，两者比较可知 $D = (L^{-1}Q)\Lambda (L^{-1}Q)^{\mathrm{T}}$，因此对角阵 $D$ 与 $\Lambda$ 合同，正主元个数与正特征值个数相等。
 
-**正定矩阵** $A$ 是对称矩阵中的特例, 是关于二次多项式的线性代数表达, 其定义如下: 
+## 正定矩阵与二次型
 
-$$
-\mathbf{x}^T A \mathbf{x} > 0 \space (x \neq 0)
-$$
+**正定矩阵** $A$ 是对称矩阵中的特例，是关于二次多项式的线性代数表达，其定义如下：
 
-有三个途径判断一个对称矩阵是否为正定矩阵: 
+$$\mathbf{x}^{\mathrm{T}} A \mathbf{x} > 0 \quad (\mathbf{x} \neq \mathbf{0})$$
+
+有三个常用的途径判断一个对称矩阵是否正定：
 
 1. 所有特征值大于 0。
-2. 所有的 $k$ 阶子行列式大于 0。
-3. 所有的主元大于 0。
+2. 所有 **顺序主子式**（左上角的 $1 \times 1, 2 \times 2, \dots, n \times n$ 子矩阵的行列式）大于 0。
+3. 所有主元大于 0。
 
-对于二次型我们可以用配方的方法来验证其是否具有最小值: 
+此外，它还等价于存在列满秩矩阵 $R$ 使得 $A = R^{\mathrm{T}}R$（此时 $\mathbf{x}^{\mathrm{T}}A\mathbf{x} = \|R\mathbf{x}\|^2 > 0$）。
 
-$$
-f(x, y) = 2x^2 + 12xy + 2y^2 = 2(x + 3y)^2 + 2y^2
-$$
+对于二次型，我们可以用配方的方法来验证其是否具有最小值：
 
-配方实际上就是消元: 
+$$f(x, y) = 2x^2 + 12xy + 20y^2 = 2(x + 3y)^2 + 2y^2$$
 
-$$
-\begin{bmatrix} 2 & 6 \\ 6 & 2 \end{bmatrix} = \begin{bmatrix} 1 &  \\ 3 & 1 \end{bmatrix} \begin{bmatrix} 2 & 6 \\  & 2 \end{bmatrix}
-$$
+配方实际上就是消元：
 
-其中主元就是平方项的系数,  $L$ 矩阵中的行操作数就是配方项内 $y$ 的系数。
+$$\begin{bmatrix} 2 & 6 \\ 6 & 20 \end{bmatrix} = \begin{bmatrix} 1 & 0 \\ 3 & 1 \end{bmatrix} \begin{bmatrix} 2 & 0 \\ 0 & 2 \end{bmatrix} \begin{bmatrix} 1 & 3 \\ 0 & 1 \end{bmatrix} = LDL^{\mathrm{T}}$$
 
+其中主元（ $D$ 的对角元素）就是平方项的系数， $L$ 中的乘数 3 就是配方项 $(x+3y)$ 中 $y$ 的系数。两个主元都为正，所以 $f$ 恒为正，矩阵正定。
 
-若  $A$ 与 $B$ 均为 $n * n$ 方阵, 若存在可逆方阵 $M$ 使得 $B = M^{-1}AM$, 则 $A$ 与 $B$ 为 **相似矩阵**。相似矩阵实际上是一系列特征值相同的矩阵。
+作为对比， $2x^2 + 12xy + 7y^2 = 2(x+3y)^2 - 11y^2$，第二个主元为负，函数在某些方向上取负值，对应的矩阵是不定的。
 
-若矩阵 $A$ 具有 $n$ 个线性无关的特征向量, 则可以对角化得到 $S^{-1}AS = \Lambda$, 则 $A$ 相似于 $\Lambda$, 是其最简洁的形式。
+两个二次型的曲面如下（可拖动旋转；曲面底部投影出了等高线，鼠标悬停可以看到 $f$ 的取值）：左边的 $f$ 是“碗”，等高线是椭圆，有最小值；右边的 $f$ 是“马鞍”，等高线是双曲线，在某些方向上取负值。
 
-若矩阵 $A$ 具有重特征值, 则可能无法进行对角化, 这时候可以找到其近似对角化的形式的相似矩阵, 称之为“**若尔当标准形**”。
+```{r}
+#| label: fig-quad-forms
+library(plotly)
+g  <- seq(-2, 2, length.out = 61)
+f1 <- outer(g, g, function(x, y) 2 * x^2 + 12 * x * y + 20 * y^2)   # 正定
+f2 <- outer(g, g, function(x, y) 2 * x^2 + 12 * x * y +  7 * y^2)   # 不定
+cont <- list(z = list(show = TRUE, usecolormap = TRUE, project = list(z = TRUE)))
+ax <- list(xaxis = list(title = "x"), yaxis = list(title = "y"), zaxis = list(title = "f"))
 
+fig <- plot_ly() %>%
+  add_surface(x = g, y = g, z = t(f1), scene = "scene",  showscale = FALSE,
+              colorscale = "Viridis", contours = cont) %>%
+  add_surface(x = g, y = g, z = t(f2), scene = "scene2", showscale = FALSE,
+              colorscale = "Viridis", contours = cont) %>%
+  layout(scene  = c(list(domain = list(x = c(0, 0.5))), ax),
+         scene2 = c(list(domain = list(x = c(0.5, 1))), ax),
+         annotations = list(
+           list(text = "positive definite", x = 0.2, y = 1, xref = "paper", yref = "paper", showarrow = FALSE),
+           list(text = "indefinite (saddle)", x = 0.8, y = 1, xref = "paper", yref = "paper", showarrow = FALSE)))
 
-将矩阵 $A$ 视为线性变换操作,  那么 $Av = u$  就是将矩阵行空间的向量经过变换以后成为列空间的一个向量。**奇异值分解**(Singular value decomposition)就是在行空间中寻找一组正交基 $\mathbf{v}$, 在经过线性变换仍然为在列空间的一组正交基 $\mathbf{u}$。
+# 交给 plotly.js 的 JS API 渲染（litedown 不走 htmlwidgets），
+# 写法见 reference/litedown/examples/022-dygraphs.Rmd
+spec <- plotly::plotly_build(fig)$x[c("data", "layout")]
+```
 
-$$
-Av_i = \sigma_i u_i
-$$
+```{js, type = 'module', echo = FALSE, fill = xfun::tojson}
+const spec = `{ spec }`;
+Plotly.newPlot(document.getElementById('la-quad-forms'), spec.data, spec.layout,
+              {responsive: true});
+```
 
-用矩阵语言描述这一过程就是:  
+::: {#la-quad-forms style="width: 100%; height: 470px;"}
+:::
 
-$$
-\begin{aligned}
-A \begin{bmatrix} \mathbf{v}_1 & \mathbf{v}_2 & \dots & \mathbf{v}_r \end{bmatrix} 
+<div class="caption">正定（碗，左）与不定（马鞍，右）二次型的曲面与等高线（可旋转）</div>
+
+## 相似矩阵与若尔当标准形
+
+若 $A$ 与 $B$ 均为 $n \times n$ 方阵，存在可逆方阵 $M$ 使得 $B = M^{-1}AM$，则 $A$ 与 $B$ 为 **相似矩阵**。相似矩阵实际上是同一个线性变换在不同基下的矩阵，因此它们的特征值（以及特征多项式、迹、行列式、秩）都相同。注意反过来不成立：特征值相同的矩阵不一定相似，例如 $I$ 与 $\begin{bmatrix} 1 & 1 \\ 0 & 1 \end{bmatrix}$。
+
+若矩阵 $A$ 具有 $n$ 个线性无关的特征向量，则可以对角化得到 $S^{-1}AS = \Lambda$，即 $A$ 相似于 $\Lambda$，这是最简洁的形式。
+
+若矩阵 $A$ 的某个特征值的几何重数小于代数重数，则无法对角化。这时可以找到一个“尽可能接近对角”的相似矩阵，称为 **若尔当标准形**，它是由若尔当块组成的分块对角矩阵，每个若尔当块形如：
+
+$$J = \begin{bmatrix} \lambda & 1 & & \\ & \lambda & \ddots & \\ & & \ddots & 1 \\ & & & \lambda \end{bmatrix}$$
+
+在复数域上，每个方阵都相似于一个若尔当标准形，两个矩阵相似当且仅当它们（在不计若尔当块顺序的意义下）有相同的若尔当标准形。
+
+## 奇异值分解（SVD）
+
+将矩阵 $A$ 视为线性变换，那么 $A\mathbf{v} = \mathbf{u}$ 就是把行空间中的向量变换成列空间中的一个向量。**奇异值分解**（singular value decomposition）就是在行空间中寻找一组标准正交基 $\mathbf{v}_i$，使它们经过线性变换后仍然是列空间中的一组正交基 $\mathbf{u}_i$（方向，长度另算）：
+
+$$A\mathbf{v}_i = \sigma_i \mathbf{u}_i$$
+
+用矩阵语言描述这一过程就是：
+
+$$\begin{aligned}
+A \begin{bmatrix} \mathbf{v}_1 & \mathbf{v}_2 & \dots & \mathbf{v}_r \end{bmatrix}
 &= \begin{bmatrix} \sigma_1\mathbf{u}_1 & \sigma_2\mathbf{u}_2 & \dots & \sigma_r\mathbf{u}_r \end{bmatrix} \\
-&= \begin{bmatrix} \mathbf{u}_1 & \mathbf{u}_2 & \dots & \mathbf{u}_r \end{bmatrix} 
+&= \begin{bmatrix} \mathbf{u}_1 & \mathbf{u}_2 & \dots & \mathbf{u}_r \end{bmatrix}
 \begin{bmatrix}
-\sigma_1 &         &        &          \\
+\sigma_1 &          &        &          \\
          & \sigma_2 &        &          \\
-         &         & \ddots &          \\
-         &         &        & \sigma_r \\
+         &          & \ddots &          \\
+         &          &        & \sigma_r
 \end{bmatrix}
-\end{aligned}
-$$
+\end{aligned}$$
 
+再把零空间的部分（ $N(A)$ 的标准正交基 $\mathbf{v}_{r+1}, \dots, \mathbf{v}_n$，满足 $A\mathbf{v}_j = \mathbf{0}$）以及左零空间的标准正交基 $\mathbf{u}_{r+1}, \dots, \mathbf{u}_m$ 补进来，就得到完整形式 $AV = U\Sigma$： $V$ 是 $n \times n$ 正交矩阵， $U$ 是 $m \times m$ 正交矩阵， $\Sigma$ 是 $m \times n$ 的“对角”矩阵，对角线上是奇异值 $\sigma_1 \geq \dots \geq \sigma_r > 0$，其余为 0。在 $AV = U\Sigma$ 两侧右乘 $V^{-1}$ 得到：
 
+$$A = U\Sigma V^{-1} = U\Sigma V^{\mathrm{T}}$$
 
+**如何求 $U, V, \Sigma$？** 利用 $A = U\Sigma V^{\mathrm{T}}$ 及 $A^{\mathrm{T}} = V\Sigma^{\mathrm{T}}U^{\mathrm{T}}$，计算 $A^{\mathrm{T}}A$：
 
-如果加入零空间的部分, 等式就变为了 $\mathbf{AV} = \mathbf{U\Sigma}$。其中零空间对应的正交基 $\mathbf{v}_{r+1} \dots \mathbf{v}_n$, 经过线性变换以后得到 $A\mathbf{v}= 0$, 对应矩阵 $\Sigma$ 中对角线最后的特征之 $\sigma_{r+1} = \sigma_{r+2} = \dots = 0$。在等式 $AV = U\Sigma$ 两侧右乘 $V^{-1}$ 得到 $A = U\Sigma V^{-1} = U\Sigma V^{T}$ 。
-
-
-为了得到这两个正交矩阵, 考虑首先解决其中的一个, 在等式
-$$ 
-A = U \Sigma V^\top 
-$$
-
-
-两侧分别乘上等式
-
-
-$$ 
-A^\top = V \Sigma^\top U^\top 
-$$
-
-
-两侧的项: 
-$$
-\begin{aligned}
-A^\top A &= V \Sigma^\top U^\top U \Sigma V^\top \\
-&= V \Sigma^\top \Sigma V^\top \\
+$$\begin{aligned}
+A^{\mathrm{T}} A &= V \Sigma^{\mathrm{T}} U^{\mathrm{T}} U \Sigma V^{\mathrm{T}} \\
+&= V \Sigma^{\mathrm{T}} \Sigma V^{\mathrm{T}} \\
 &= V \begin{bmatrix}
 \sigma_1^2 & & \\
 & \sigma_2^2 & \\
 & & \ddots
-\end{bmatrix} V^\top
-\end{aligned}
-$$
+\end{bmatrix} V^{\mathrm{T}}
+\end{aligned}$$
 
-上式是正定矩阵 $A^\top A$ 的正交分解,  $V$ 的列向量 $\{v_i\}$ 就是矩阵 $A^\top A$ 的特征向量,  $\sigma_i^2$ 就是矩阵 $A^\top A$ 的特征值, 奇异值 $\sigma_i$ 要取正平方根。用同样的办法也可以求得 $U$, 它的列向量就是矩阵 $A A^\top$ 的特征向量, 但是考虑到特征向量方向的问题, 常见的做法是求出 $V$ 以后带入原式求出 $U$。 
+这正是对称半正定矩阵 $A^{\mathrm{T}} A$ 的谱分解（正交对角化）： $V$ 的列向量 $\mathbf{v}_i$ 是 $A^{\mathrm{T}} A$ 的标准正交特征向量， $\sigma_i^2$ 是 $A^{\mathrm{T}} A$ 的特征值，奇异值 $\sigma_i$ 取正的平方根。用同样的办法，由 $AA^{\mathrm{T}} = U\Sigma\Sigma^{\mathrm{T}} U^{\mathrm{T}}$ 也可以求得 $U$，它的列向量是 $AA^{\mathrm{T}}$ 的特征向量。但由于特征向量存在方向（正负号）的不确定性，常见的做法是先求出 $V$ 与 $\sigma_i$，再由 $\mathbf{u}_i = A\mathbf{v}_i/\sigma_i$（ $\sigma_i \neq 0$）求出 $U$ 的前 $r$ 列，其余列取左零空间的标准正交基补全。
 
-SVD为矩阵 $A$ 的四个基本子空间提供了一套完美的正交基。设 $A = U\Sigma V^T$, 且 $A$ 的秩为 $r$: 
+SVD 为矩阵 $A$ 的四个基本子空间提供了一套完美的正交基。设 $A = U\Sigma V^{\mathrm{T}}$，且 $A$ 的秩为 $r$：
 
-- **列空间 $C(A)$**: $U$ 的前 $r$ 个列向量 $\{u_1, \ldots, u_r\}$ 构成 $A$ 列空间的一组标准正交基。
-- **左零空间 $N(A^T)$**: $U$ 的后 $m - r$ 个列向量 $\{u_{r+1}, \ldots, u_m\}$ 构成 $A^T$ 零空间的一组标准正交基。
-- **行空间 $C(A^T)$**: $V$ 的前 $r$ 个列向量 $\{v_1, \ldots, v_r\}$ 构成 $A^T$ 列空间(即 $A$ 的行空间)的一组标准正交基。
-- **零空间 $N(A)$**: $V$ 的后 $n - r$ 个列向量 $\{v_{r+1}, \ldots, v_n\}$ 构成 $A$ 零空间的一组标准正交基。
+- **列空间 $C(A)$**： $U$ 的前 $r$ 个列向量 $\{\mathbf{u}_1, \ldots, \mathbf{u}_r\}$ 构成 $A$ 列空间的一组标准正交基。
+- **左零空间 $N(A^{\mathrm{T}})$**： $U$ 的后 $m - r$ 个列向量 $\{\mathbf{u}_{r+1}, \ldots, \mathbf{u}_m\}$ 构成 $A^{\mathrm{T}}$ 零空间的一组标准正交基。
+- **行空间 $C(A^{\mathrm{T}})$**： $V$ 的前 $r$ 个列向量 $\{\mathbf{v}_1, \ldots, \mathbf{v}_r\}$ 构成 $A$ 行空间的一组标准正交基。
+- **零空间 $N(A)$**： $V$ 的后 $n - r$ 个列向量 $\{\mathbf{v}_{r+1}, \ldots, \mathbf{v}_n\}$ 构成 $A$ 零空间的一组标准正交基。
 
-SVD 一次性地给出了所有四个子空间的正交基, 完美地揭示了它们之间的正交关系。
+SVD 一次性地给出了所有四个子空间的正交基，完美地揭示了它们之间的正交关系。
 
-前面在提到矩阵消元的行最简时候, 我们提到过对于情形2无解的情况我们可以通过投影给出一个最优解, 但是对于情形 4 无解的情况并没有提到如何解决, 而伪逆给出了任何情形下的最优解。
+## 左逆、右逆与伪逆
 
-**左逆, 右逆, 伪逆**: 
+前面在讲矩阵消元时，对于情形 2 的无解情况，我们可以通过投影给出一个最优解，但情形 4 的无解情况并没有提到如何解决，而伪逆给出了任何情形下的最优解。
+
+对 $\Sigma$ 取 **伪逆** $\Sigma^+$：把 $\Sigma$ 的形状转置成 $n \times m$，并把每个非零奇异值 $\sigma_i$ 换成 $1/\sigma_i$（零保持为零）。则 $A$ 的伪逆（Moore-Penrose pseudoinverse）为 $A^+ = V\Sigma^+U^{\mathrm{T}}$。
+
+**左逆、右逆、伪逆**：
 
 | 性质 | 左逆 | 右逆 | 伪逆 |
 | --- | --- | --- | --- |
-| 存在条件 | A列满秩( $m ≥ n$ ) | A行满秩( $m ≤ n$) | 任意矩阵 |
-| 唯一性 | 不唯一(除非 $m = n$ ) | 不唯一(除非 $m = n$ ) | 唯一 |
-| 构造公式 | $(A^TA)^{-1}A^T$ | $A^T(AA^T)^{-1}$ | $V\Sigma^+U^T$ |
+| 存在条件 | $A$ 列满秩（ $m \geq n$） | $A$ 行满秩（ $m \leq n$） | 任意矩阵 |
+| 唯一性 | 不唯一（除非 $m = n$） | 不唯一（除非 $m = n$） | 唯一 |
+| 常用公式 | $(A^{\mathrm{T}}A)^{-1}A^{\mathrm{T}}$ | $A^{\mathrm{T}}(AA^{\mathrm{T}})^{-1}$ | $V\Sigma^+U^{\mathrm{T}}$ |
 | 应用场景 | 超定方程组的最小二乘解 | 欠定方程组的最小范数解 | 广义解、秩亏问题 |
 
-当 $A$ 列满秩时, 其伪逆 $A^+ = V\Sigma^+ U^T$ 的计算结果恰好等于其左逆 $(A^T A)^{-1}A^T$。因此, 伪逆是最小二乘解的推广, 它给出了对任意线性方程组 $Ax = b$ 的**最小范数最小二乘解**。
+当 $A$ 列满秩时，伪逆 $A^+ = V\Sigma^+U^{\mathrm{T}}$ 恰好等于左逆 $(A^{\mathrm{T}}A)^{-1}A^{\mathrm{T}}$；当 $A$ 行满秩时，则等于右逆 $A^{\mathrm{T}}(AA^{\mathrm{T}})^{-1}$。因此，伪逆是最小二乘解的推广，它给出了对任意线性方程组 $A\mathbf{x} = \mathbf{b}$ 的 **最小范数最小二乘解** $\mathbf{x}^+ = A^+\mathbf{b}$：
 
-- **最小二乘**: 即使 $Ax = b$ 无解, 也要求 $\|Ax - b\|$ 最小。
-- **最小范数**: 如果有无穷多解, 则选择使 $\|x\|$ 最小的解。
+- **最小二乘**：即使 $A\mathbf{x} = \mathbf{b}$ 无解，也要求 $\|A\mathbf{x} - \mathbf{b}\|$ 最小。
+- **最小范数**：如果这样的最小二乘解有无穷多个，则选择使 $\|\mathbf{x}\|$ 最小的那个。
 
-伪逆方法统一了这两种情形, 能够为任意线性方程组 $Ax = b$ 给出最优解。
+伪逆方法统一了这两种情形，能够为任意线性方程组 $A\mathbf{x} = \mathbf{b}$ 给出最优解。
+
+NOTE：数值计算中通常用 $QR$ 或 SVD 求最小二乘解，而不直接解正规方程 $A^{\mathrm{T}}A\hat{\mathbf{x}} = A^{\mathrm{T}}\mathbf{b}$，因为 $A^{\mathrm{T}}A$ 的条件数是 $A$ 的平方，容易放大误差。
 
 # 线性变换、基变换下的矩阵分解
 
-基变换是视角的转化, 而线性变换则是对空间本身的网格变换, 例如放缩, 平移, 旋转。
+**基变换** 是视角的转化（同一个向量，换一组基来描述它的坐标），而 **线性变换** 则是对空间本身的“网格”变换，例如放缩、旋转、剪切、反射、投影（注意：平移不是线性变换，它不保持原点，属于仿射变换）。
 
-矩阵本身无法提供其是作为线性变换还是基变换的信息, 基变换由线性变换表示, 因此可以说基变换是线性变换的特例。
+矩阵本身无法提供它是作为线性变换还是基变换的信息。基变换矩阵是一个可逆矩阵，对应恒等变换在两组不同的基下的矩阵表示；因此从形式上说，基变换可以看作可逆线性变换的一种特殊解读。仅凭矩阵和乘法操作（如 $A\mathbf{v}$），无法直接判断它是线性变换还是基变换，因为它们的数学形式可能完全相同。例如：
 
-仅凭矩阵和乘法操作 (如 $Av$ ),  无法直接判断其是线性变换还是基变换 , 因为它们的数学形式可能完全相同。例如: 
+- 如果 $A$ 是一个旋转矩阵，则 $A\mathbf{v}$ 表示对向量 $\mathbf{v}$ 进行旋转（线性变换）。
+- 如果 $P$ 是基变换矩阵，则 $P[\mathbf{v}]_C$ 表示把 $\mathbf{v}$ 在新基下的坐标换算成旧基下的坐标（基变换）。
 
-如果 $A$ 是一个旋转矩阵, 则 $Av$ 表示对向量 v 进行旋转(线性变换)。
+区分的关键在于语境和构造。
 
-如果 $A$ 是基变换矩阵(如从基 $B$ 到基 $C$ 的过渡矩阵), 则 $A[v]_B$ 表示将 v 的坐标从基 $B$ 转换到基 $C$(基变换)。
+**基变换矩阵的约定**：设 $B$ 为旧基， $C$ 为新基，过渡矩阵 $P$ 的第 $j$ 列是新基向量 $\mathbf{c}_j$ 在旧基 $B$ 下的坐标。则
 
-区分的关键在于语境和构造
+$$[\mathbf{v}]_B = P\,[\mathbf{v}]_C, \qquad [\mathbf{v}]_C = P^{-1}[\mathbf{v}]_B$$
 
-基变换矩阵的特性 : 
+即 $P$ 把“新坐标”换算成“旧坐标”， $P^{-1}$ 则相反。基变换矩阵必须可逆（因为基之间的转换必须可逆）。
 
-- 其列向量必须是 新基在旧基下的坐标表示 。例如, 若从基 $B$ 到基 $C$ 的过渡矩阵为 $P$, 则 $P$ 的每一列是 $C$ 中的基向量在 $B$ 下的坐标。
-- 必须是 可逆的 (因为基之间的转换必须可逆)。
-  
-一般线性变换矩阵的特性 : 
+一般线性变换矩阵的特性：
 
-- 其列向量是该变换作用于 标准基 后的结果(例如旋转、缩放后的标准基向量)。
-- 可能不可逆(如压缩映射)。
+- 其列向量是该变换作用于标准基之后的结果（例如旋转、缩放之后的标准基向量）。
+- 可能不可逆（如压缩、投影）。
 
+对于一个矩阵的具体作用，在不同情形下可能有不同的理解。
 
-对于一个矩阵具体的作用, 在不同情形下可能有不同的理解。
+## A = LU
 
-## $A = LU$
-
-$LU$ 分解将矩阵分解为一个下三角以及上三角矩阵乘积；实际上, 对于线性方程组进行高斯消元时, 在不设计行交换时, 每一次的行变换都可以用一个下三角矩阵表示, 那么其乘积以及逆都是下三角矩阵 $L$, 该下三角矩阵, 的每一个系数记录了每次操作的消元系数。
+$LU$ 分解把矩阵分解为一个下三角矩阵与一个上三角矩阵的乘积。在不涉及行交换时，对线性方程组进行高斯消元的每一次行变换都可以用一个下三角矩阵表示，这些下三角矩阵的乘积 $E$ 仍然是下三角矩阵，其逆 $L = E^{-1}$ 也是下三角矩阵， $L$ 的每个元素记录了每次操作的消元乘数 $\ell_{ij}$：
 
 $$\begin{bmatrix}
 1 &  &  \\
-a_{21} & 1 &  \\
-a_{31} & a_{32} & 1 \\
+\ell_{21} & 1 &  \\
+\ell_{31} & \ell_{32} & 1
 \end{bmatrix}$$
 
-如上矩阵表示在对一列进行消元时, 进行的操作 $r_2 = r_2 + a_{21}r_1$ ,  $r_3 = a_{31}r_1$ ；在第二列进行消元时,   $r_3 = a_{32}r_2$ 。
+如上矩阵表示：对第一列消元时，进行的操作是 $r_2 \leftarrow r_2 - \ell_{21}r_1$， $r_3 \leftarrow r_3 - \ell_{31}r_1$；对第二列消元时，进行的操作是 $r_3 \leftarrow r_3 - \ell_{32}r_2$。
 
-## $A = P\Lambda P^{-1}$
+## A = S Λ S⁻¹
 
-考虑方阵 $A$ ,  $A$ 代表了一个空间变换, 空间的变换只对该矩阵的特征向量起到缩放作用。那么 $A$ 所代表的空间变换, 我们可以考虑先把向量 $x$ 转化为用矩阵 $A$ 的特征向量构成的基底表示, 即 $Q^{-1}x$ , 其中 $Q$ 为方阵 $A$ 的特征向量构成的矩阵(为什么是 $Q^{-1}$ 而不是 $Q$ ?因为特征向量是从原矩阵求解而来, 它们都是在同一视角下的表示, 要变化到特征向量的视角则是其逆 $Q^{-1}$ )。那么矩阵 $A$ 对这个新的 $x$ , 即 $Q^{-1}x$ 的作用就仅仅是缩放(在每个维度上进行缩放), 这个缩放用一个新的矩阵 $\Sigma$ 表示, 其为对角矩阵, 对角线上即是对应的特征值, 那么现在整个变化记为 $\Sigma$ $Q^{-1}x$ 。完成变化后, 我们回到原来的基的视角, 即左乘 $Q$ , 整个变化即如下: 
+考虑方阵 $A$，它代表了一个空间变换，这个变换只对 $A$ 的特征向量起到缩放作用。那么 $A$ 所代表的变换，可以分三步来理解：先把向量 $\mathbf{x}$ 转化为用 $A$ 的特征向量构成的基来表示，再在这个基下做缩放，最后回到原来的基。
 
-$$Ax = Q\Sigma{Q^{-1}}{x} \longrightarrow A = Q\Sigma{Q^{-1}}$$
+其中 $S$ 为 $A$ 的特征向量构成的矩阵。 $S$ 的列是特征向量在原来（标准）坐标下的表示，所以按上面的约定， $S$ 把“特征向量坐标”换算成“原坐标”。因此要从原坐标变到特征向量坐标，需要的是 $S^{-1}$（而不是 $S$），即 $S^{-1}\mathbf{x}$。在特征向量坐标下， $A$ 的作用仅仅是在每个维度上缩放，这个缩放用对角矩阵 $\Lambda$（对角线上是对应的特征值）表示，变成 $\Lambda S^{-1}\mathbf{x}$。完成变换后，再左乘 $S$ 回到原来的坐标，整个变换就是：
 
+$$A\mathbf{x} = S\Lambda S^{-1}\mathbf{x} \longrightarrow A = S\Lambda S^{-1}$$
 
-## $A = U\Sigma V^*$
+## A = U Σ Vᵀ
 
-考虑向量 $\begin{bmatrix} V_1 & V_2 \end{bmatrix}$ , 其为一组正交的向量, 如果其在经历空间变换 $M$ 以后仍然映射为一组正交的向量 $\begin{bmatrix} U_1 & U_2 \end{bmatrix}$ 。那么, 我们直接在向量 $\begin{bmatrix} U_1 & U_2 \end{bmatrix}$ 的方向上选择一组基 $\begin{bmatrix} u_1 & u_2 \end{bmatrix}$ , 那么向量 $\begin{bmatrix} v_1 & v_2 \end{bmatrix}$ , 在经历空间变化以后, 在基 $\begin{bmatrix} u_1 & u_2 \end{bmatrix}$ 上的表示为,  $\begin{bmatrix} u_1 & u_2 \end{bmatrix} * \begin{bmatrix} \sigma_1 &  \\  & \sigma_2 \end{bmatrix}$ 。即: 
+考虑一组标准正交向量 $\mathbf{v}_1, \mathbf{v}_2$，如果它们在经历线性变换 $M$ 以后仍然映射为一组正交的向量，则这两个像向量可以写成 $\sigma_1\mathbf{u}_1, \sigma_2\mathbf{u}_2$，其中 $\mathbf{u}_1, \mathbf{u}_2$ 是单位正交向量， $\sigma_i$ 是长度。即：
 
-$$M[v_1, v_2] = [u_1, u_2] * \begin{bmatrix} \sigma_1 &  \\  & \sigma_2 \end{bmatrix} \rightarrow
-MV = U\Sigma \rightarrow  M = U\Sigma V^T$$
+$$M[\mathbf{v}_1, \mathbf{v}_2] = [\mathbf{u}_1, \mathbf{u}_2] \begin{bmatrix} \sigma_1 &  \\  & \sigma_2 \end{bmatrix} \rightarrow
+MV = U\Sigma \rightarrow M = U\Sigma V^{\mathrm{T}}$$
 
-如此, 对于奇异值分解, 我们有如下的直观理解: 对于矩阵 $M$ ,其对一组向量 $V$ 在变换以后仍然为正交的向量。在进行变换的时候考虑直接转换到向量 $V$ 的视角之下, 然后进行缩放 $\Sigma$ , 以及其它变换 $E$ (旋转, 投影), 最后变换回原来的视角。即: 
+对奇异值分解可以有如下直观理解：先用 $V^{\mathrm{T}}$ 转换到 $V$ 的视角（输入空间中的一组标准正交基），在这个视角下各个方向只被缩放 $\Sigma$，然后用 $U$ 变换到输出空间中的一组标准正交基。
 
-$$M = VE\Sigma V^T \rightarrow M = U\Sigma V^T$$
+对于方阵 $M$，若令 $E = V^{\mathrm{T}}U$（它是正交矩阵），则 $M = U\Sigma V^{\mathrm{T}} = VE\Sigma V^{\mathrm{T}}$：先转到 $V$ 的视角，缩放 $\Sigma$，再做一个旋转（或反射） $E$，最后变换回原来的视角。
 
-可以看到奇异值与特征值分解的区别在于, 选择的视角不同。当选择特征向量视角时, 变换只会有缩放即 $\Sigma$ 变换, 当选择任意的正交向量视角时, 变换不仅包含缩放还含有旋转以及投影等即 $E\Sigma$ 。
+可以看到奇异值分解与特征值分解的区别在于：特征值分解输入与输出使用 **同一组基**（特征向量），所以变换只剩缩放 $\Lambda$；奇异值分解的输入与输出使用 **两组不同的标准正交基** $V$ 与 $U$，二者之间的错位表现为额外的旋转 $E$。而“投影”（降维）并不来自 $E$（ $E$ 是正交矩阵），而是来自 $\Sigma$ 中为 0 的奇异值。
 
+需要注意的是，虽然上面从视角转换的角度解释了特征分解以及奇异值分解，但矩阵分解同样可以从空间变换的角度理解。例如对于奇异值分解有如下解释：第一个变换 $V^{\mathrm{T}}$ 把标准正交向量 $\mathbf{v}_1, \mathbf{v}_2$ 转到水平和垂直方向（标准基方向）； $\Sigma$ 对这两个方向分别放缩（单位圆变成椭圆， $\sigma_i$ 是半轴长）； $U$ 再把放缩后的椭圆旋转（或反射）到最后的位置。
 
-需要注意的是, 虽然对于特征分解以及奇异值分解从视角转换的角度去解释了。但是, 矩阵分解同样可以从空间变换的角度理解。例如对于奇异值分解有如下解释: 
+下面把 SVD 的三步变换画出来： $V^{\mathrm{T}}$ 把 $\mathbf{v}_1, \mathbf{v}_2$ 转到坐标轴方向， $\Sigma$ 沿坐标轴缩放（单位圆变成椭圆，半轴长为 $\sigma_i$）， $U$ 再把椭圆转到最终位置。
 
-第一个变换 $V^{T}$ 将单位正交向量 $v_1, v_2$ 转到水平和垂直方向、 $\Sigma$ 相当于对 $v_1, v_2$ 进行放缩、 $U$ 将放缩后的向量旋转到最后的位置。
+```{r}
+#| label: fig-svd-steps
+#| fig.width: 10
+#| fig.height: 2.9
+#| fig.cap: "SVD 的几何意义：$$x \to V^{\mathrm{T}} x \to \Sigma V^{\mathrm{T}} x \to U \Sigma V^{\mathrm{T}} x$$"
+th <- seq(0, 2 * pi, length.out = 200); circ <- rbind(cos(th), sin(th))
+M <- matrix(c(2, 0, 1, 1.5), 2)               # 即 [[2, 1], [0, 1.5]]
+s <- svd(M); V <- s$v; U <- s$u; D <- diag(s$d)
 
+panel <- function(pts, vecs, ttl, lim = 2.8) {
+  plot(t(pts), type = "l", asp = 1, xlim = c(-lim, lim), ylim = c(-lim, lim),
+       xlab = "", ylab = "", main = ttl)
+  abline(h = 0, v = 0, col = "grey85")
+  draw_vec(vecs[, 1], col = col_a)
+  draw_vec(vecs[, 2], col = col_p)
+}
+par(mfrow = c(1, 4), mar = c(2, 2, 2, 1))
+panel(circ,                    V,       "x (v₁, v₂)")
+panel(t(V) %*% circ,           diag(2), "Vᵀx")
+panel(D %*% t(V) %*% circ,     D,       "ΣVᵀx")
+panel(U %*% D %*% t(V) %*% circ, U %*% D, "UΣVᵀx = Mx")
+```
+
+# 各种分解总览
+
+| 分解 | 适用对象 | 条件 | 核心思想 | 典型用途 |
+| --- | --- | --- | --- | --- |
+| $A = LU$（ $PA = LU$） | 方阵（一般矩阵亦可） | 消元顺利（必要时行交换） | 记录消元乘数 | 解方程组、行列式 |
+| $A = QR$ | $m \times n$ | 列线性无关 | Gram-Schmidt 正交化 | 最小二乘 |
+| $A = S\Lambda S^{-1}$ | 方阵 | 有 $n$ 个线性无关的特征向量 | 在特征向量基下只做缩放 | 矩阵的幂、微分方程 |
+| $A = Q\Lambda Q^{\mathrm{T}}$ | 实对称矩阵 | 无（总可以） | 标准正交的特征向量 | 二次型、正定性 |
+| $A = U\Sigma V^{\mathrm{T}}$ | 任意矩阵 | 无（总可以） | 两组正交基之间的缩放 | 低秩逼近、伪逆 |
+| 若尔当标准形 | 复方阵 | 无（总可以） | 不能对角化时的最简形式 | 理论分析 |
+
+# 用 R 做数值验证
+
+下面用几个小例子验证前面的结论。
+
+**解方程组并检验**（开头的例子，解为 $x_1 = 2.2,\ x_2 = 1.2$）：
+
+```{r}
+A <- matrix(c(2, 3, 1, -1), 2, byrow = TRUE)
+b <- c(8, 1)
+x <- solve(A, b)
+x
+A %*% x   # 应等于 b
+```
+
+**最小二乘： $QR$ 分解与正规方程给出相同的解**（拟合直线 $y = c_0 + c_1 t$）：
+
+```{r}
+X <- cbind(1, c(0, 1, 2))
+y <- c(1, 2, 2)
+qr_X <- qr(X)
+Q <- qr.Q(qr_X); R <- qr.R(qr_X)
+all.equal(Q %*% R, X)                          # X = QR
+backsolve(R, t(Q) %*% y)                       # 解 R x = Q^{\mathrm{T}} y
+solve(t(X) %*% X, t(X) %*% y)                  # 正规方程，结果相同
+```
+
+**正定性判断**：
+
+```{r}
+S <- matrix(c(2, 6, 6, 20), 2)
+eigen(S)$values        # 全为正，说明正定
+chol(S)                # 能成功分解（R^{\mathrm{T}} R），也说明正定
+
+S2 <- matrix(c(2, 6, 6, 7), 2)
+eigen(S2)$values        # 有负特征值，不定
+```
+
+**SVD 与伪逆**（秩为 1 的 $2 \times 3$ 矩阵， $A$ 不可逆但有伪逆）：
+
+```{r}
+M <- matrix(c(1, 2, 3,
+              2, 4, 6), 2, byrow = TRUE)
+s <- svd(M)
+s$d                                    # 第二个奇异值（数值上）为 0
+M_plus <- MASS::ginv(M)
+M_plus
+all.equal(M %*% M_plus %*% M, M)       # 伪逆的基本性质 A A^+ A = A
+```
