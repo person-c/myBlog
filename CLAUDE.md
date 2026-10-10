@@ -30,7 +30,7 @@ hugo mod clean && hugo mod get -u && hugo mod vendor   # upgrade modules — onl
 Render a note (`.Rmd` → `.html`). Run it **in the file's own directory**: image paths in the `.Rmd` are relative to it.
 
 ```sh
-cd content/note && Rscript -e 'litedown::fuse("2025-09-02-introduction-to-linear-algebra-review.Rmd")'
+cd content/note && Rscript -e 'litedown::fuse("2025-09-02-introduction-to-linear-algebra.Rmd")'
 ```
 
 Deterministic checks and preview (what they enforce is in the review directives):
@@ -43,7 +43,8 @@ sh scripts/preview.sh content/note/foo.Rmd     # reuse or start the litedown pre
 
 Pipeline facts worth remembering:
 
-- Notes are rendered by **litedown** (`litedown::fuse()` — knitr + markdown in one step), **not** Quarto or rmarkdown. Quarto-only options (`code-fold:`, `fig-format:`, `#| ...`) are silently ignored, so do not introduce them; plotly output has not been verified under litedown, test it before relying on it.
+- Notes are rendered by **litedown** (`litedown::fuse()` — knitr + markdown in one step), **not** Quarto or rmarkdown. The authoritative reference is the source clone at `reference/litedown/` (gitignored; re-clone from https://github.com/yihui/litedown if missing) — see `reference/litedown/docs/02-fuse.Rmd` (chunk options, devices), `05-assets.Rmd` (assets, code folding), `06-widgets.Rmd` (plotly). Facts that cost time to learn: chunk options are litedown's own and dotted (`fig.cap`, `fig.width`; Quarto's `fig-cap:`, `code-fold:`, `fig-format:` are silently ignored); global defaults go through `litedown::reactor()`, **not** `knitr::opts_chunk$set()`; the device is set with `reactor(dev = "svg")`; code folding is `meta: js: ["@fold-details"]`; `fig.align` does not exist (figures are centred by default). Plot files land in `<input>__files/` (the default `fig.path`) and are inlined into the page, so that directory is generated output and is gitignored.
+- **plotly**: litedown has no htmlwidgets support, so the figures use the documented JS route (recipe in `reference/litedown/examples/022-dygraphs.Rmd`, prose in `docs/06-widgets.Rmd`): an R chunk with `litedown::vest(js = '@npm/plotly.js@<ver>/dist/plotly.min.js')` loads the library, a second R chunk ends with `spec <- plotly::plotly_build(fig)$x[c("data", "layout")]`, then a `{js, type = 'module', echo = FALSE, fill = xfun::tojson}` chunk runs `Plotly.newPlot(document.getElementById(<id>), spec.data, spec.layout, {responsive: true})`, and the container is a fenced div `::: {#<id> style="width: 100%; height: <h>px;"}` placed **after** that chunk (module scripts are deferred). Both figures verified rendering in headless Chrome (`.main-svg` present in both containers, no JS errors). `vest()` resolves the npm alias and caches the file; by default the page still links the jsdelivr URL — add `embed_resources: "all"` to inline it (+4.5 MB).
 - `hugo.toml` sets `ignoreFiles = ["\\.Rmd$"]`: the `.Rmd` is never built, so the rendered **`.html` is the published page and has to be committed**. Editing the `.Rmd` alone changes nothing online until it is re-rendered.
 - `hugo mod get -u` upgrades every module, the theme included. The pinned version is in `go.mod`; do not copy version numbers into this file.
 - Production builds run on Vercel, with the Hugo version pinned in `vercel.json`.

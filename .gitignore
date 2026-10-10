@@ -1,7 +1,13 @@
 /public
+# litedown writes plot files to <input>__files/ and inlines them in the HTML --
+# generated output, not a source (see CLAUDE.md)
+*__files/
 /themes/
 /content/note/fluent_disease*
 /content/note/social_media*
 /.quarto/
 /content/daily_life/
 /.claude/settings.local.json
+# litedown source clone -- docs/ and examples/ are the reference for math syntax,
+# widgets and chunk options (see CLAUDE.md)
+/reference/litedown/
