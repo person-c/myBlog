@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 
 # Preview content with litedown::roam(): reuse a server that already covers the
-# target, otherwise start one.  See CLAUDE.md, "Preview with litedown".
+# target, otherwise start one.  See docs/litedown.md, "Preview with roam".
 #
 # Usage: scripts/preview.sh [file-or-dir]      (default: content/note)
 # Exit status: 0 = a server covers the target (URL printed),

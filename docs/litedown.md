@@ -33,6 +33,10 @@ litedown delegates math protection to `xfun::protect_math()`, which shields only
 
 Plot files land in `<input>__files/` (the default `fig.path`), e.g. `content/note/foo__files/fig-bar-1.svg`. They are **inlined** into the `.html` — nothing in the page points at that directory — so it is generated output, and `*__files/` is gitignored. A page's `<img>` tags are likewise inlined local images as data URIs (e.g. `static/images-note/four_subspace.png`).
 
+## Preview with roam
+
+`litedown::roam(<dir>)` serves the files in that directory over HTTP (port 4321 by default, incrementing when it is busy) and re-renders the `.Rmd` live — no `.html` is written. `scripts/preview.sh <file-or-dir>` reuses a running server that already covers the target, otherwise starts one.
+
 ## plotly
 
 litedown has no htmlwidgets support, so plotly figures use the documented JS route — recipe in `examples/022-dygraphs.Rmd`, prose in `docs/06-widgets.Rmd`:
