@@ -39,6 +39,7 @@ Applies to every `.md`/`.Rmd` that contains code or front matter.
 Every Hugo content file begins with YAML front matter. Verify correctness before reviewing body content. (The litedown-generated `.html` in `content/note` is the exception — it has no front matter; its `.Rmd` carries the title and date.) `Rscript scripts/check-meta.R <file>` does the mechanical part.
 
 - **Required fields:** `title` must be present and non-empty; `date` must be present and in ISO 8601 format (`YYYY-MM-DD`). If the file has no `date`, flag as `[Accuracy]`.
+- **Section indexes are exempt:** an `_index.md` (branch bundle) carries only what its layout needs — `content/note/_index.md` is just `layout: note`, with no title and no date. Do not require either; `scripts/check-meta.R` reports it as a note, not an error.
 - **Date consistency:** The `date` in front matter must match the date prefix in the filename (e.g., `2025-09-19-AI-related.md` → `date: 2025-09-19`). Mismatch is an `[Accuracy]` error.
 - **Lastmod:** do not hand-write it. `hugo.toml` sets `enableGitInfo = true`, so Hugo takes the date from git; a hand-written `lastmod` goes stale the moment the file is reviewed. Flag an existing `lastmod` as `[Suggestion]` — recommend deleting it.
 - **Boolean fields:** `draft` must be `true` or `false` (unquoted). A quoted `"true"` or `"false"` is a YAML string, not a boolean — flag as `[Accuracy]`.

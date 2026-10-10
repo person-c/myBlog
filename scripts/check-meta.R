@@ -74,6 +74,13 @@ for (f in files) {
     next
   }
 
+  # a section index carries only what its layout needs: content/note/_index.md is
+  # just `layout: note`, with no title and no date, and that is fine
+  if (tolower(basename(f)) == "_index.md") {
+    note(f, "section index -- title/date not required")
+    next
+  }
+
   # title
   if (is.null(meta$title) || !nzchar(trimws(as.character(meta$title)))) {
     err(f, "missing or empty 'title'")
