@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-Hugo-based personal blog using theme [Nothing](https://github.com/person-c/Nothing) v3.1.3 (self-built, imported via Hugo Module), deployed on Vercel (https://cying.org).
+Hugo-based personal blog using theme [Nothing](https://github.com/person-c/Nothing) (self-built, imported as a Hugo Module — the pinned version lives in `go.mod`), deployed on Vercel (https://cying.org).
 
 ### Directory Structure
 
@@ -23,9 +23,30 @@ content/
 ### Common Commands
 
 ```sh
-hugo mod clean && hugo mod get -u && hugo mod vendor
-hugo server --noHTTPCache --disableFastRender
+hugo server --noHTTPCache --disableFastRender          # local Hugo preview
+hugo mod clean && hugo mod get -u && hugo mod vendor   # upgrade modules — only when intended
 ```
+
+Render a note (`.Rmd` → `.html`). Run it **in the file's own directory**: image paths in the `.Rmd` are relative to it.
+
+```sh
+cd content/note && Rscript -e 'litedown::fuse("2025-09-02-introduction-to-linear-algebra-review.Rmd")'
+```
+
+Deterministic checks and preview (what they enforce is in the review directives):
+
+```sh
+Rscript scripts/check-math.R content/note      # math litedown will not protect
+Rscript scripts/check-meta.R content/note      # YAML front matter
+sh scripts/preview.sh content/note/foo.Rmd     # reuse or start the litedown preview server
+```
+
+Pipeline facts worth remembering:
+
+- Notes are rendered by **litedown** (`litedown::fuse()` — knitr + markdown in one step), **not** Quarto or rmarkdown. Quarto-only options (`code-fold:`, `fig-format:`, `#| ...`) are silently ignored, so do not introduce them; plotly output has not been verified under litedown, test it before relying on it.
+- `hugo.toml` sets `ignoreFiles = ["\\.Rmd$"]`: the `.Rmd` is never built, so the rendered **`.html` is the published page and has to be committed**. Editing the `.Rmd` alone changes nothing online until it is re-rendered.
+- `hugo mod get -u` upgrades every module, the theme included. The pinned version is in `go.mod`; do not copy version numbers into this file.
+- Production builds run on Vercel, with the Hugo version pinned in `vercel.json`.
 
 ---
 
@@ -41,6 +62,8 @@ Highest priority is **verifiable accuracy**. Every critique must be grounded in 
 
 For every substantive correction involving facts, formulas, definitions, or core concepts, you **must** first state the underlying principle from a canonical source, then apply it.
 
+Give a section number only when you can confirm it; otherwise name the book and the topic (e.g., "Casella & Berger, *Statistical Inference*, the chapter on interval estimation"). A precise-looking locator that turns out not to exist is worse than no locator at all.
+
 **Example:**
 > **[Accuracy]** The original formula for the t-statistic is incorrect because it uses the population standard deviation (`σ`). The t-distribution is specifically used when `σ` is unknown and estimated by the sample standard deviation (`s`).
 >
@@ -51,15 +74,17 @@ For every substantive correction involving facts, formulas, definitions, or core
 
 Prioritize sources in the following order. If sources conflict, defer to the higher tier.
 
+A difference in **convention** is not an error. Whether Jordan blocks carry their 1s above or below the diagonal, the sign convention for the determinant, `A^T` vs `A^\top`, whether "positive definite" requires symmetry in the definition itself — books legitimately differ. Report such a conflict as `[Clarity]` (choose one form and say why), never as `[Accuracy]`.
+
 - **Tier 1 (Canonical):** ISO standards, official language documentation, and documentation from major scientific/regulatory bodies.
-  - **General:** ISO standards, W3C specifications.
+  - **General:** ISO standards, W3C specifications. For Chinese writing: GB/T 15834-2011《标点符号用法》, and the 全国科学技术名词审定委员会 term database ([termonline.cn](https://www.termonline.cn/)) for 科技术语.
   - **R:** [R Language Definition](https://cran.r-project.org/doc/manuals/r-release/R-lang.html), [R Internals](https://cran.r-project.org/doc/manuals/r-release/R-ints.html), official CRAN package reference manuals.
   - **Python:** [Python Language Reference](https://docs.python.org/3/reference/), [Python Standard Library](https://docs.python.org/3/library/).
   - **JavaScript/TypeScript:** [ECMAScript Language Specification (ECMA-262)](https://tc39.es/ecma262/), [MDN Web Docs](https://developer.mozilla.org/), [TypeScript Handbook](https://www.typescriptlang.org/docs/handbook/).
   - **Rust:** [The Rust Reference](https://doc.rust-lang.org/reference/), [Rust Standard Library Docs](https://doc.rust-lang.org/std/), [The Rustonomicon](https://doc.rust-lang.org/nomicon/) (for unsafe code).
   - **Economics/Finance:** Cochrane *Asset Pricing* (Revised ed.), Campbell, Lo & MacKinlay *The Econometrics of Financial Markets*, Fama & French (1993) *Common risk factors in the returns on stocks and bonds*.
   - **Medicine/Epidemiology:** CONSORT 2010 Statement, STROBE Statement, PRISMA 2020 Statement, Cochrane Handbook for Systematic Reviews of Interventions, ICMJE Recommendations, FDA/EMA/NMPA guidance documents.
-  - **Mathematics:** Rudin *Principles of Mathematical Analysis* (3rd ed.), Strang *Linear Algebra and Its Applications* (5th ed.), Billingsley *Probability and Measure* (3rd ed.).
+  - **Mathematics:** Rudin *Principles of Mathematical Analysis* (3rd ed.), Strang *Linear Algebra and Its Applications* (5th ed.) and *Introduction to Linear Algebra* (6th ed., the MIT 18.06 text), Billingsley *Probability and Measure* (3rd ed.).
 - **Tier 2 (Seminal Works):** Widely-recognized graduate-level textbooks and foundational research papers.
   - **General/ML:** Bishop *Pattern Recognition and Machine Learning*, Hastie, Tibshirani & Friedman *The Elements of Statistical Learning* (2nd ed.), Murphy *Probabilistic Machine Learning*.
   - **R:** Wickham *Advanced R* (2nd ed.), *ggplot2: Elegant Graphics for Data Analysis* (3rd ed.), *R for Data Science* (2nd ed.); Chambers *Software for Data Analysis*.
@@ -138,8 +163,8 @@ Review depth is determined by the content section. Apply the correct intensity b
 - Late-binding closures: In a loop creating lambdas, variables are captured by name, not value — `[lambda: i for i in range(3)]` produces three functions all returning 2. Flag as `[Accuracy]`. Use `lambda i=i: i` to bind by value.
 - `assert` for input validation: `assert` statements are stripped under `python -O`, so production code must not depend on them for validation. Flag as `[Accuracy]` in non-tutorial code.
 - `time.time()` for measuring duration: returns wall-clock time subject to DST/NTP jumps. Flag as `[Suggestion]`. Use `time.monotonic()` or `time.perf_counter()`.
-- pandas chain-assignment: `df[df.a > 0]["b"] = 1` may trigger `SettingWithCopyWarning` and has undefined semantics. Flag as `[Suggestion]`. Use `.loc`: `df.loc[df.a > 0, "b"] = 1`.
-- `inplace=True` in pandas: deprecated since pandas 2.0, removed in 3.0. Flag as `[Suggestion]`. Use explicit assignment: `df = df.drop(...)`.
+- pandas chain-assignment: `df[df.a > 0]["b"] = 1`. Under pandas ≥ 3.0 (Copy-on-Write is the only mode) it silently does nothing and `SettingWithCopyWarning` no longer exists; under 2.x it warns and the outcome is undefined. Flag as `[Suggestion]`, and say which of the two applies. Use `.loc`: `df.loc[df.a > 0, "b"] = 1`.
+- `inplace=True` in pandas: still present in 3.0 — value-changing methods now return `self` instead of `None`; deprecated in 3.1, with removal planned for 4.0, shape-changing methods first (PDEP-8). Flag as `[Suggestion]`. Use explicit assignment: `df = df.drop(...)`.
 - `os.system()` / `os.popen()`: passes input through the shell, risking command injection. Flag as `[Accuracy]`. Use `subprocess.run()` with `shell=False` (the default).
 - Top-level mutable module state: assigning to imported module attributes (`mymodule.x = 5`) breaks composability and testability. Flag as `[Suggestion]`.
 - Missing encoding on `open()`: `open("file")` uses locale-dependent encoding on Windows. Flag as `[Suggestion]`. Always specify `encoding="utf-8"`.
@@ -169,8 +194,25 @@ Review depth is determined by the content section. Apply the correct intensity b
 - `clone()` to pacify the borrow checker: a performance smell when used to silence a borrow error rather than restructure ownership. Flag as `[Suggestion]`.
 - `println!` / `dbg!` in library code: writes to stdout, interfering with downstream consumers. Flag as `[Suggestion]`. Use `log` or `tracing` crates.
 - `collect::<Vec<_>>()` then iterate: materializes an intermediate collection unnecessarily. Flag as `[Suggestion]`. Chain the iterator directly.
-- Missing `#[must_use]` on fallible functions: a function returning `Result` whose result callers should not ignore. Flag as `[Suggestion]`.
+- Redundant `#[must_use]`: `Result` and `Option` are already `#[must_use]`, so a bare `#[must_use]` on a function returning one of them adds nothing and `clippy::double_must_use` lints it. Flag as `[Suggestion]`. Keep the attribute for types that are *not* already `#[must_use]`, or attach a message: `#[must_use = "..."]`.
 - `as` cast for numeric conversions that silently truncate: `u32 as u16` drops upper bits silently. Flag as `[Suggestion]`. Use `TryFrom` / `from` for checked conversions.
+
+**litedown math checks** (apply to every `.Rmd` file — this repo's `.Rmd` → `.html` pipeline is litedown, which delegates math protection to `xfun::protect_math()`):
+
+litedown shields only the math that matches xfun's heuristics. Anything else is handed to the Markdown parser as ordinary text and silently corrupted (`\\` → `\`, `\,` → `,`, `\|` → `|`, `^` → `<sup>`, `_` → `<em>`, `'` → `’`, and a lone `=` line turns the preceding lines into a setext heading). Since KaTeX auto-render accepts only `$$…$$`, `\(…\)` and `\[…\]`, the formula then fails to render at all in the browser. Flag every violation as `[Accuracy]`.
+
+- Inline `$...$`: the opening `$` must be preceded by whitespace, an ASCII `(`, or the start of a line. Flag as `[Accuracy]` — `、$LU$`、`：$C$`、`（$A$ 可逆）` are all broken, because a full-width `（` is not `(`, and CJK punctuation is not whitespace. The closing `$` must not be followed by a digit, and no space may sit just inside either delimiter. **Fix:** insert one space before the `$` (this is also the standard gap between Chinese text and Western symbols).
+- Display `$$...$$`: a multi-line block is protected only when the opening `$$` is glued to its content and the closing `$$` is glued to the end of the last content line — `$$\begin{aligned}` … `\end{aligned}$$`. A `$$` alone on its own line is never protected. Flag as `[Accuracy]`. **Fix:** move the delimiters onto the content lines. (xfun's own documentation says multi-line `$$…$$` is supported, so this is a tool limitation to code around, not an error in the author's LaTeX.)
+- Never settle for repairing the rendered `.html` — it is generated output, and `litedown::roam()` re-renders the `.Rmd` live without writing `.html` at all. Fix the `.Rmd` and re-render.
+- Reference: `?xfun::protect_math` (Details) and `xfun:::escape_math()`; rules verified against litedown 0.10.1 / xfun 0.56 (an `.Rmd` that satisfies them renders with zero mis-converted formulas).
+- Exact check for one file (`xfun::prose_index()` keeps R code chunks, whose `$` is R's extract operator, out of the scan):
+
+```r
+x <- readLines("file.Rmd")
+p <- xfun::protect_math(x)
+which(grepl("[$]", gsub("[$][$]", "", p[xfun::prose_index(x)])))  # inline math that will NOT render
+grep("^[[:space:]]*[$][$][[:space:]]*$", x)                       # bare $$ lines that will NOT protect
+```
 
 **2. Enhance Clarity and Structure**
 - Improve logical flow, conciseness, and precision of language
@@ -178,18 +220,31 @@ Review depth is determined by the content section. Apply the correct intensity b
 
 **3. Validate Metadata (Front Matter)**
 
-Every Hugo content file begins with YAML front matter. Verify correctness before reviewing body content.
+Every Hugo content file begins with YAML front matter. Verify correctness before reviewing body content. (The litedown-generated `.html` in `content/note` is the exception — it has no front matter; its `.Rmd` carries the title and date.) `Rscript scripts/check-meta.R <file>` does the mechanical part.
 
 - **Required fields:** `title` must be present and non-empty; `date` must be present and in ISO 8601 format (`YYYY-MM-DD`). If the file has no `date`, flag as `[Accuracy]`.
 - **Date consistency:** The `date` in front matter must match the date prefix in the filename (e.g., `2025-09-19-AI-related.md` → `date: 2025-09-19`). Mismatch is an `[Accuracy]` error.
-- **Lastmod consistency:** If `lastmod` is present, it must match the file's latest git modification date (run `git log -1 --format=%as -- <file>` to obtain it). A stale `lastmod` that predates actual content changes is an `[Accuracy]` error. If `lastmod` is absent but the file has been modified after its `date`, flag as `[Suggestion]` — recommend adding `lastmod`.
+- **Lastmod:** do not hand-write it. `hugo.toml` sets `enableGitInfo = true`, so Hugo takes the date from git; a hand-written `lastmod` goes stale the moment the file is reviewed. Flag an existing `lastmod` as `[Suggestion]` — recommend deleting it.
 - **Boolean fields:** `draft` must be `true` or `false` (unquoted). A quoted `"true"` or `"false"` is a YAML string, not a boolean — flag as `[Accuracy]`.
 - **Categories/Tags:** `categories` and `tags` must be YAML lists, not comma-separated strings. Flag inconsistent formats across sibling articles as `[Suggestion]`.
-- **Extra/Stale fields:** Flag non-standard fields (e.g., `layout`, `author`, custom keys) as `[Question]` — ask whether they are consumed by the theme or are leftover cruft.
+- **Extra/Stale fields:** Flag fields Hugo does not define (e.g., `author`, custom keys, a typo in a field name) as `[Question]` — ask whether they are consumed by the theme or are leftover cruft. `layout`, `type`, `weight`, `aliases` and the like are standard, and `scripts/check-meta.R` reports only what is not.
 
 **4. Provide Strategic Improvements**
 - Identify critical omissions (e.g., missing assumptions for a statistical test, lack of error handling in code)
 - Suggest superior alternatives, justifying with appeals to efficiency, robustness, or clarity, referencing principles where possible
+
+**5. Enforce Site Conventions**
+
+- **Annotation language: Chinese.** Annotation blocks and the review summary are written in Chinese; quoted 原文 stays as it is.
+- **Notation: consistent within an article — and an article that is already self-consistent keeps its own choice** (see the convention note under the source hierarchy). Do not rewrite notation wholesale; flag mixing as `[Clarity]` and name both forms.
+
+| Convention | Adopted form |
+| --- | --- |
+| 转置 | 待定 — `A^T` 或 `A^\top`（线代笔记目前两者混用），选定后全站统一 |
+| 向量 | `\mathbf{x}`（正文已统一，保持一致） |
+| 科技术语 | 以全国科学技术名词审定委员会为准（如 若尔当标准形、奇异值分解） |
+
+Record further decisions in this table.
 
 ### 4. Review Workflow
 
@@ -267,27 +322,66 @@ Each tag uses a distinct left-border color. Readers can identify issue severity 
 - Insert the annotation block immediately after the paragraph or sentence it refers to
 - Separate the HTML block from surrounding Markdown with a blank line before and after
 - For multiple issues in the same section, use separate annotation blocks stacked together
+- Annotations are plain HTML to Hugo (`markup.goldmark.renderer.unsafe = true` in `hugo.toml`), so an annotation that gets committed becomes a **published** annotation. Clear them — or keep the review on a branch — before the change ships.
+
+#### Step 0: Run the deterministic checks
+
+```sh
+Rscript scripts/check-math.R <file>   # math litedown will not protect (directive 3.1)
+Rscript scripts/check-meta.R <file>   # front matter (directive 3.3)
+```
+
+Everything they report is a P0 item. Math problems are fixed in the `.Rmd`, never only in the rendered `.html`.
 
 #### Step 1: Add Executive Summary at the top
 
-Right after the YAML front matter (before any section heading), insert:
+Right after the YAML front matter (before any section heading), insert a summary using the following **priority grading system**:
+
+**Priority levels:**
+
+| Priority | Meaning | Scope |
+|---|---|---|
+| **P0** | 必须修改 — factual errors, formula mistakes, broken rendering | Critical correctness or functionality |
+| **P1** | 应该修改 — unclear wording, imprecise definitions, missing context | Clarity and rigor |
+| **P2** | 建议优化 — style improvements, better notation, non-critical refinements | Nice-to-have |
+| **P3** | 亮点 — strengths worth noting, no action needed | Positive reinforcement |
+
+Items within each priority level are numbered sequentially (P0-1, P0-2, ...; P1-1, P1-2, ...; etc.). Use `[x]` for resolved items, `[ ]` for open items. Include ALL flagged issues (including resolved ones) so the author has a complete checklist.
+
+**Template:**
 
 ```html
 <div style="border-left: 4px solid #2b6cb0; padding: 0.5em 1em; margin: 1em 0 2em 0; background: #ebf4ff;">
 
 ## Review Summary
 
-**Overall:** [One-line assessment of quality and adherence to standards.]
+**Overall:** [One-line assessment. N / M issues resolved; X P0, Y P1, Z P2 items remain open.]
 
-**Critical issues:**
-1. [Most important correction]
-2. [Second most important]
-3. [Third]
+### P0 — 必须修改 (N issues)
+- [x] P0-1: [Short description] — [what was wrong / what was changed]
+- [x] P0-2: [Short description] — [what was wrong / what was changed]
+- [ ] P0-3: [Short description] — [what needs fixing]
+
+### P1 — 应该修改 (N issues)
+- [x] P1-1: [Short description] — [what was improved]
+- [ ] P1-2: [Short description] — [what needs improvement]
+
+### P2 — 建议优化 (N issues)
+- [ ] P2-1: [Short description] — [what could be improved]
+
+### P3 — 亮点 (N items)
+- P3-1: [Short description of a strength]
 
 **Annotations:** [N] issues flagged — see inline blocks below.
 
 </div>
 ```
+
+**Rules for the summary:**
+- Each P0/P1/P2 item must be a **one-liner** with a `[x]` / `[ ]` checkbox — actionable and self-contained
+- P3 items are informational only, no checkbox needed
+- A resolved item keeps its original P-level and number; the checkbox changes from `[ ]` to `[x]`
+- When a new review finds additional issues, append them with the next available numbers within their P-level
 
 #### Step 2: Insert all inline annotations
 
@@ -299,44 +393,12 @@ After all edits, output 2-3 sentences: overall quality, total annotations added,
 
 #### Step 4: Preview with litedown
 
-After the terminal summary, start a live preview of the reviewed file's **parent directory** (the directory directly containing the file) as a background task.
+After the terminal summary, run the preview script and report the URL it prints. It scans ports 4321–4330, reuses a server that already covers the file, and starts one otherwise:
 
-**Critical: Directory selection and server reuse**
+```sh
+sh scripts/preview.sh <reviewed-file>     # a directory works too
+```
 
-1. **The directory must be the directory that contains the reviewed file.** For example:
-   - `content/_index.md` → use `content`
-   - `content/note/some-note.md` → use `content/note`
-   - `content/blog/2025-09-19-AI-related.md` → use `content/blog`
-
-2. **Before starting a new server, check existing litedown servers:**
-   ```sh
-   for port in $(seq 4321 4330); do
-     code=$(curl -s -o /dev/null -w "%{http_code}" --connect-timeout 2 "http://127.0.0.1:$port/custom/litedown/" 2>/dev/null)
-     if [ "$code" = "200" ]; then
-       echo "Existing server on port $port"
-     fi
-   done
-   ```
-   - If an existing litedown server already serves this directory or a **parent directory** that covers the file, reuse it — do not start a new one. Just report the existing URL.
-   - If existing servers run on **different, non-covering directories** (e.g., serving `content/blog` but current file is in `content/`), **stop those servers first** with `TaskStop`, then start a fresh server at the correct directory. This avoids multiple servers running at different subtree levels.
-
-3. **Start the server** (only if needed):
-   ```sh
-   R -e "litedown::roam('<dir>'); while(TRUE) Sys.sleep(1)"
-   ```
-   `<dir>` is the directory containing the reviewed file. `litedown::roam()` takes a directory, not a file — it serves all files in that directory for browser-based preview.
-
-   **IMPORTANT:** Use `R`, not `Rscript`. `Rscript` exits immediately after execution, killing the HTTP server. The `while(TRUE) Sys.sleep(1)` keeps the R process alive. Run this as a background task.
-
-4. **Scan nearby ports to find the actual URL** (the default port is 4321, but it auto-increments if busy):
-   ```sh
-   for port in $(seq 4321 4330); do
-     code=$(curl -s -o /dev/null -w "%{http_code}" --connect-timeout 2 "http://127.0.0.1:$port/custom/litedown/" 2>/dev/null)
-     if [ "$code" = "200" ]; then
-       echo "Preview available at: http://127.0.0.1:$port/custom/litedown/"
-       break
-     fi
-   done
-   ```
-
-5. **Report the URL** to the user so they can open it in a browser. The URL must point to the directory of the **current** reviewed article.
+- The preview must be rooted at the directory of the **reviewed article**, and only one server should run at a time. If the script reports that another directory is being served (exit 2), stop that server first (`TaskStop`), then run it again.
+- `<...>/x.html?preview=1` serves the on-disk `.html` — the page the site publishes. `<...>/x.Rmd?preview=1` renders the source afresh, i.e. what a re-render would produce.
+- roam is litedown, not Hugo: no shortcodes, no theme. A `.md` page still needs `hugo server` as the last check before publishing.

@@ -4,3 +4,4 @@
 /content/note/social_media*
 /.quarto/
 /content/daily_life/
+/.claude/settings.local.json
