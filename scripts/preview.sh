@@ -8,9 +8,11 @@
 #              2 = a server is running for a directory that does not cover it.
 #
 # A ".html" next to the source wins over the source itself, because the .html is
-# what the site publishes (hugo.toml ignores *.Rmd).  roam serves that file as
-# is: <...>/x.html?preview=1 is the rendered page, while <...>/x.Rmd?preview=1
-# is a fresh render of the source.
+# what the site publishes (hugo.toml ignores *.Rmd).  roam serves a file as is at
+# its plain URL: <...>/x.html comes back byte-for-byte.  Appending "?preview=1"
+# (which roam's own listing links) instead makes roam *render* the file as a
+# document -- that escapes every tag of an .html into a mangled page, and for an
+# .Rmd it shows the source as markdown without running knitr.
 
 path=${1:-content/note}
 if [ -d "$path" ]; then
@@ -51,7 +53,7 @@ for port in $(seq 4321 4350); do
       echo "reusing litedown server on port $port"
       echo "  listing: $base/"
       if [ -n "$file" ]; then
-        echo "  file:    $base${target#"$served"}/$file?preview=1"
+        echo "  file:    $base${target#"$served"}/$file"
       fi
       exit 0
       ;;

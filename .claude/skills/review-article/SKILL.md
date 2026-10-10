@@ -211,5 +211,5 @@ sh scripts/preview.sh <reviewed-file>     # a directory works too
 ```
 
 - The preview must be rooted at the directory of the **reviewed article**, and only one server should run at a time. If the script reports that another directory is being served (exit 2), stop that server first (`TaskStop`), then run it again.
-- `<...>/x.html?preview=1` serves the on-disk `.html` — the page the site publishes. `<...>/x.Rmd?preview=1` renders the source afresh, i.e. what a re-render would produce.
+- `<...>/x.html` serves the on-disk `.html` byte-for-byte — the page the site publishes. Do **not** append `?preview=1` (roam's own listing does): that makes roam render the file as a document, which escapes the whole page. `<...>/x.Rmd` serves the source text.
 - roam is litedown, not Hugo: no shortcodes, no theme. A `.md` page still needs `hugo server` as the last check before publishing.
