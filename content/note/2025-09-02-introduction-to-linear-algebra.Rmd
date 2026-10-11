@@ -514,10 +514,14 @@ Plotly.newPlot(document.getElementById('la-proj-plane'), spec.data, spec.layout,
               {responsive: true});
 ```
 
+:::: {#fig:fig-proj-plane .figure}
 ::: {#la-proj-plane style="width: 100%; height: 430px;"}
 :::
 
-<div class="caption">$$\mathbf{b}$$ 投影到列空间（平面）：$$\mathbf{b} = \mathbf{p} + \mathbf{e}$$，$$\mathbf{e}$$ 垂直于平面（可旋转）</div>
+::: caption
+[ ](#@fig:fig-proj-plane) $$\mathbf{b}$$ 投影到列空间（平面）：$$\mathbf{b} = \mathbf{p} + \mathbf{e}$$，$$\mathbf{e}$$ 垂直于平面（可旋转）
+:::
+::::
 
 最小二乘拟合直线可以看作同样的投影：数据向量 $\mathbf{b}$ 被投影到 $A$ 的列空间，拟合值 $\mathbf{p}=A\hat{\mathbf{x}}$ 就是图中直线上的点，残差 $\mathbf{e}$ 就是竖直的虚线段。
 
@@ -779,10 +783,14 @@ Plotly.newPlot(document.getElementById('la-quad-forms'), spec.data, spec.layout,
               {responsive: true});
 ```
 
+:::: {#fig:fig-quad-forms .figure}
 ::: {#la-quad-forms style="width: 100%; height: 470px;"}
 :::
 
-<div class="caption">正定（碗，左）与不定（马鞍，右）二次型的曲面与等高线（可旋转）</div>
+::: caption
+[ ](#@fig:fig-quad-forms) 正定（碗，左）与不定（马鞍，右）二次型的曲面与等高线（可旋转）
+:::
+::::
 
 ## 相似矩阵与若尔当标准形
 

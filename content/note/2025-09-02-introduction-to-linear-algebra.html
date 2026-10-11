@@ -1021,9 +1021,13 @@ Gram-Schmidt：从 $$a_1$$、$$a_2$$ 得到标准正交的 $$q_1$$、$$q_2$$</p>
 };
 Plotly.newPlot(document.getElementById('la-proj-plane'), spec.data, spec.layout,
               {responsive: true});</script>
+<div id="fig:fig-proj-plane" class="figure">
 <div id="la-proj-plane" style="width: 100%; height: 430px;">
 </div>
-<div class="caption">$$\mathbf{b}$$ 投影到列空间（平面）：$$\mathbf{b} = \mathbf{p} + \mathbf{e}$$，$$\mathbf{e}$$ 垂直于平面（可旋转）</div>
+<div class="caption">
+<p><span class="ref-number-fig">5</span> $$\mathbf{b}$$ 投影到列空间（平面）：$$\mathbf{b} = \mathbf{p} + \mathbf{e}$$，$$\mathbf{e}$$ 垂直于平面（可旋转）</p>
+</div>
+</div>
 <p>最小二乘拟合直线可以看作同样的投影：数据向量 \(\mathbf{b}\) 被投影到 \(A\) 的列空间，拟合值 \(\mathbf{p}=A\hat{\mathbf{x}}\) 就是图中直线上的点，残差 \(\mathbf{e}\) 就是竖直的虚线段。</p>
 <div id="fig:fig-ls-fit" class="figure">
 <p><svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' width='345.60pt' height='273.60pt' viewBox='0 0 345.60 273.60' alt="最小二乘拟合直线：数据点、拟合值与残差">
@@ -1110,7 +1114,7 @@ Plotly.newPlot(document.getElementById('la-proj-plane'), spec.data, spec.layout,
 </g>
 </svg></p>
 <div class="caption">
-<p><span class="ref-number-fig">5</span>
+<p><span class="ref-number-fig">6</span>
 最小二乘拟合直线：数据点、拟合值与残差</p>
 </div>
 </div>
@@ -1234,7 +1238,7 @@ C_{1n} &amp; \dots &amp; C_{nn}
 </g>
 </svg></p>
 <div class="caption">
-<p><span class="ref-number-fig">6</span>
+<p><span class="ref-number-fig">7</span>
 单位正方形经 $$A$$ 变成平行四边形，面积为 $$|\det A|$$</p>
 </div>
 </div>
@@ -1331,7 +1335,7 @@ C_{1n} &amp; \dots &amp; C_{nn}
 </g>
 </svg></p>
 <div class="caption">
-<p><span class="ref-number-fig">7</span>
+<p><span class="ref-number-fig">8</span>
 特征向量只被放缩：蓝色为 $$x$$，红色为 $$Ax$$</p>
 </div>
 </div>
@@ -1623,9 +1627,13 @@ AS &amp;= A \begin{bmatrix} \mathbf{x}_1 &amp; \mathbf{x}_2 &amp; \dots &amp; \m
 };
 Plotly.newPlot(document.getElementById('la-quad-forms'), spec.data, spec.layout,
               {responsive: true});</script>
+<div id="fig:fig-quad-forms" class="figure">
 <div id="la-quad-forms" style="width: 100%; height: 470px;">
 </div>
-<div class="caption">正定（碗，左）与不定（马鞍，右）二次型的曲面与等高线（可旋转）</div>
+<div class="caption">
+<p><span class="ref-number-fig">9</span> 正定（碗，左）与不定（马鞍，右）二次型的曲面与等高线（可旋转）</p>
+</div>
+</div>
 <h2 id="sec:_17">相似矩阵与若尔当标准形</h2>
 <p>若 \(A\) 与 \(B\) 均为 \(n \times n\) 方阵，存在可逆方阵 \(M\) 使得 \(B = M^{-1}AM\)，则 \(A\) 与 \(B\) 为 <strong>相似矩阵</strong>。相似矩阵实际上是同一个线性变换在不同基下的矩阵，因此它们的特征值（以及特征多项式、迹、行列式、秩）都相同。注意反过来不成立：特征值相同的矩阵不一定相似，例如 \(I\) 与 \(\begin{bmatrix} 1 &amp; 1 \\ 0 &amp; 1 \end{bmatrix}\)。</p>
 <p>若矩阵 \(A\) 具有 \(n\) 个线性无关的特征向量，则可以对角化得到 \(S^{-1}AS = \Lambda\)，即 \(A\) 相似于 \(\Lambda\)，这是最简洁的形式。</p>
@@ -2013,7 +2021,7 @@ MV = U\Sigma \rightarrow M = U\Sigma V^{\mathrm{T}}$$</p>
 </g>
 </svg></p>
 <div class="caption">
-<p><span class="ref-number-fig">8</span>
+<p><span class="ref-number-fig">10</span>
 SVD 的几何意义：$$x \to V^{\mathrm{T}} x \to \Sigma V^{\mathrm{T}} x \to U \Sigma V^{\mathrm{T}} x$$</p>
 </div>
 </div>
