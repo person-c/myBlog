@@ -13,3 +13,6 @@
 # litedown source clone -- docs/ and examples/ are the reference for math syntax,
 # widgets and chunk options (see docs/litedown.md)
 /reference/litedown/
+# Third-party lecture PDFs, used as input when writing a note -- 12 files, 27 MB,
+# copyrighted, and not sources of the site
+/reference/statistics/
