@@ -108,6 +108,42 @@ Because it renders in place, **commit or stash before running it**: an
 uncommitted `.Rmd` is rendered and compared, then reset to its `HEAD` content
 along with everything else.
 
+### A note's variables leak into the notes rendered after it
+
+`check-fresh.R` and `render-force` render every `.Rmd` **in one R process**, so
+whatever a note's chunks assign is still in the session for the notes that
+follow. Shadowing a name base R already uses therefore breaks *another* note,
+and the report names the victim, not the culprit:
+
+```
+2025-02-02-statistics.Rmd                            OK  (litedown 0.11)
+2025-09-02-introduction-to-linear-algebra.Rmd        RENDER FAILED
+     'to' must be of length 1
+1 of 5 product(s) need attention
+Re-render and commit the .html together with its .Rmd.
+```
+
+Measured 2026-10-11: the statistics note had assigned `pi` (a data frame from
+`predict()`), so the linear-algebra note's eigen figure ran
+`th <- seq(0, 2 * pi, length.out = 200)` with `pi` no longer the constant and
+`seq()`'s `to` came out with three elements. `beta` and `outer` were shadowed in
+the same batch. Before touching the note that failed, check the names the
+earlier ones assign:
+
+```r
+x  <- readLines(f)
+x  <- x[grepl("^[[:space:]]*[a-zA-Z_.][a-zA-Z0-9_.]*[[:space:]]*<-", x)]
+nm <- unique(sub("^[[:space:]]*([a-zA-Z_.][a-zA-Z0-9_.]*)[[:space:]]*<-.*", "\\1", x))
+intersect(nm, c(ls(baseenv()), ls("package:stats"), ls("package:graphics"),
+                ls("package:grDevices")))
+```
+
+In practice: avoid `pi`, `T`, `F` and the short function names (`beta`, `outer`,
+`df`, `dt`, `t`, `c`, `I`). Renaming changes nothing in the output — variable
+names never reach the page, and a note with `echo = FALSE` does not print its
+code — so the fix is a `.Rmd`-only edit, after which `check-fresh` reports every
+product OK.
+
 ## `content/ramblings` is a gitlink, not a directory
 
 Git records it as a submodule commit, not as files:
