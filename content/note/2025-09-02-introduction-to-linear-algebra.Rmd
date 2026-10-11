@@ -20,7 +20,12 @@ output:
 # litedown 不走 htmlwidgets 框架，plotly 图改用 plotly.js 的 JS API 渲染（见 reference/litedown/docs/06-widgets.Rmd）
 # 设备必须用 svglite：cairo 的 svg() 把字形写成 <defs> 里的 id="glyph-*"，多张图内联进同一页时 id 冲突，
 # 标题与坐标轴文字会错位重叠（roam 不内联，所以只看 roam 发现不了）。svglite 用 <text>、不写 id，详见 docs/litedown.md
-litedown::reactor(dev = "svglite::svglite", message = FALSE, warning = FALSE)
+# 图内文字用衬线族、变量用斜体（font = 3，粗体斜体是 4）：这样图里的字母与旁边 KaTeX 排的图注
+# 观感一致。svglite 没有 family 参数，字体走它的 system_fonts 别名表——把默认族 sans 指向
+# Times New Roman，于是所有没特别指定的文字都是衬线；读者机器上没有这个字体时由浏览器回退
+litedown::reactor(dev = "svglite::svglite",
+                  dev.args = list(system_fonts = list(sans = "Times New Roman")),
+                  message = FALSE, warning = FALSE)
 
 # 全文统一的颜色约定：b 黑色，a 蓝色，p（投影/拟合值）红色，e（误差）灰色虚线
 col_a <- "royalblue"; col_p <- "firebrick"; col_e <- "grey40"
@@ -30,10 +35,12 @@ col_a <- "royalblue"; col_p <- "firebrick"; col_e <- "grey40"
 
 
 # 画向量（从 from 出发，可选标签）
-draw_vec <- function(v, from = c(0, 0), col = "black", lwd = 2, lab = NULL, pos = 3, cex = 1) {
+# 这个笔记里 draw_vec 的标签都是变量（a、b、p、e、A e₁ …），默认用斜体
+draw_vec <- function(v, from = c(0, 0), col = "black", lwd = 2, lab = NULL, pos = 3, cex = 1,
+                     font = 3) {
   arrows(from[1], from[2], from[1] + v[1], from[2] + v[2],
          col = col, lwd = lwd, length = 0.1)
-  if (!is.null(lab)) text(from[1] + v[1], from[2] + v[2], lab, pos = pos, col = col, cex = cex)
+  if (!is.null(lab)) text(from[1] + v[1], from[2] + v[2], lab, pos = pos, col = col, cex = cex, font = font)
 }
 
 # 在 corner 处画直角标记，d1、d2 为两条边的方向
@@ -131,7 +138,7 @@ x_2 \begin{bmatrix} 3 \\ -1 \end{bmatrix} =
 #| fig.cap: "行视角（左）与列视角（右）"
 A <- matrix(c(2, 3, 1, -1), 2, byrow = TRUE); b <- c(8, 1)
 x <- solve(A, b)
-par(mfrow = c(1, 2), mar = c(2.5, 2.5, 2, 1))
+par(mfrow = c(1, 2), mar = c(2.5, 2.5, 2, 1), font.lab = 3)   # x1、x2 是变量，斜体
 
 # 行视角：每个方程是一条直线
 plot(NA, xlim = c(0, 5), ylim = c(-1, 3.5), asp = 1,
@@ -270,8 +277,8 @@ diamond <- function(cx, cy, d, col = col_a, lwd = 1.5) {
 # 面板上的 R 与它的上标分开画：Unicode 的上标 n、m（U+207F、U+1D50）在 svglite 用的字体里没有，
 # 直接写会渲染成豆腐块；分开画一个小的、抬高的字母最稳妥
 rsup <- function(x, y, s) {
-  text(x - 0.05, y, "R", font = 2, cex = 1.15)
-  text(x + 0.14, y + 0.15, s, cex = 0.8)
+  text(x - 0.05, y, "R", font = 4, cex = 1.15)
+  text(x + 0.14, y + 0.15, s, cex = 0.8, font = 3)
 }
 
 par(mar = c(0.5, 0.5, 0.5, 0.5))
@@ -281,33 +288,33 @@ plot(NA, xlim = c(0, 10), ylim = c(0, 5.75), asp = 1, axes = FALSE, xlab = "", y
 diamond(mx1, my + d_row, d_row)
 diamond(mx1, my - d_null, d_null)
 text(mx1, my + d_row + 0.30, "Row space", font = 2, col = col_a, cex = 0.9)
-text(mx1, my + d_row - 0.10, "all Aᵀy", cex = 0.9)
+text(mx1, my + d_row - 0.10, "all Aᵀy", cex = 0.9, font = 3)
 rsup(mx1 - 0.35, my, "n")         # 接触点左右两侧上下两块都占不到，正好放 R^n 与垂直标注
 text(mx1 + 0.25, my + 0.12, "Perpendicular", adj = 0, cex = 0.85)
-text(mx1 + 0.25, my - 0.17, "xᵀ(Aᵀy) = 0", adj = 0, cex = 0.85)
+text(mx1 + 0.25, my - 0.17, "xᵀ(Aᵀy) = 0", adj = 0, cex = 0.85, font = 3)
 text(mx1, my - d_null + 0.45, "x in", font = 2, col = col_a, cex = 0.9)
 text(mx1, my - d_null, "Nullspace", font = 2, col = col_a, cex = 0.9)
-text(mx1, my - d_null - 0.45, "Ax = 0", cex = 0.9)
-text(0.30, my + d_row + 0.50, "C(Aᵀ)", font = 2, adj = 0)
-text(0.30, my - d_null - 0.50, "N(A)", font = 2, adj = 0)
-text(0.30, my + d_row, "dim r", adj = 0, cex = 0.9)
-text(0.30, my - d_null, "dim n − r", adj = 0, cex = 0.9)
+text(mx1, my - d_null - 0.45, "Ax = 0", cex = 0.9, font = 3)
+text(0.30, my + d_row + 0.50, "C(Aᵀ)", font = 4, adj = 0)
+text(0.30, my - d_null - 0.50, "N(A)", font = 4, adj = 0)
+text(0.30, my + d_row, "dim r", adj = 0, cex = 0.9, font = 3)
+text(0.30, my - d_null, "dim n − r", adj = 0, cex = 0.9, font = 3)
 
 # ---- 右：R^m = 列空间 ⊕ 左零空间 ----
 diamond(mx2, my + d_col, d_col)
 diamond(mx2, my - d_lnull, d_lnull)
 text(mx2, my + d_col + 0.30, "Column space", font = 2, col = col_a, cex = 0.9)
-text(mx2, my + d_col - 0.10, "all Ax", cex = 0.9)
+text(mx2, my + d_col - 0.10, "all Ax", cex = 0.9, font = 3)
 rsup(mx2 + 0.35, my, "m")
 text(mx2 - 0.25, my + 0.12, "Perpendicular", adj = 1, cex = 0.85)
-text(mx2 - 0.25, my - 0.17, "yᵀ(Ax) = 0", adj = 1, cex = 0.85)
+text(mx2 - 0.25, my - 0.17, "yᵀ(Ax) = 0", adj = 1, cex = 0.85, font = 3)
 text(mx2, my - d_lnull + 0.42, "y in", font = 2, col = col_a, cex = 0.9)
 text(mx2, my - d_lnull, "Nullspace of Aᵀ", font = 2, col = col_a, cex = 0.9)
-text(mx2, my - d_lnull - 0.42, "Aᵀy = 0", cex = 0.9)
-text(9.70, my + d_col + 0.50, "C(A)", font = 2, adj = 1)
-text(9.70, my - d_lnull - 0.50, "N(Aᵀ)", font = 2, adj = 1)
-text(9.70, my + d_col, "dim r", adj = 1, cex = 0.9)
-text(9.70, my - d_lnull, "dim m − r", adj = 1, cex = 0.9)
+text(mx2, my - d_lnull - 0.42, "Aᵀy = 0", cex = 0.9, font = 3)
+text(9.70, my + d_col + 0.50, "C(A)", font = 4, adj = 1)
+text(9.70, my - d_lnull - 0.50, "N(Aᵀ)", font = 4, adj = 1)
+text(9.70, my + d_col, "dim r", adj = 1, cex = 0.9, font = 3)
+text(9.70, my - d_lnull, "dim m − r", adj = 1, cex = 0.9, font = 3)
 ```
 
 其中 $\dim C(A) + \dim N(A) = r + (n-r) = n$，这就是 **秩-零化度定理**（rank–nullity theorem）。
@@ -361,7 +368,7 @@ $$\mathbf{a}^{\mathrm{T}}(\mathbf{b}-\mathbf{p}) = 0 \rightarrow \mathbf{a}^{\ma
 #| label: fig-proj-line
 #| fig.width: 5
 #| fig.height: 3.8
-#| fig.cap: "b 在 a 方向上的投影 p 与误差 e"
+#| fig.cap: "$$\mathbf{b}$$ 在 $$\mathbf{a}$$ 方向上的投影 $$\mathbf{p}$$ 与误差 $$\mathbf{e}$$"
 a <- c(3, 1); b <- c(2, 3)
 p <- sum(a * b) / sum(a * a) * a      # 投影
 e <- b - p                            # 误差，与 a 正交
@@ -373,9 +380,9 @@ abline(0, a[2] / a[1], col = "grey80")                  # a 所在的直线
 draw_vec(a, col = col_a, lab = "a", pos = 4)
 draw_vec(b, col = "black", lab = "b", pos = 3)
 draw_vec(p, col = col_p)
-text(p[1] + 0.18, p[2] - 0.28, "p", col = col_p)                  # 让开直角标记
+text(p[1] + 0.18, p[2] - 0.28, "p", col = col_p, font = 3)                  # 让开直角标记
 segments(p[1], p[2], b[1], b[2], lty = 2, lwd = 2, col = col_e)   # e
-text((p[1] + b[1]) / 2, (p[2] + b[2]) / 2, "e", pos = 4, col = col_e)
+text((p[1] + b[1]) / 2, (p[2] + b[2]) / 2, "e", pos = 4, col = col_e, font = 3)
 right_angle(p, -a, e)
 ```
 
@@ -406,7 +413,7 @@ $$\mathbf{w}_3 = \mathbf{a}_3 - \frac{\mathbf{w}_1\mathbf{w}_1^{\mathrm{T}}}{\ma
 #| label: fig-gram-schmidt
 #| fig.width: 5
 #| fig.height: 3.8
-#| fig.cap: "Gram-Schmidt：从 a₁、a₂ 得到标准正交的 q₁、q₂"
+#| fig.cap: "Gram-Schmidt：从 $$a_1$$、$$a_2$$ 得到标准正交的 $$q_1$$、$$q_2$$"
 a1 <- c(3, 1); a2 <- c(2, 3)
 p  <- sum(a1 * a2) / sum(a1 * a1) * a1       # a2 在 a1 上的投影
 w2 <- a2 - p
@@ -423,8 +430,8 @@ segments(p[1], p[2], a2[1], a2[2], lty = 2, col = col_e)   # a2 - p
 draw_vec(w2, col = col_e, lab = "w₂", pos = 2)
 draw_vec(q1, col = col_a, lwd = 4)
 draw_vec(q2, col = col_e, lwd = 4)
-text(q1[1], q1[2], "q₁", pos = 1, col = col_a)
-text(q2[1], q2[2], "q₂", pos = 2, col = col_e)
+text(q1[1], q1[2], "q₁", pos = 1, col = col_a, font = 3)
+text(q2[1], q2[2], "q₂", pos = 2, col = col_e, font = 3)
 right_angle(c(0, 0), q1, q2)
 ```
 
@@ -508,7 +515,7 @@ Plotly.newPlot(document.getElementById('la-proj-plane'), spec.data, spec.layout,
 ::: {#la-proj-plane style="width: 100%; height: 430px;"}
 :::
 
-<div class="caption">b 投影到列空间（平面）：$$\mathbf{b} = \mathbf{p} + \mathbf{e}$$，e 垂直于平面（可旋转）</div>
+<div class="caption">$$\mathbf{b}$$ 投影到列空间（平面）：$$\mathbf{b} = \mathbf{p} + \mathbf{e}$$，$$\mathbf{e}$$ 垂直于平面（可旋转）</div>
 
 最小二乘拟合直线可以看作同样的投影：数据向量 $\mathbf{b}$ 被投影到 $A$ 的列空间，拟合值 $\mathbf{p}=A\hat{\mathbf{x}}$ 就是图中直线上的点，残差 $\mathbf{e}$ 就是竖直的虚线段。
 
@@ -522,13 +529,13 @@ X <- cbind(1, tt)
 beta <- solve(t(X) %*% X, t(X) %*% y)     # 正规方程
 fit <- drop(X %*% beta)                   # p = X beta
 
-par(mar = c(3, 3, 1, 1))
+par(mar = c(3, 3, 1, 1), font.lab = 3)                        # t、y 是变量，斜体
 plot(tt, y, pch = 19, xlim = c(-0.3, 2.3), ylim = c(0.5, 2.7), xlab = "t", ylab = "y",
      main = "least squares fit")
 abline(a = beta[1], b = beta[2], col = col_a, lwd = 2)
 segments(tt, fit, tt, y, lty = 2, col = col_e)
 points(tt, fit, pch = 1, col = col_p, cex = 1.5)
-legend("topleft", bty = "n", cex = 0.8,
+legend("topleft", bty = "n", cex = 0.8, text.font = 3,   # 图例里带变量，整条斜体
        legend = c("data (b)", "fitted (p)", "residual (e)"),
        pch = c(19, 1, NA), lty = c(NA, NA, 2), col = c("black", col_p, col_e))
 ```
@@ -610,10 +617,10 @@ $$x_j = \frac{\det(B_j)}{\det(A)}$$
 #| label: fig-det-area
 #| fig.width: 5
 #| fig.height: 3.6
-#| fig.cap: "单位正方形经 A 变成平行四边形，面积为 $$|\det A|$$"
+#| fig.cap: "单位正方形经 $$A$$ 变成平行四边形，面积为 $$|\det A|$$"
 A <- matrix(c(2, 0.5, 1, 1.5), 2)           # 列为 (2, 0.5) 和 (1, 1.5)
 a1 <- A[, 1]; a2 <- A[, 2]
-par(mar = c(2, 2, 2, 1))
+par(mar = c(2, 2, 2, 1), font.main = 3)                       # 标题是公式，斜体
 plot(NA, xlim = c(-0.3, 3.5), ylim = c(-0.3, 2.3), asp = 1, xlab = "", ylab = "",
      main = paste0("|det A| = ", abs(det(A))))
 polygon(c(0, 1, 1, 0), c(0, 0, 1, 1), col = "#e5e5e5", border = "grey50")
@@ -641,7 +648,7 @@ $$\det(A - \lambda I) = 0$$
 #| label: fig-eigen
 #| fig.width: 4.6
 #| fig.height: 4.2
-#| fig.cap: "特征向量只被放缩：蓝色为 x，红色为 Ax"
+#| fig.cap: "特征向量只被放缩：蓝色为 $$x$$，红色为 $$Ax$$"
 A <- matrix(c(2, 1, 1, 2), 2)
 ev <- eigen(A)
 th <- seq(0, 2 * pi, length.out = 200); circ <- rbind(cos(th), sin(th))
@@ -655,7 +662,7 @@ for (i in 1:2) {
   draw_vec(v, col = col_a)
   draw_vec(ev$values[i] * v, col = col_p)
   text(1.15 * ev$values[i] * v[1], 1.15 * ev$values[i] * v[2],
-       paste0("λ = ", round(ev$values[i], 2)), col = col_p, pos = 3)   # 标签挪到箭头之外
+       paste0("λ = ", round(ev$values[i], 2)), col = col_p, pos = 3, font = 3)   # 标签挪到箭头之外
 }
 ```
 
@@ -935,7 +942,7 @@ panel <- function(pts, vecs, ttl, lim = 2.8) {
   draw_vec(vecs[, 1], col = col_a)
   draw_vec(vecs[, 2], col = col_p)
 }
-par(mfrow = c(1, 4), mar = c(2, 2, 2, 1))
+par(mfrow = c(1, 4), mar = c(2, 2, 2, 1), font.main = 3)      # 四个面板标题都是公式，斜体
 panel(circ,                    V,       "x (v₁, v₂)")
 panel(t(V) %*% circ,           diag(2), "Vᵀx")
 panel(D %*% t(V) %*% circ,     D,       "ΣVᵀx")

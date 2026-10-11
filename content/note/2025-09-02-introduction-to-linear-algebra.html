@@ -253,7 +253,7 @@ x_2 \begin{bmatrix} 3 \\ -1 \end{bmatrix} =
 <p>下面把开头的例子画出来：左图是行视角（两条直线的交点），右图是列视角（用 \(\mathbf{a}_1, \mathbf{a}_2\) 的线性组合拼出 \(\mathbf{b}\)）。</p>
 <pre><code class="language-r">A &lt;- matrix(c(2, 3, 1, -1), 2, byrow = TRUE); b &lt;- c(8, 1)
 x &lt;- solve(A, b)
-par(mfrow = c(1, 2), mar = c(2.5, 2.5, 2, 1))
+par(mfrow = c(1, 2), mar = c(2.5, 2.5, 2, 1), font.lab = 3)   # x1、x2 是变量，斜体
 
 # 行视角：每个方程是一条直线
 plot(NA, xlim = c(0, 5), ylim = c(-1, 3.5), asp = 1,
@@ -305,23 +305,23 @@ draw_vec(b, col = &quot;black&quot;, lab = &quot;b&quot;, pos = 3)
 <line x1='155.32' y1='208.80' x2='155.32' y2='216.00' style='stroke-width: 0.75;' />
 <line x1='192.36' y1='208.80' x2='192.36' y2='216.00' style='stroke-width: 0.75;' />
 <line x1='229.39' y1='208.80' x2='229.39' y2='216.00' style='stroke-width: 0.75;' />
-<text x='44.21' y='234.72' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='6.67px' lengthAdjust='spacingAndGlyphs'>0</text>
-<text x='81.24' y='234.72' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='6.67px' lengthAdjust='spacingAndGlyphs'>1</text>
-<text x='118.28' y='234.72' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='6.67px' lengthAdjust='spacingAndGlyphs'>2</text>
-<text x='155.32' y='234.72' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='6.67px' lengthAdjust='spacingAndGlyphs'>3</text>
-<text x='192.36' y='234.72' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='6.67px' lengthAdjust='spacingAndGlyphs'>4</text>
-<text x='229.39' y='234.72' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='6.67px' lengthAdjust='spacingAndGlyphs'>5</text>
+<text x='44.21' y='234.72' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>0</text>
+<text x='81.24' y='234.72' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>1</text>
+<text x='118.28' y='234.72' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>2</text>
+<text x='155.32' y='234.72' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>3</text>
+<text x='192.36' y='234.72' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>4</text>
+<text x='229.39' y='234.72' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>5</text>
 <line x1='36.00' y1='202.13' x2='36.00' y2='53.99' style='stroke-width: 0.75;' />
 <line x1='36.00' y1='202.13' x2='28.80' y2='202.13' style='stroke-width: 0.75;' />
 <line x1='36.00' y1='165.10' x2='28.80' y2='165.10' style='stroke-width: 0.75;' />
 <line x1='36.00' y1='128.06' x2='28.80' y2='128.06' style='stroke-width: 0.75;' />
 <line x1='36.00' y1='91.02' x2='28.80' y2='91.02' style='stroke-width: 0.75;' />
 <line x1='36.00' y1='53.99' x2='28.80' y2='53.99' style='stroke-width: 0.75;' />
-<text transform='translate(18.72,202.13) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='10.67px' lengthAdjust='spacingAndGlyphs'>-1</text>
-<text transform='translate(18.72,165.10) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='6.67px' lengthAdjust='spacingAndGlyphs'>0</text>
-<text transform='translate(18.72,128.06) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='6.67px' lengthAdjust='spacingAndGlyphs'>1</text>
-<text transform='translate(18.72,91.02) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='6.67px' lengthAdjust='spacingAndGlyphs'>2</text>
-<text transform='translate(18.72,53.99) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='6.67px' lengthAdjust='spacingAndGlyphs'>3</text>
+<text transform='translate(18.72,202.13) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='10.00px' lengthAdjust='spacingAndGlyphs'>-1</text>
+<text transform='translate(18.72,165.10) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>0</text>
+<text transform='translate(18.72,128.06) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>1</text>
+<text transform='translate(18.72,91.02) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>2</text>
+<text transform='translate(18.72,53.99) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>3</text>
 <polygon points='36.00,208.80 237.60,208.80 237.60,28.80 36.00,28.80 ' style='stroke-width: 0.75;' />
 </g>
 <defs>
@@ -330,9 +330,9 @@ draw_vec(b, col = &quot;black&quot;, lab = &quot;b&quot;, pos = 3)
   </clipPath>
 </defs>
 <g clip-path='url(#cpMC4wMHwyNTIuMDB8MC4wMHwyNDQuODA=)'>
-<text x='136.80' y='19.55' text-anchor='middle' style='font-size: 14.40px; font-weight: bold; font-family: "Arial";' textLength='77.56px' lengthAdjust='spacingAndGlyphs'>row picture</text>
-<text x='136.80' y='263.52' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='12.67px' lengthAdjust='spacingAndGlyphs'>x1</text>
-<text transform='translate(-10.08,118.80) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='12.67px' lengthAdjust='spacingAndGlyphs'>x2</text>
+<text x='136.80' y='19.17' text-anchor='middle' style='font-size: 14.40px; font-weight: bold; font-family: "Times New Roman";' textLength='71.02px' lengthAdjust='spacingAndGlyphs'>row picture</text>
+<text x='136.80' y='263.52' text-anchor='middle' style='font-size: 12.00px; font-style: italic; font-family: "Times New Roman";' textLength='11.33px' lengthAdjust='spacingAndGlyphs'>x1</text>
+<text transform='translate(-10.08,118.80) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-style: italic; font-family: "Times New Roman";' textLength='11.33px' lengthAdjust='spacingAndGlyphs'>x2</text>
 </g>
 <defs>
   <clipPath id='cpMzYuMDB8MjM3LjYwfDI4LjgwfDIwOC44MA=='>
@@ -343,7 +343,7 @@ draw_vec(b, col = &quot;black&quot;, lab = &quot;b&quot;, pos = 3)
 <line x1='36.00' y1='60.86' x2='237.60' y2='195.26' style='stroke-width: 1.50; stroke: #4169E1;' />
 <line x1='36.00' y1='210.34' x2='237.60' y2='8.74' style='stroke-width: 1.50; stroke: #B22222;' />
 <circle cx='125.69' cy='120.65' r='2.70' style='stroke-width: 0.75; fill: #000000;' />
-<text x='132.89' y='123.52' style='font-size: 12.00px; font-family: "Arial";' textLength='48.00px' lengthAdjust='spacingAndGlyphs'>(2.2, 1.2)</text>
+<text x='132.89' y='123.30' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='44.00px' lengthAdjust='spacingAndGlyphs'>(2.2, 1.2)</text>
 </g>
 <defs>
   <clipPath id='cpMjg4LjAwfDQ4OS42MHwyOC44MHwyMDguODA='>
@@ -359,20 +359,20 @@ draw_vec(b, col = &quot;black&quot;, lab = &quot;b&quot;, pos = 3)
 <line x1='383.89' y1='208.80' x2='383.89' y2='216.00' style='stroke-width: 0.75;' />
 <line x1='423.19' y1='208.80' x2='423.19' y2='216.00' style='stroke-width: 0.75;' />
 <line x1='462.48' y1='208.80' x2='462.48' y2='216.00' style='stroke-width: 0.75;' />
-<text x='305.29' y='234.72' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='6.67px' lengthAdjust='spacingAndGlyphs'>0</text>
-<text x='344.59' y='234.72' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='6.67px' lengthAdjust='spacingAndGlyphs'>2</text>
-<text x='383.89' y='234.72' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='6.67px' lengthAdjust='spacingAndGlyphs'>4</text>
-<text x='423.19' y='234.72' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='6.67px' lengthAdjust='spacingAndGlyphs'>6</text>
-<text x='462.48' y='234.72' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='6.67px' lengthAdjust='spacingAndGlyphs'>8</text>
+<text x='305.29' y='234.72' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>0</text>
+<text x='344.59' y='234.72' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>2</text>
+<text x='383.89' y='234.72' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>4</text>
+<text x='423.19' y='234.72' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>6</text>
+<text x='462.48' y='234.72' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>8</text>
 <line x1='288.00' y1='169.89' x2='288.00' y2='51.99' style='stroke-width: 0.75;' />
 <line x1='288.00' y1='169.89' x2='280.80' y2='169.89' style='stroke-width: 0.75;' />
 <line x1='288.00' y1='130.59' x2='280.80' y2='130.59' style='stroke-width: 0.75;' />
 <line x1='288.00' y1='91.29' x2='280.80' y2='91.29' style='stroke-width: 0.75;' />
 <line x1='288.00' y1='51.99' x2='280.80' y2='51.99' style='stroke-width: 0.75;' />
-<text transform='translate(270.72,169.89) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='10.67px' lengthAdjust='spacingAndGlyphs'>-2</text>
-<text transform='translate(270.72,130.59) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='6.67px' lengthAdjust='spacingAndGlyphs'>0</text>
-<text transform='translate(270.72,91.29) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='6.67px' lengthAdjust='spacingAndGlyphs'>2</text>
-<text transform='translate(270.72,51.99) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='6.67px' lengthAdjust='spacingAndGlyphs'>4</text>
+<text transform='translate(270.72,169.89) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='10.00px' lengthAdjust='spacingAndGlyphs'>-2</text>
+<text transform='translate(270.72,130.59) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>0</text>
+<text transform='translate(270.72,91.29) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>2</text>
+<text transform='translate(270.72,51.99) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>4</text>
 <polygon points='288.00,208.80 489.60,208.80 489.60,28.80 288.00,28.80 ' style='stroke-width: 0.75;' />
 </g>
 <defs>
@@ -381,18 +381,18 @@ draw_vec(b, col = &quot;black&quot;, lab = &quot;b&quot;, pos = 3)
   </clipPath>
 </defs>
 <g clip-path='url(#cpMjUyLjAwfDUwNC4wMHwwLjAwfDI0NC44MA==)'>
-<text x='388.80' y='19.55' text-anchor='middle' style='font-size: 14.40px; font-weight: bold; font-family: "Arial";' textLength='103.17px' lengthAdjust='spacingAndGlyphs'>column picture</text>
+<text x='388.80' y='19.17' text-anchor='middle' style='font-size: 14.40px; font-weight: bold; font-family: "Times New Roman";' textLength='92.88px' lengthAdjust='spacingAndGlyphs'>column picture</text>
 </g>
 <g clip-path='url(#cpMjg4LjAwfDQ4OS42MHwyOC44MHwyMDguODA=)'>
 <line x1='305.29' y1='130.59' x2='391.75' y2='87.36' style='stroke-width: 1.50; stroke: #4169E1;' />
 <polyline points='387.78,93.37 391.75,87.36 384.56,86.93 ' style='stroke-width: 1.50; stroke: #4169E1;' />
-<text x='391.75' y='80.16' text-anchor='middle' style='font-size: 12.00px;fill: #4169E1; font-family: "Arial";' textLength='24.52px' lengthAdjust='spacingAndGlyphs'>x₁a₁</text>
+<text x='391.75' y='80.16' text-anchor='middle' style='font-size: 12.00px; font-style: italic;fill: #4169E1; font-family: "Times New Roman";' textLength='18.52px' lengthAdjust='spacingAndGlyphs'>x₁a₁</text>
 <line x1='391.75' y1='87.36' x2='462.48' y2='110.94' style='stroke-width: 1.50; stroke: #B22222;' />
 <polyline points='455.43,112.38 462.48,110.94 457.71,105.55 ' style='stroke-width: 1.50; stroke: #B22222;' />
-<text x='462.48' y='125.30' text-anchor='middle' style='font-size: 12.00px;fill: #B22222; font-family: "Arial";' textLength='24.52px' lengthAdjust='spacingAndGlyphs'>x₂a₂</text>
+<text x='462.48' y='124.76' text-anchor='middle' style='font-size: 12.00px; font-style: italic;fill: #B22222; font-family: "Times New Roman";' textLength='18.52px' lengthAdjust='spacingAndGlyphs'>x₂a₂</text>
 <line x1='305.29' y1='130.59' x2='462.48' y2='110.94' style='stroke-width: 1.50;' />
 <polyline points='456.74,115.29 462.48,110.94 455.85,108.14 ' style='stroke-width: 1.50;' />
-<text x='462.48' y='103.74' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='6.67px' lengthAdjust='spacingAndGlyphs'>b</text>
+<text x='462.48' y='103.74' text-anchor='middle' style='font-size: 12.00px; font-style: italic; font-family: "Times New Roman";' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>b</text>
 </g>
 </g>
 </svg></p>
@@ -527,8 +527,8 @@ diamond &lt;- function(cx, cy, d, col = col_a, lwd = 1.5) {
 # 面板上的 R 与它的上标分开画：Unicode 的上标 n、m（U+207F、U+1D50）在 svglite 用的字体里没有，
 # 直接写会渲染成豆腐块；分开画一个小的、抬高的字母最稳妥
 rsup &lt;- function(x, y, s) {
-  text(x - 0.05, y, &quot;R&quot;, font = 2, cex = 1.15)
-  text(x + 0.14, y + 0.15, s, cex = 0.8)
+  text(x - 0.05, y, &quot;R&quot;, font = 4, cex = 1.15)
+  text(x + 0.14, y + 0.15, s, cex = 0.8, font = 3)
 }
 
 par(mar = c(0.5, 0.5, 0.5, 0.5))
@@ -538,33 +538,33 @@ plot(NA, xlim = c(0, 10), ylim = c(0, 5.75), asp = 1, axes = FALSE, xlab = &quot
 diamond(mx1, my + d_row, d_row)
 diamond(mx1, my - d_null, d_null)
 text(mx1, my + d_row + 0.30, &quot;Row space&quot;, font = 2, col = col_a, cex = 0.9)
-text(mx1, my + d_row - 0.10, &quot;all Aᵀy&quot;, cex = 0.9)
+text(mx1, my + d_row - 0.10, &quot;all Aᵀy&quot;, cex = 0.9, font = 3)
 rsup(mx1 - 0.35, my, &quot;n&quot;)         # 接触点左右两侧上下两块都占不到，正好放 R^n 与垂直标注
 text(mx1 + 0.25, my + 0.12, &quot;Perpendicular&quot;, adj = 0, cex = 0.85)
-text(mx1 + 0.25, my - 0.17, &quot;xᵀ(Aᵀy) = 0&quot;, adj = 0, cex = 0.85)
+text(mx1 + 0.25, my - 0.17, &quot;xᵀ(Aᵀy) = 0&quot;, adj = 0, cex = 0.85, font = 3)
 text(mx1, my - d_null + 0.45, &quot;x in&quot;, font = 2, col = col_a, cex = 0.9)
 text(mx1, my - d_null, &quot;Nullspace&quot;, font = 2, col = col_a, cex = 0.9)
-text(mx1, my - d_null - 0.45, &quot;Ax = 0&quot;, cex = 0.9)
-text(0.30, my + d_row + 0.50, &quot;C(Aᵀ)&quot;, font = 2, adj = 0)
-text(0.30, my - d_null - 0.50, &quot;N(A)&quot;, font = 2, adj = 0)
-text(0.30, my + d_row, &quot;dim r&quot;, adj = 0, cex = 0.9)
-text(0.30, my - d_null, &quot;dim n − r&quot;, adj = 0, cex = 0.9)
+text(mx1, my - d_null - 0.45, &quot;Ax = 0&quot;, cex = 0.9, font = 3)
+text(0.30, my + d_row + 0.50, &quot;C(Aᵀ)&quot;, font = 4, adj = 0)
+text(0.30, my - d_null - 0.50, &quot;N(A)&quot;, font = 4, adj = 0)
+text(0.30, my + d_row, &quot;dim r&quot;, adj = 0, cex = 0.9, font = 3)
+text(0.30, my - d_null, &quot;dim n − r&quot;, adj = 0, cex = 0.9, font = 3)
 
 # ---- 右：R^m = 列空间 ⊕ 左零空间 ----
 diamond(mx2, my + d_col, d_col)
 diamond(mx2, my - d_lnull, d_lnull)
 text(mx2, my + d_col + 0.30, &quot;Column space&quot;, font = 2, col = col_a, cex = 0.9)
-text(mx2, my + d_col - 0.10, &quot;all Ax&quot;, cex = 0.9)
+text(mx2, my + d_col - 0.10, &quot;all Ax&quot;, cex = 0.9, font = 3)
 rsup(mx2 + 0.35, my, &quot;m&quot;)
 text(mx2 - 0.25, my + 0.12, &quot;Perpendicular&quot;, adj = 1, cex = 0.85)
-text(mx2 - 0.25, my - 0.17, &quot;yᵀ(Ax) = 0&quot;, adj = 1, cex = 0.85)
+text(mx2 - 0.25, my - 0.17, &quot;yᵀ(Ax) = 0&quot;, adj = 1, cex = 0.85, font = 3)
 text(mx2, my - d_lnull + 0.42, &quot;y in&quot;, font = 2, col = col_a, cex = 0.9)
 text(mx2, my - d_lnull, &quot;Nullspace of Aᵀ&quot;, font = 2, col = col_a, cex = 0.9)
-text(mx2, my - d_lnull - 0.42, &quot;Aᵀy = 0&quot;, cex = 0.9)
-text(9.70, my + d_col + 0.50, &quot;C(A)&quot;, font = 2, adj = 1)
-text(9.70, my - d_lnull - 0.50, &quot;N(Aᵀ)&quot;, font = 2, adj = 1)
-text(9.70, my + d_col, &quot;dim r&quot;, adj = 1, cex = 0.9)
-text(9.70, my - d_lnull, &quot;dim m − r&quot;, adj = 1, cex = 0.9)
+text(mx2, my - d_lnull - 0.42, &quot;Aᵀy = 0&quot;, cex = 0.9, font = 3)
+text(9.70, my + d_col + 0.50, &quot;C(A)&quot;, font = 4, adj = 1)
+text(9.70, my - d_lnull - 0.50, &quot;N(Aᵀ)&quot;, font = 4, adj = 1)
+text(9.70, my + d_col, &quot;dim r&quot;, adj = 1, cex = 0.9, font = 3)
+text(9.70, my - d_lnull, &quot;dim m − r&quot;, adj = 1, cex = 0.9, font = 3)
 </code></pre>
 <div id="fig:fig-four-subspaces" class="figure">
 <p><svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' width='576.00pt' height='331.20pt' viewBox='0 0 576.00 331.20' alt="四个基本子空间（以 $$m = 6$$、$$n = 7$$、$$r = 4$$ 为例，各块面积与维数成正比）：左为 $$\mathbb{R}^n$$，行空间与零空间互为正交补；右为 $$\mathbb{R}^m$$，列空间与左零空间互为正交补">
@@ -603,34 +603,34 @@ text(9.70, my - d_lnull, &quot;dim m − r&quot;, adj = 1, cex = 0.9)
 <g clip-path='url(#cpNy4yMHw1NjguODB8Ny4yMHwzMjQuMDA=)'>
 <polygon points='175.77,164.32 239.54,100.56 175.77,36.79 112.00,100.56 ' style='stroke-width: 1.12; stroke: #4169E1;' />
 <polygon points='175.77,274.77 230.99,219.55 175.77,164.32 120.54,219.55 ' style='stroke-width: 1.12; stroke: #4169E1;' />
-<text x='175.77' y='88.05' text-anchor='middle' style='font-size: 10.80px; font-weight: bold;fill: #4169E1; font-family: "Arial";' textLength='56.38px' lengthAdjust='spacingAndGlyphs'>Row space</text>
-<text x='175.77' y='108.39' text-anchor='middle' style='font-size: 10.80px; font-family: "Arial";' textLength='30.50px' lengthAdjust='spacingAndGlyphs'>all Aᵀy</text>
-<text x='155.36' y='169.26' text-anchor='middle' style='font-size: 13.80px; font-weight: bold; font-family: "Arial";' textLength='9.97px' lengthAdjust='spacingAndGlyphs'>R</text>
-<text x='165.06' y='159.21' text-anchor='middle' style='font-size: 9.60px; font-family: "Arial";' textLength='5.33px' lengthAdjust='spacingAndGlyphs'>n</text>
-<text x='188.52' y='160.84' style='font-size: 10.20px; font-family: "Arial";' textLength='62.91px' lengthAdjust='spacingAndGlyphs'>Perpendicular</text>
-<text x='188.52' y='175.64' style='font-size: 10.20px; font-family: "Arial";' textLength='49.86px' lengthAdjust='spacingAndGlyphs'>xᵀ(Aᵀy) = 0</text>
-<text x='175.77' y='200.46' text-anchor='middle' style='font-size: 10.80px; font-weight: bold;fill: #4169E1; font-family: "Arial";' textLength='18.59px' lengthAdjust='spacingAndGlyphs'>x in</text>
-<text x='175.77' y='222.35' text-anchor='middle' style='font-size: 10.80px; font-weight: bold;fill: #4169E1; font-family: "Arial";' textLength='50.98px' lengthAdjust='spacingAndGlyphs'>Nullspace</text>
-<text x='175.77' y='246.32' text-anchor='middle' style='font-size: 10.80px; font-family: "Arial";' textLength='30.92px' lengthAdjust='spacingAndGlyphs'>Ax = 0</text>
-<text x='48.23' y='78.16' style='font-size: 12.00px; font-weight: bold; font-family: "Arial";' textLength='30.55px' lengthAdjust='spacingAndGlyphs'>C(Aᵀ)</text>
-<text x='48.23' y='248.16' style='font-size: 12.00px; font-weight: bold; font-family: "Arial";' textLength='25.34px' lengthAdjust='spacingAndGlyphs'>N(A)</text>
-<text x='48.23' y='104.36' style='font-size: 10.80px; font-family: "Arial";' textLength='24.00px' lengthAdjust='spacingAndGlyphs'>dim r</text>
-<text x='48.23' y='223.35' style='font-size: 10.80px; font-family: "Arial";' textLength='42.31px' lengthAdjust='spacingAndGlyphs'>dim n − r</text>
+<text x='175.77' y='87.67' text-anchor='middle' style='font-size: 10.80px; font-weight: bold;fill: #4169E1; font-family: "Times New Roman";' textLength='48.91px' lengthAdjust='spacingAndGlyphs'>Row space</text>
+<text x='175.77' y='108.24' text-anchor='middle' style='font-size: 10.80px; font-style: italic; font-family: "Times New Roman";' textLength='29.48px' lengthAdjust='spacingAndGlyphs'>all Aᵀy</text>
+<text x='155.36' y='168.89' text-anchor='middle' style='font-size: 13.80px; font-weight: bold; font-style: italic; font-family: "Times New Roman";' textLength='9.20px' lengthAdjust='spacingAndGlyphs'>R</text>
+<text x='165.06' y='158.74' text-anchor='middle' style='font-size: 9.60px; font-style: italic; font-family: "Times New Roman";' textLength='4.80px' lengthAdjust='spacingAndGlyphs'>n</text>
+<text x='188.52' y='160.65' style='font-size: 10.20px; font-family: "Times New Roman";' textLength='56.55px' lengthAdjust='spacingAndGlyphs'>Perpendicular</text>
+<text x='188.52' y='175.43' style='font-size: 10.20px; font-style: italic; font-family: "Times New Roman";' textLength='46.97px' lengthAdjust='spacingAndGlyphs'>xᵀ(Aᵀy) = 0</text>
+<text x='175.77' y='200.25' text-anchor='middle' style='font-size: 10.80px; font-weight: bold;fill: #4169E1; font-family: "Times New Roman";' textLength='17.11px' lengthAdjust='spacingAndGlyphs'>x in</text>
+<text x='175.77' y='221.97' text-anchor='middle' style='font-size: 10.80px; font-weight: bold;fill: #4169E1; font-family: "Times New Roman";' textLength='45.00px' lengthAdjust='spacingAndGlyphs'>Nullspace</text>
+<text x='175.77' y='246.10' text-anchor='middle' style='font-size: 10.80px; font-style: italic; font-family: "Times New Roman";' textLength='29.48px' lengthAdjust='spacingAndGlyphs'>Ax = 0</text>
+<text x='48.23' y='77.97' style='font-size: 12.00px; font-weight: bold; font-style: italic; font-family: "Times New Roman";' textLength='28.34px' lengthAdjust='spacingAndGlyphs'>C(Aᵀ)</text>
+<text x='48.23' y='247.98' style='font-size: 12.00px; font-weight: bold; font-style: italic; font-family: "Times New Roman";' textLength='24.67px' lengthAdjust='spacingAndGlyphs'>N(A)</text>
+<text x='48.23' y='104.25' style='font-size: 10.80px; font-style: italic; font-family: "Times New Roman";' textLength='23.11px' lengthAdjust='spacingAndGlyphs'>dim r</text>
+<text x='48.23' y='223.24' style='font-size: 10.80px; font-style: italic; font-family: "Times New Roman";' textLength='41.20px' lengthAdjust='spacingAndGlyphs'>dim n − r</text>
 <polygon points='400.23,164.32 464.00,100.56 400.23,36.79 336.46,100.56 ' style='stroke-width: 1.12; stroke: #4169E1;' />
 <polygon points='400.23,254.51 445.32,209.42 400.23,164.32 355.14,209.42 ' style='stroke-width: 1.12; stroke: #4169E1;' />
-<text x='400.23' y='88.12' text-anchor='middle' style='font-size: 10.80px; font-weight: bold;fill: #4169E1; font-family: "Arial";' textLength='73.77px' lengthAdjust='spacingAndGlyphs'>Column space</text>
-<text x='400.23' y='109.46' text-anchor='middle' style='font-size: 10.80px; font-family: "Arial";' textLength='25.83px' lengthAdjust='spacingAndGlyphs'>all Ax</text>
-<text x='415.54' y='169.26' text-anchor='middle' style='font-size: 13.80px; font-weight: bold; font-family: "Arial";' textLength='9.97px' lengthAdjust='spacingAndGlyphs'>R</text>
-<text x='425.23' y='159.21' text-anchor='middle' style='font-size: 9.60px; font-family: "Arial";' textLength='7.98px' lengthAdjust='spacingAndGlyphs'>m</text>
-<text x='387.48' y='160.84' text-anchor='end' style='font-size: 10.20px; font-family: "Arial";' textLength='62.91px' lengthAdjust='spacingAndGlyphs'>Perpendicular</text>
-<text x='387.48' y='175.64' text-anchor='end' style='font-size: 10.20px; font-family: "Arial";' textLength='45.45px' lengthAdjust='spacingAndGlyphs'>yᵀ(Ax) = 0</text>
-<text x='400.23' y='190.72' text-anchor='middle' style='font-size: 10.80px; font-weight: bold;fill: #4169E1; font-family: "Arial";' textLength='18.59px' lengthAdjust='spacingAndGlyphs'>y in</text>
-<text x='400.23' y='212.28' text-anchor='middle' style='font-size: 10.80px; font-weight: bold;fill: #4169E1; font-family: "Arial";' textLength='79.23px' lengthAdjust='spacingAndGlyphs'>Nullspace of Aᵀ</text>
-<text x='400.23' y='233.59' text-anchor='middle' style='font-size: 10.80px; font-family: "Arial";' textLength='35.59px' lengthAdjust='spacingAndGlyphs'>Aᵀy = 0</text>
-<text x='527.77' y='78.16' text-anchor='end' style='font-size: 12.00px; font-weight: bold; font-family: "Arial";' textLength='25.34px' lengthAdjust='spacingAndGlyphs'>C(A)</text>
-<text x='527.77' y='238.03' text-anchor='end' style='font-size: 12.00px; font-weight: bold; font-family: "Arial";' textLength='30.55px' lengthAdjust='spacingAndGlyphs'>N(Aᵀ)</text>
-<text x='527.77' y='104.36' text-anchor='end' style='font-size: 10.80px; font-family: "Arial";' textLength='24.00px' lengthAdjust='spacingAndGlyphs'>dim r</text>
-<text x='527.77' y='213.22' text-anchor='end' style='font-size: 10.80px; font-family: "Arial";' textLength='45.31px' lengthAdjust='spacingAndGlyphs'>dim m − r</text>
+<text x='400.23' y='87.75' text-anchor='middle' style='font-size: 10.80px; font-weight: bold;fill: #4169E1; font-family: "Times New Roman";' textLength='65.11px' lengthAdjust='spacingAndGlyphs'>Column space</text>
+<text x='400.23' y='109.35' text-anchor='middle' style='font-size: 10.80px; font-style: italic; font-family: "Times New Roman";' textLength='25.31px' lengthAdjust='spacingAndGlyphs'>all Ax</text>
+<text x='415.54' y='168.89' text-anchor='middle' style='font-size: 13.80px; font-weight: bold; font-style: italic; font-family: "Times New Roman";' textLength='9.20px' lengthAdjust='spacingAndGlyphs'>R</text>
+<text x='425.23' y='158.74' text-anchor='middle' style='font-size: 9.60px; font-style: italic; font-family: "Times New Roman";' textLength='6.92px' lengthAdjust='spacingAndGlyphs'>m</text>
+<text x='387.48' y='160.65' text-anchor='end' style='font-size: 10.20px; font-family: "Times New Roman";' textLength='56.55px' lengthAdjust='spacingAndGlyphs'>Perpendicular</text>
+<text x='387.48' y='175.43' text-anchor='end' style='font-size: 10.20px; font-style: italic; font-family: "Times New Roman";' textLength='43.03px' lengthAdjust='spacingAndGlyphs'>yᵀ(Ax) = 0</text>
+<text x='400.23' y='190.48' text-anchor='middle' style='font-size: 10.80px; font-weight: bold;fill: #4169E1; font-family: "Times New Roman";' textLength='17.11px' lengthAdjust='spacingAndGlyphs'>y in</text>
+<text x='400.23' y='211.92' text-anchor='middle' style='font-size: 10.80px; font-weight: bold;fill: #4169E1; font-family: "Times New Roman";' textLength='70.77px' lengthAdjust='spacingAndGlyphs'>Nullspace of Aᵀ</text>
+<text x='400.23' y='233.33' text-anchor='middle' style='font-size: 10.80px; font-style: italic; font-family: "Times New Roman";' textLength='33.66px' lengthAdjust='spacingAndGlyphs'>Aᵀy = 0</text>
+<text x='527.77' y='77.97' text-anchor='end' style='font-size: 12.00px; font-weight: bold; font-style: italic; font-family: "Times New Roman";' textLength='24.00px' lengthAdjust='spacingAndGlyphs'>C(A)</text>
+<text x='527.77' y='237.85' text-anchor='end' style='font-size: 12.00px; font-weight: bold; font-style: italic; font-family: "Times New Roman";' textLength='29.02px' lengthAdjust='spacingAndGlyphs'>N(Aᵀ)</text>
+<text x='527.77' y='104.25' text-anchor='end' style='font-size: 10.80px; font-style: italic; font-family: "Times New Roman";' textLength='23.11px' lengthAdjust='spacingAndGlyphs'>dim r</text>
+<text x='527.77' y='213.11' text-anchor='end' style='font-size: 10.80px; font-style: italic; font-family: "Times New Roman";' textLength='43.59px' lengthAdjust='spacingAndGlyphs'>dim m − r</text>
 </g>
 </g>
 </svg></p>
@@ -708,13 +708,13 @@ abline(0, a[2] / a[1], col = &quot;grey80&quot;)                  # a 所在的�
 draw_vec(a, col = col_a, lab = &quot;a&quot;, pos = 4)
 draw_vec(b, col = &quot;black&quot;, lab = &quot;b&quot;, pos = 3)
 draw_vec(p, col = col_p)
-text(p[1] + 0.18, p[2] - 0.28, &quot;p&quot;, col = col_p)                  # 让开直角标记
+text(p[1] + 0.18, p[2] - 0.28, &quot;p&quot;, col = col_p, font = 3)                  # 让开直角标记
 segments(p[1], p[2], b[1], b[2], lty = 2, lwd = 2, col = col_e)   # e
-text((p[1] + b[1]) / 2, (p[2] + b[2]) / 2, &quot;e&quot;, pos = 4, col = col_e)
+text((p[1] + b[1]) / 2, (p[2] + b[2]) / 2, &quot;e&quot;, pos = 4, col = col_e, font = 3)
 right_angle(p, -a, e)
 </code></pre>
 <div id="fig:fig-proj-line" class="figure">
-<p><svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' width='360.00pt' height='273.60pt' viewBox='0 0 360.00 273.60' alt="b 在 a 方向上的投影 p 与误差 e">
+<p><svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' width='360.00pt' height='273.60pt' viewBox='0 0 360.00 273.60' alt="$$\mathbf{b}$$ 在 $$\mathbf{a}$$ 方向上的投影 $$\mathbf{p}$$ 与误差 $$\mathbf{e}$$">
 <g class='svglite'>
 <defs>
   <style type='text/css'><![CDATA[
@@ -747,11 +747,11 @@ right_angle(p, -a, e)
 <line x1='187.20' y1='244.80' x2='187.20' y2='252.00' style='stroke-width: 0.75;' />
 <line x1='248.15' y1='244.80' x2='248.15' y2='252.00' style='stroke-width: 0.75;' />
 <line x1='309.10' y1='244.80' x2='309.10' y2='252.00' style='stroke-width: 0.75;' />
-<text x='65.30' y='270.72' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='6.67px' lengthAdjust='spacingAndGlyphs'>0</text>
-<text x='126.25' y='270.72' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='6.67px' lengthAdjust='spacingAndGlyphs'>1</text>
-<text x='187.20' y='270.72' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='6.67px' lengthAdjust='spacingAndGlyphs'>2</text>
-<text x='248.15' y='270.72' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='6.67px' lengthAdjust='spacingAndGlyphs'>3</text>
-<text x='309.10' y='270.72' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='6.67px' lengthAdjust='spacingAndGlyphs'>4</text>
+<text x='65.30' y='270.72' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>0</text>
+<text x='126.25' y='270.72' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>1</text>
+<text x='187.20' y='270.72' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>2</text>
+<text x='248.15' y='270.72' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>3</text>
+<text x='309.10' y='270.72' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>4</text>
 <line x1='28.80' y1='236.27' x2='28.80' y2='22.93' style='stroke-width: 0.75;' />
 <line x1='28.80' y1='236.27' x2='21.60' y2='236.27' style='stroke-width: 0.75;' />
 <line x1='28.80' y1='205.79' x2='21.60' y2='205.79' style='stroke-width: 0.75;' />
@@ -761,16 +761,16 @@ right_angle(p, -a, e)
 <line x1='28.80' y1='83.89' x2='21.60' y2='83.89' style='stroke-width: 0.75;' />
 <line x1='28.80' y1='53.41' x2='21.60' y2='53.41' style='stroke-width: 0.75;' />
 <line x1='28.80' y1='22.93' x2='21.60' y2='22.93' style='stroke-width: 0.75;' />
-<text transform='translate(11.52,236.27) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='16.67px' lengthAdjust='spacingAndGlyphs'>0.0</text>
-<text transform='translate(11.52,205.79) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='16.67px' lengthAdjust='spacingAndGlyphs'>0.5</text>
-<text transform='translate(11.52,175.31) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='16.67px' lengthAdjust='spacingAndGlyphs'>1.0</text>
-<text transform='translate(11.52,144.84) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='16.67px' lengthAdjust='spacingAndGlyphs'>1.5</text>
-<text transform='translate(11.52,114.36) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='16.67px' lengthAdjust='spacingAndGlyphs'>2.0</text>
-<text transform='translate(11.52,83.89) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='16.67px' lengthAdjust='spacingAndGlyphs'>2.5</text>
-<text transform='translate(11.52,53.41) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='16.67px' lengthAdjust='spacingAndGlyphs'>3.0</text>
-<text transform='translate(11.52,22.93) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='16.67px' lengthAdjust='spacingAndGlyphs'>3.5</text>
+<text transform='translate(11.52,236.27) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>0.0</text>
+<text transform='translate(11.52,205.79) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>0.5</text>
+<text transform='translate(11.52,175.31) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>1.0</text>
+<text transform='translate(11.52,144.84) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>1.5</text>
+<text transform='translate(11.52,114.36) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>2.0</text>
+<text transform='translate(11.52,83.89) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>2.5</text>
+<text transform='translate(11.52,53.41) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>3.0</text>
+<text transform='translate(11.52,22.93) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>3.5</text>
 <polygon points='28.80,244.80 345.60,244.80 345.60,14.40 28.80,14.40 ' style='stroke-width: 0.75;' />
-<text x='187.20' y='12.35' text-anchor='middle' style='font-size: 14.40px; font-weight: bold; font-family: "Arial";' textLength='147.16px' lengthAdjust='spacingAndGlyphs'>projection of b onto a</text>
+<text x='187.20' y='11.97' text-anchor='middle' style='font-size: 14.40px; font-weight: bold; font-family: "Times New Roman";' textLength='131.69px' lengthAdjust='spacingAndGlyphs'>projection of b onto a</text>
 </g>
 <defs>
   <clipPath id='cpMjguODB8MzQ1LjYwfDE0LjQwfDI0NC44MA=='>
@@ -781,22 +781,22 @@ right_angle(p, -a, e)
 <line x1='28.80' y1='248.43' x2='345.60' y2='142.83' style='stroke-width: 0.75; stroke: #CCCCCC;' />
 <line x1='65.30' y1='236.27' x2='248.15' y2='175.31' style='stroke-width: 1.50; stroke: #4169E1;' />
 <polyline points='243.38,180.70 248.15,175.31 241.10,173.87 ' style='stroke-width: 1.50; stroke: #4169E1;' />
-<text x='255.35' y='178.18' style='font-size: 12.00px;fill: #4169E1; font-family: "Arial";' textLength='6.67px' lengthAdjust='spacingAndGlyphs'>a</text>
+<text x='255.35' y='177.96' style='font-size: 12.00px; font-style: italic;fill: #4169E1; font-family: "Times New Roman";' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>a</text>
 <line x1='65.30' y1='236.27' x2='187.20' y2='53.41' style='stroke-width: 1.50;' />
 <polyline points='186.74,60.59 187.20,53.41 180.75,56.60 ' style='stroke-width: 1.50;' />
-<text x='187.20' y='46.21' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='6.67px' lengthAdjust='spacingAndGlyphs'>b</text>
+<text x='187.20' y='46.21' text-anchor='middle' style='font-size: 12.00px; font-style: italic; font-family: "Times New Roman";' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>b</text>
 <line x1='65.30' y1='236.27' x2='229.87' y2='181.41' style='stroke-width: 1.50; stroke: #B22222;' />
 <polyline points='225.09,186.80 229.87,181.41 222.81,179.97 ' style='stroke-width: 1.50; stroke: #B22222;' />
-<text x='240.84' y='200.47' text-anchor='middle' style='font-size: 12.00px;fill: #B22222; font-family: "Arial";' textLength='6.67px' lengthAdjust='spacingAndGlyphs'>p</text>
+<text x='240.84' y='199.84' text-anchor='middle' style='font-size: 12.00px; font-style: italic;fill: #B22222; font-family: "Times New Roman";' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>p</text>
 <line x1='229.87' y1='181.41' x2='187.20' y2='53.41' style='stroke-width: 1.50; stroke: #666666; stroke-dasharray: 8.00,8.00;' />
-<text x='215.73' y='120.27' style='font-size: 12.00px;fill: #666666; font-family: "Arial";' textLength='6.67px' lengthAdjust='spacingAndGlyphs'>e</text>
+<text x='215.73' y='120.06' style='font-size: 12.00px; font-style: italic;fill: #666666; font-family: "Times New Roman";' textLength='5.33px' lengthAdjust='spacingAndGlyphs'>e</text>
 <polyline points='221.19,184.30 218.30,175.63 226.98,172.74 ' style='stroke-width: 0.75;' />
 </g>
 </g>
 </svg></p>
 <div class="caption">
 <p><span class="ref-number-fig">3</span>
-b 在 a 方向上的投影 p 与误差 e</p>
+$$\mathbf{b}$$ 在 $$\mathbf{a}$$ 方向上的投影 $$\mathbf{p}$$ 与误差 $$\mathbf{e}$$</p>
 </div>
 </div>
 <p>右乘一个向量是列的线性组合，所以 \(P\mathbf{b}\) 一定落在 \(P\) 的列空间里，而 \(P\) 的列都是 \(\mathbf{a}\) 的倍数，因此 \(C(P) = C(\mathbf{a})\)， \(P\) 的秩为 1。另一方面，投影两次与投影一次结果相同，即 \(P^2\mathbf{b} = P\mathbf{b}\)。因此投影矩阵满足：</p>
@@ -833,12 +833,12 @@ segments(p[1], p[2], a2[1], a2[2], lty = 2, col = col_e)   # a2 - p
 draw_vec(w2, col = col_e, lab = &quot;w₂&quot;, pos = 2)
 draw_vec(q1, col = col_a, lwd = 4)
 draw_vec(q2, col = col_e, lwd = 4)
-text(q1[1], q1[2], &quot;q₁&quot;, pos = 1, col = col_a)
-text(q2[1], q2[2], &quot;q₂&quot;, pos = 2, col = col_e)
+text(q1[1], q1[2], &quot;q₁&quot;, pos = 1, col = col_a, font = 3)
+text(q2[1], q2[2], &quot;q₂&quot;, pos = 2, col = col_e, font = 3)
 right_angle(c(0, 0), q1, q2)
 </code></pre>
 <div id="fig:fig-gram-schmidt" class="figure">
-<p><svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' width='360.00pt' height='273.60pt' viewBox='0 0 360.00 273.60' alt="Gram-Schmidt：从 a₁、a₂ 得到标准正交的 q₁、q₂">
+<p><svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' width='360.00pt' height='273.60pt' viewBox='0 0 360.00 273.60' alt="Gram-Schmidt：从 $$a_1$$、$$a_2$$ 得到标准正交的 $$q_1$$、$$q_2$$">
 <g class='svglite'>
 <defs>
   <style type='text/css'><![CDATA[
@@ -872,23 +872,23 @@ right_angle(c(0, 0), q1, q2)
 <line x1='224.70' y1='244.80' x2='224.70' y2='252.00' style='stroke-width: 0.75;' />
 <line x1='274.70' y1='244.80' x2='274.70' y2='252.00' style='stroke-width: 0.75;' />
 <line x1='324.70' y1='244.80' x2='324.70' y2='252.00' style='stroke-width: 0.75;' />
-<text x='74.70' y='270.72' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='10.67px' lengthAdjust='spacingAndGlyphs'>-1</text>
-<text x='124.70' y='270.72' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='6.67px' lengthAdjust='spacingAndGlyphs'>0</text>
-<text x='174.70' y='270.72' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='6.67px' lengthAdjust='spacingAndGlyphs'>1</text>
-<text x='224.70' y='270.72' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='6.67px' lengthAdjust='spacingAndGlyphs'>2</text>
-<text x='274.70' y='270.72' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='6.67px' lengthAdjust='spacingAndGlyphs'>3</text>
-<text x='324.70' y='270.72' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='6.67px' lengthAdjust='spacingAndGlyphs'>4</text>
+<text x='74.70' y='270.72' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='10.00px' lengthAdjust='spacingAndGlyphs'>-1</text>
+<text x='124.70' y='270.72' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>0</text>
+<text x='174.70' y='270.72' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>1</text>
+<text x='224.70' y='270.72' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>2</text>
+<text x='274.70' y='270.72' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>3</text>
+<text x='324.70' y='270.72' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>4</text>
 <line x1='28.80' y1='211.80' x2='28.80' y2='61.80' style='stroke-width: 0.75;' />
 <line x1='28.80' y1='211.80' x2='21.60' y2='211.80' style='stroke-width: 0.75;' />
 <line x1='28.80' y1='161.80' x2='21.60' y2='161.80' style='stroke-width: 0.75;' />
 <line x1='28.80' y1='111.80' x2='21.60' y2='111.80' style='stroke-width: 0.75;' />
 <line x1='28.80' y1='61.80' x2='21.60' y2='61.80' style='stroke-width: 0.75;' />
-<text transform='translate(11.52,211.80) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='6.67px' lengthAdjust='spacingAndGlyphs'>0</text>
-<text transform='translate(11.52,161.80) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='6.67px' lengthAdjust='spacingAndGlyphs'>1</text>
-<text transform='translate(11.52,111.80) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='6.67px' lengthAdjust='spacingAndGlyphs'>2</text>
-<text transform='translate(11.52,61.80) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='6.67px' lengthAdjust='spacingAndGlyphs'>3</text>
+<text transform='translate(11.52,211.80) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>0</text>
+<text transform='translate(11.52,161.80) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>1</text>
+<text transform='translate(11.52,111.80) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>2</text>
+<text transform='translate(11.52,61.80) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>3</text>
 <polygon points='28.80,244.80 345.60,244.80 345.60,28.80 28.80,28.80 ' style='stroke-width: 0.75;' />
-<text x='187.20' y='19.55' text-anchor='middle' style='font-size: 14.40px; font-weight: bold; font-family: "Arial";' textLength='99.16px' lengthAdjust='spacingAndGlyphs'>Gram-Schmidt</text>
+<text x='187.20' y='19.17' text-anchor='middle' style='font-size: 14.40px; font-weight: bold; font-family: "Times New Roman";' textLength='92.73px' lengthAdjust='spacingAndGlyphs'>Gram-Schmidt</text>
 </g>
 <defs>
   <clipPath id='cpMjguODB8MzQ1LjYwfDI4LjgwfDI0NC44MA=='>
@@ -900,30 +900,30 @@ right_angle(c(0, 0), q1, q2)
 <line x1='124.70' y1='244.80' x2='124.70' y2='28.80' style='stroke-width: 0.75; stroke: #E5E5E5;' />
 <line x1='124.70' y1='211.80' x2='274.70' y2='161.80' style='stroke-width: 1.50; stroke: #4169E1;' />
 <polyline points='269.92,167.19 274.70,161.80 267.65,160.36 ' style='stroke-width: 1.50; stroke: #4169E1;' />
-<text x='281.90' y='164.67' style='font-size: 12.00px;fill: #4169E1; font-family: "Arial";' textLength='12.59px' lengthAdjust='spacingAndGlyphs'>a₁</text>
+<text x='281.90' y='164.45' style='font-size: 12.00px; font-style: italic;fill: #4169E1; font-family: "Times New Roman";' textLength='9.59px' lengthAdjust='spacingAndGlyphs'>a₁</text>
 <line x1='124.70' y1='211.80' x2='224.70' y2='61.80' style='stroke-width: 1.50;' />
 <polyline points='224.24,68.99 224.70,61.80 218.25,64.99 ' style='stroke-width: 1.50;' />
-<text x='224.70' y='54.60' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='12.59px' lengthAdjust='spacingAndGlyphs'>a₂</text>
+<text x='224.70' y='54.60' text-anchor='middle' style='font-size: 12.00px; font-style: italic; font-family: "Times New Roman";' textLength='9.59px' lengthAdjust='spacingAndGlyphs'>a₂</text>
 <line x1='124.70' y1='211.80' x2='259.70' y2='166.80' style='stroke-width: 1.50; stroke: #B22222;' />
 <polyline points='254.92,172.19 259.70,166.80 252.65,165.36 ' style='stroke-width: 1.50; stroke: #B22222;' />
-<text x='259.70' y='181.16' text-anchor='middle' style='font-size: 12.00px;fill: #B22222; font-family: "Arial";' textLength='6.67px' lengthAdjust='spacingAndGlyphs'>p</text>
+<text x='259.70' y='180.62' text-anchor='middle' style='font-size: 12.00px; font-style: italic;fill: #B22222; font-family: "Times New Roman";' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>p</text>
 <line x1='259.70' y1='166.80' x2='224.70' y2='61.80' style='stroke-width: 0.75; stroke: #666666; stroke-dasharray: 4.00,4.00;' />
 <line x1='124.70' y1='211.80' x2='89.70' y2='106.80' style='stroke-width: 1.50; stroke: #666666;' />
 <polyline points='95.09,111.58 89.70,106.80 88.26,113.85 ' style='stroke-width: 1.50; stroke: #666666;' />
-<text x='82.50' y='109.67' text-anchor='end' style='font-size: 12.00px;fill: #666666; font-family: "Arial";' textLength='14.59px' lengthAdjust='spacingAndGlyphs'>w₂</text>
+<text x='82.50' y='109.45' text-anchor='end' style='font-size: 12.00px; font-style: italic;fill: #666666; font-family: "Times New Roman";' textLength='11.59px' lengthAdjust='spacingAndGlyphs'>w₂</text>
 <line x1='124.70' y1='211.80' x2='172.13' y2='195.99' style='stroke-width: 3.00; stroke: #4169E1;' />
 <polyline points='167.36,201.38 172.13,195.99 165.08,194.55 ' style='stroke-width: 3.00; stroke: #4169E1;' />
 <line x1='124.70' y1='211.80' x2='108.89' y2='164.37' style='stroke-width: 3.00; stroke: #666666;' />
 <polyline points='114.28,169.14 108.89,164.37 107.45,171.42 ' style='stroke-width: 3.00; stroke: #666666;' />
-<text x='172.13' y='210.35' text-anchor='middle' style='font-size: 12.00px;fill: #4169E1; font-family: "Arial";' textLength='12.59px' lengthAdjust='spacingAndGlyphs'>q₁</text>
-<text x='101.69' y='167.23' text-anchor='end' style='font-size: 12.00px;fill: #666666; font-family: "Arial";' textLength='12.59px' lengthAdjust='spacingAndGlyphs'>q₂</text>
+<text x='172.13' y='209.81' text-anchor='middle' style='font-size: 12.00px; font-style: italic;fill: #4169E1; font-family: "Times New Roman";' textLength='9.59px' lengthAdjust='spacingAndGlyphs'>q₁</text>
+<text x='101.69' y='167.02' text-anchor='end' style='font-size: 12.00px; font-style: italic;fill: #666666; font-family: "Times New Roman";' textLength='9.59px' lengthAdjust='spacingAndGlyphs'>q₂</text>
 <polyline points='131.82,209.43 129.44,202.31 122.33,204.68 ' style='stroke-width: 0.75;' />
 </g>
 </g>
 </svg></p>
 <div class="caption">
 <p><span class="ref-number-fig">4</span>
-Gram-Schmidt：从 a₁、a₂ 得到标准正交的 q₁、q₂</p>
+Gram-Schmidt：从 $$a_1$$、$$a_2$$ 得到标准正交的 $$q_1$$、$$q_2$$</p>
 </div>
 </div>
 <p>这个过程用矩阵语言表示就是 \(QR\)  分解 \(A = QR\)，其中 \(R\) 为上三角矩阵（要求 \(A\) 的列线性无关）。以两个向量为例：</p>
@@ -1187,20 +1187,20 @@ Plotly.newPlot(document.getElementById('la-proj-plane'), spec.data, spec.layout,
               {responsive: true});</script>
 <div id="la-proj-plane" style="width: 100%; height: 430px;">
 </div>
-<div class="caption">b 投影到列空间（平面）：$$\mathbf{b} = \mathbf{p} + \mathbf{e}$$，e 垂直于平面（可旋转）</div>
+<div class="caption">$$\mathbf{b}$$ 投影到列空间（平面）：$$\mathbf{b} = \mathbf{p} + \mathbf{e}$$，$$\mathbf{e}$$ 垂直于平面（可旋转）</div>
 <p>最小二乘拟合直线可以看作同样的投影：数据向量 \(\mathbf{b}\) 被投影到 \(A\) 的列空间，拟合值 \(\mathbf{p}=A\hat{\mathbf{x}}\) 就是图中直线上的点，残差 \(\mathbf{e}\) 就是竖直的虚线段。</p>
 <pre><code class="language-r">tt &lt;- c(0, 1, 2); y &lt;- c(1, 2, 2)
 X &lt;- cbind(1, tt)
 beta &lt;- solve(t(X) %*% X, t(X) %*% y)     # 正规方程
 fit &lt;- drop(X %*% beta)                   # p = X beta
 
-par(mar = c(3, 3, 1, 1))
+par(mar = c(3, 3, 1, 1), font.lab = 3)                        # t、y 是变量，斜体
 plot(tt, y, pch = 19, xlim = c(-0.3, 2.3), ylim = c(0.5, 2.7), xlab = &quot;t&quot;, ylab = &quot;y&quot;,
      main = &quot;least squares fit&quot;)
 abline(a = beta[1], b = beta[2], col = col_a, lwd = 2)
 segments(tt, fit, tt, y, lty = 2, col = col_e)
 points(tt, fit, pch = 1, col = col_p, cex = 1.5)
-legend(&quot;topleft&quot;, bty = &quot;n&quot;, cex = 0.8,
+legend(&quot;topleft&quot;, bty = &quot;n&quot;, cex = 0.8, text.font = 3,   # 图例里带变量，整条斜体
        legend = c(&quot;data (b)&quot;, &quot;fitted (p)&quot;, &quot;residual (e)&quot;),
        pch = c(19, 1, NA), lty = c(NA, NA, 2), col = c(&quot;black&quot;, col_p, col_e))
 </code></pre>
@@ -1250,26 +1250,26 @@ legend(&quot;topleft&quot;, bty = &quot;n&quot;, cex = 0.8,
 <line x1='187.20' y1='230.40' x2='187.20' y2='237.60' style='stroke-width: 0.75;' />
 <line x1='238.48' y1='230.40' x2='238.48' y2='237.60' style='stroke-width: 0.75;' />
 <line x1='289.76' y1='230.40' x2='289.76' y2='237.60' style='stroke-width: 0.75;' />
-<text x='84.64' y='256.32' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='16.67px' lengthAdjust='spacingAndGlyphs'>0.0</text>
-<text x='135.92' y='256.32' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='16.67px' lengthAdjust='spacingAndGlyphs'>0.5</text>
-<text x='187.20' y='256.32' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='16.67px' lengthAdjust='spacingAndGlyphs'>1.0</text>
-<text x='238.48' y='256.32' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='16.67px' lengthAdjust='spacingAndGlyphs'>1.5</text>
-<text x='289.76' y='256.32' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='16.67px' lengthAdjust='spacingAndGlyphs'>2.0</text>
+<text x='84.64' y='256.32' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>0.0</text>
+<text x='135.92' y='256.32' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>0.5</text>
+<text x='187.20' y='256.32' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>1.0</text>
+<text x='238.48' y='256.32' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>1.5</text>
+<text x='289.76' y='256.32' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>2.0</text>
 <line x1='43.20' y1='222.40' x2='43.20' y2='40.58' style='stroke-width: 0.75;' />
 <line x1='43.20' y1='222.40' x2='36.00' y2='222.40' style='stroke-width: 0.75;' />
 <line x1='43.20' y1='176.95' x2='36.00' y2='176.95' style='stroke-width: 0.75;' />
 <line x1='43.20' y1='131.49' x2='36.00' y2='131.49' style='stroke-width: 0.75;' />
 <line x1='43.20' y1='86.04' x2='36.00' y2='86.04' style='stroke-width: 0.75;' />
 <line x1='43.20' y1='40.58' x2='36.00' y2='40.58' style='stroke-width: 0.75;' />
-<text transform='translate(25.92,222.40) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='16.67px' lengthAdjust='spacingAndGlyphs'>0.5</text>
-<text transform='translate(25.92,176.95) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='16.67px' lengthAdjust='spacingAndGlyphs'>1.0</text>
-<text transform='translate(25.92,131.49) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='16.67px' lengthAdjust='spacingAndGlyphs'>1.5</text>
-<text transform='translate(25.92,86.04) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='16.67px' lengthAdjust='spacingAndGlyphs'>2.0</text>
-<text transform='translate(25.92,40.58) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='16.67px' lengthAdjust='spacingAndGlyphs'>2.5</text>
+<text transform='translate(25.92,222.40) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>0.5</text>
+<text transform='translate(25.92,176.95) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>1.0</text>
+<text transform='translate(25.92,131.49) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>1.5</text>
+<text transform='translate(25.92,86.04) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>2.0</text>
+<text transform='translate(25.92,40.58) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>2.5</text>
 <polygon points='43.20,230.40 331.20,230.40 331.20,14.40 43.20,14.40 ' style='stroke-width: 0.75;' />
-<text x='187.20' y='12.35' text-anchor='middle' style='font-size: 14.40px; font-weight: bold; font-family: "Arial";' textLength='109.58px' lengthAdjust='spacingAndGlyphs'>least squares fit</text>
-<text x='187.20' y='285.12' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='3.33px' lengthAdjust='spacingAndGlyphs'>t</text>
-<text transform='translate(-2.88,122.40) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>y</text>
+<text x='187.20' y='11.97' text-anchor='middle' style='font-size: 14.40px; font-weight: bold; font-family: "Times New Roman";' textLength='95.67px' lengthAdjust='spacingAndGlyphs'>least squares fit</text>
+<text x='187.20' y='285.12' text-anchor='middle' style='font-size: 12.00px; font-style: italic; font-family: "Times New Roman";' textLength='3.33px' lengthAdjust='spacingAndGlyphs'>t</text>
+<text transform='translate(-2.88,122.40) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-style: italic; font-family: "Times New Roman";' textLength='5.33px' lengthAdjust='spacingAndGlyphs'>y</text>
 </g>
 <g clip-path='url(#cpNDMuMjB8MzMxLjIwfDE0LjQwfDIzMC40MA==)'>
 <line x1='43.20' y1='180.16' x2='331.20' y2='52.52' style='stroke-width: 1.50; stroke: #4169E1;' />
@@ -1282,9 +1282,9 @@ legend(&quot;topleft&quot;, bty = &quot;n&quot;, cex = 0.8,
 <line x1='45.79' y1='48.96' x2='63.07' y2='48.96' style='stroke-width: 0.75; stroke: #666666; stroke-dasharray: 4.00,4.00;' />
 <circle cx='54.43' cy='25.92' r='2.16' style='stroke-width: 0.75; fill: #000000;' />
 <circle cx='54.43' cy='37.44' r='2.16' style='stroke-width: 0.75; stroke: #B22222;' />
-<text x='71.71' y='29.35' style='font-size: 9.60px; font-family: "Arial";' textLength='33.03px' lengthAdjust='spacingAndGlyphs'>data (b)</text>
-<text x='71.71' y='40.87' style='font-size: 9.60px; font-family: "Arial";' textLength='35.17px' lengthAdjust='spacingAndGlyphs'>fitted (p)</text>
-<text x='71.71' y='52.39' style='font-size: 9.60px; font-family: "Arial";' textLength='47.92px' lengthAdjust='spacingAndGlyphs'>residual (e)</text>
+<text x='71.71' y='29.10' style='font-size: 9.60px; font-style: italic; font-family: "Times New Roman";' textLength='30.64px' lengthAdjust='spacingAndGlyphs'>data (b)</text>
+<text x='71.71' y='40.62' style='font-size: 9.60px; font-style: italic; font-family: "Times New Roman";' textLength='33.33px' lengthAdjust='spacingAndGlyphs'>fitted (p)</text>
+<text x='71.71' y='52.14' style='font-size: 9.60px; font-style: italic; font-family: "Times New Roman";' textLength='44.16px' lengthAdjust='spacingAndGlyphs'>residual (e)</text>
 </g>
 </g>
 </svg></p>
@@ -1344,7 +1344,7 @@ C_{1n} &amp; \dots &amp; C_{nn}
 <p>行列式的绝对值 \(|\det A|\) 是由 \(A\) 的行向量（或列向量）构成的平行体（二维为平行四边形，三维为平行六面体）的体积，符号则表示定向（是否翻转）。</p>
 <pre><code class="language-r">A &lt;- matrix(c(2, 0.5, 1, 1.5), 2)           # 列为 (2, 0.5) 和 (1, 1.5)
 a1 &lt;- A[, 1]; a2 &lt;- A[, 2]
-par(mar = c(2, 2, 2, 1))
+par(mar = c(2, 2, 2, 1), font.main = 3)                       # 标题是公式，斜体
 plot(NA, xlim = c(-0.3, 3.5), ylim = c(-0.3, 2.3), asp = 1, xlab = &quot;&quot;, ylab = &quot;&quot;,
      main = paste0(&quot;|det A| = &quot;, abs(det(A))))
 polygon(c(0, 1, 1, 0), c(0, 0, 1, 1), col = &quot;#e5e5e5&quot;, border = &quot;grey50&quot;)
@@ -1356,7 +1356,7 @@ text(0.5, 0.5, &quot;1&quot;, col = &quot;grey30&quot;)
 text(1.5, 1, &quot;A(unit square)&quot;, col = col_a)
 </code></pre>
 <div id="fig:fig-det-area" class="figure">
-<p><svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' width='360.00pt' height='259.20pt' viewBox='0 0 360.00 259.20' alt="单位正方形经 A 变成平行四边形，面积为 $$|\det A|$$">
+<p><svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' width='360.00pt' height='259.20pt' viewBox='0 0 360.00 259.20' alt="单位正方形经 $$A$$ 变成平行四边形，面积为 $$|\det A|$$">
 <g class='svglite'>
 <defs>
   <style type='text/css'><![CDATA[
@@ -1388,23 +1388,23 @@ text(1.5, 1, &quot;A(unit square)&quot;, col = col_a)
 <line x1='144.12' y1='230.40' x2='144.12' y2='237.60' style='stroke-width: 0.75;' />
 <line x1='215.92' y1='230.40' x2='215.92' y2='237.60' style='stroke-width: 0.75;' />
 <line x1='287.71' y1='230.40' x2='287.71' y2='237.60' style='stroke-width: 0.75;' />
-<text x='72.33' y='256.32' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='6.67px' lengthAdjust='spacingAndGlyphs'>0</text>
-<text x='144.12' y='256.32' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='6.67px' lengthAdjust='spacingAndGlyphs'>1</text>
-<text x='215.92' y='256.32' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='6.67px' lengthAdjust='spacingAndGlyphs'>2</text>
-<text x='287.71' y='256.32' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='6.67px' lengthAdjust='spacingAndGlyphs'>3</text>
+<text x='72.33' y='256.32' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>0</text>
+<text x='144.12' y='256.32' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>1</text>
+<text x='215.92' y='256.32' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>2</text>
+<text x='287.71' y='256.32' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>3</text>
 <line x1='28.80' y1='201.39' x2='28.80' y2='57.81' style='stroke-width: 0.75;' />
 <line x1='28.80' y1='201.39' x2='21.60' y2='201.39' style='stroke-width: 0.75;' />
 <line x1='28.80' y1='165.50' x2='21.60' y2='165.50' style='stroke-width: 0.75;' />
 <line x1='28.80' y1='129.60' x2='21.60' y2='129.60' style='stroke-width: 0.75;' />
 <line x1='28.80' y1='93.70' x2='21.60' y2='93.70' style='stroke-width: 0.75;' />
 <line x1='28.80' y1='57.81' x2='21.60' y2='57.81' style='stroke-width: 0.75;' />
-<text transform='translate(11.52,201.39) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='16.67px' lengthAdjust='spacingAndGlyphs'>0.0</text>
-<text transform='translate(11.52,165.50) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='16.67px' lengthAdjust='spacingAndGlyphs'>0.5</text>
-<text transform='translate(11.52,129.60) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='16.67px' lengthAdjust='spacingAndGlyphs'>1.0</text>
-<text transform='translate(11.52,93.70) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='16.67px' lengthAdjust='spacingAndGlyphs'>1.5</text>
-<text transform='translate(11.52,57.81) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='16.67px' lengthAdjust='spacingAndGlyphs'>2.0</text>
+<text transform='translate(11.52,201.39) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>0.0</text>
+<text transform='translate(11.52,165.50) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>0.5</text>
+<text transform='translate(11.52,129.60) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>1.0</text>
+<text transform='translate(11.52,93.70) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>1.5</text>
+<text transform='translate(11.52,57.81) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>2.0</text>
 <polygon points='28.80,230.40 345.60,230.40 345.60,28.80 28.80,28.80 ' style='stroke-width: 0.75;' />
-<text x='187.20' y='19.55' text-anchor='middle' style='font-size: 14.40px; font-weight: bold; font-family: "Arial";' textLength='79.92px' lengthAdjust='spacingAndGlyphs'>|det A| = 2.5</text>
+<text x='187.20' y='19.17' text-anchor='middle' style='font-size: 14.40px; font-style: italic; font-family: "Times New Roman";' textLength='72.52px' lengthAdjust='spacingAndGlyphs'>|det A| = 2.5</text>
 </g>
 <defs>
   <clipPath id='cpMjguODB8MzQ1LjYwfDI4LjgwfDIzMC40MA=='>
@@ -1416,18 +1416,18 @@ text(1.5, 1, &quot;A(unit square)&quot;, col = col_a)
 <polygon points='72.33,201.39 215.92,165.50 287.71,57.81 144.12,93.70 ' style='stroke-width: 1.50; stroke: #4169E1; fill: #4169E1; fill-opacity: 0.15;' />
 <line x1='72.33' y1='201.39' x2='215.92' y2='165.50' style='stroke-width: 2.25; stroke: #4169E1;' />
 <polyline points='210.74,170.50 215.92,165.50 209.00,163.52 ' style='stroke-width: 2.25; stroke: #4169E1;' />
-<text x='215.92' y='179.86' text-anchor='middle' style='font-size: 12.00px;fill: #4169E1; font-family: "Arial";' textLength='23.27px' lengthAdjust='spacingAndGlyphs'>A e₁</text>
+<text x='215.92' y='179.32' text-anchor='middle' style='font-size: 12.00px; font-style: italic;fill: #4169E1; font-family: "Times New Roman";' textLength='19.03px' lengthAdjust='spacingAndGlyphs'>A e₁</text>
 <line x1='72.33' y1='201.39' x2='144.12' y2='93.70' style='stroke-width: 2.25; stroke: #4169E1;' />
 <polyline points='143.66,100.89 144.12,93.70 137.67,96.89 ' style='stroke-width: 2.25; stroke: #4169E1;' />
-<text x='136.92' y='96.57' text-anchor='end' style='font-size: 12.00px;fill: #4169E1; font-family: "Arial";' textLength='23.27px' lengthAdjust='spacingAndGlyphs'>A e₂</text>
-<text x='108.23' y='169.81' text-anchor='middle' style='font-size: 12.00px;fill: #4D4D4D; font-family: "Arial";' textLength='6.67px' lengthAdjust='spacingAndGlyphs'>1</text>
-<text x='180.02' y='132.71' text-anchor='middle' style='font-size: 12.00px;fill: #4169E1; font-family: "Arial";' textLength='75.36px' lengthAdjust='spacingAndGlyphs'>A(unit square)</text>
+<text x='136.92' y='96.35' text-anchor='end' style='font-size: 12.00px; font-style: italic;fill: #4169E1; font-family: "Times New Roman";' textLength='19.03px' lengthAdjust='spacingAndGlyphs'>A e₂</text>
+<text x='108.23' y='169.55' text-anchor='middle' style='font-size: 12.00px;fill: #4D4D4D; font-family: "Times New Roman";' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>1</text>
+<text x='180.02' y='132.48' text-anchor='middle' style='font-size: 12.00px;fill: #4169E1; font-family: "Times New Roman";' textLength='69.66px' lengthAdjust='spacingAndGlyphs'>A(unit square)</text>
 </g>
 </g>
 </svg></p>
 <div class="caption">
 <p><span class="ref-number-fig">6</span>
-单位正方形经 A 变成平行四边形，面积为 $$|\det A|$$</p>
+单位正方形经 $$A$$ 变成平行四边形，面积为 $$|\det A|$$</p>
 </div>
 </div>
 <h2 id="sec:_13">特征值与特征向量</h2>
@@ -1449,11 +1449,11 @@ for (i in 1:2) {
   draw_vec(v, col = col_a)
   draw_vec(ev$values[i] * v, col = col_p)
   text(1.15 * ev$values[i] * v[1], 1.15 * ev$values[i] * v[2],
-       paste0(&quot;λ = &quot;, round(ev$values[i], 2)), col = col_p, pos = 3)   # 标签挪到箭头之外
+       paste0(&quot;λ = &quot;, round(ev$values[i], 2)), col = col_p, pos = 3, font = 3)   # 标签挪到箭头之外
 }
 </code></pre>
 <div id="fig:fig-eigen" class="figure">
-<p><svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' width='331.20pt' height='302.40pt' viewBox='0 0 331.20 302.40' alt="特征向量只被放缩：蓝色为 x，红色为 Ax">
+<p><svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' width='331.20pt' height='302.40pt' viewBox='0 0 331.20 302.40' alt="特征向量只被放缩：蓝色为 $$x$$，红色为 $$Ax$$">
 <g class='svglite'>
 <defs>
   <style type='text/css'><![CDATA[
@@ -1498,13 +1498,13 @@ for (i in 1:2) {
 <line x1='210.58' y1='273.60' x2='210.58' y2='280.80' style='stroke-width: 0.75;' />
 <line x1='248.36' y1='273.60' x2='248.36' y2='280.80' style='stroke-width: 0.75;' />
 <line x1='286.13' y1='273.60' x2='286.13' y2='280.80' style='stroke-width: 0.75;' />
-<text x='59.47' y='299.52' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='10.67px' lengthAdjust='spacingAndGlyphs'>-3</text>
-<text x='97.24' y='299.52' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='10.67px' lengthAdjust='spacingAndGlyphs'>-2</text>
-<text x='135.02' y='299.52' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='10.67px' lengthAdjust='spacingAndGlyphs'>-1</text>
-<text x='172.80' y='299.52' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='6.67px' lengthAdjust='spacingAndGlyphs'>0</text>
-<text x='210.58' y='299.52' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='6.67px' lengthAdjust='spacingAndGlyphs'>1</text>
-<text x='248.36' y='299.52' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='6.67px' lengthAdjust='spacingAndGlyphs'>2</text>
-<text x='286.13' y='299.52' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='6.67px' lengthAdjust='spacingAndGlyphs'>3</text>
+<text x='59.47' y='299.52' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='10.00px' lengthAdjust='spacingAndGlyphs'>-3</text>
+<text x='97.24' y='299.52' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='10.00px' lengthAdjust='spacingAndGlyphs'>-2</text>
+<text x='135.02' y='299.52' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='10.00px' lengthAdjust='spacingAndGlyphs'>-1</text>
+<text x='172.80' y='299.52' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>0</text>
+<text x='210.58' y='299.52' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>1</text>
+<text x='248.36' y='299.52' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>2</text>
+<text x='286.13' y='299.52' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>3</text>
 <line x1='28.80' y1='264.53' x2='28.80' y2='37.87' style='stroke-width: 0.75;' />
 <line x1='28.80' y1='264.53' x2='21.60' y2='264.53' style='stroke-width: 0.75;' />
 <line x1='28.80' y1='226.76' x2='21.60' y2='226.76' style='stroke-width: 0.75;' />
@@ -1513,15 +1513,15 @@ for (i in 1:2) {
 <line x1='28.80' y1='113.42' x2='21.60' y2='113.42' style='stroke-width: 0.75;' />
 <line x1='28.80' y1='75.64' x2='21.60' y2='75.64' style='stroke-width: 0.75;' />
 <line x1='28.80' y1='37.87' x2='21.60' y2='37.87' style='stroke-width: 0.75;' />
-<text transform='translate(11.52,264.53) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='10.67px' lengthAdjust='spacingAndGlyphs'>-3</text>
-<text transform='translate(11.52,226.76) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='10.67px' lengthAdjust='spacingAndGlyphs'>-2</text>
-<text transform='translate(11.52,188.98) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='10.67px' lengthAdjust='spacingAndGlyphs'>-1</text>
-<text transform='translate(11.52,151.20) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='6.67px' lengthAdjust='spacingAndGlyphs'>0</text>
-<text transform='translate(11.52,113.42) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='6.67px' lengthAdjust='spacingAndGlyphs'>1</text>
-<text transform='translate(11.52,75.64) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='6.67px' lengthAdjust='spacingAndGlyphs'>2</text>
-<text transform='translate(11.52,37.87) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Arial";' textLength='6.67px' lengthAdjust='spacingAndGlyphs'>3</text>
+<text transform='translate(11.52,264.53) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='10.00px' lengthAdjust='spacingAndGlyphs'>-3</text>
+<text transform='translate(11.52,226.76) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='10.00px' lengthAdjust='spacingAndGlyphs'>-2</text>
+<text transform='translate(11.52,188.98) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='10.00px' lengthAdjust='spacingAndGlyphs'>-1</text>
+<text transform='translate(11.52,151.20) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>0</text>
+<text transform='translate(11.52,113.42) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>1</text>
+<text transform='translate(11.52,75.64) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>2</text>
+<text transform='translate(11.52,37.87) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: "Times New Roman";' textLength='6.00px' lengthAdjust='spacingAndGlyphs'>3</text>
 <polygon points='28.80,273.60 316.80,273.60 316.80,28.80 28.80,28.80 ' style='stroke-width: 0.75;' />
-<text x='172.80' y='19.55' text-anchor='middle' style='font-size: 14.40px; font-weight: bold; font-family: "Arial";' textLength='142.62px' lengthAdjust='spacingAndGlyphs'>A x for the unit circle</text>
+<text x='172.80' y='19.17' text-anchor='middle' style='font-size: 14.40px; font-weight: bold; font-family: "Times New Roman";' textLength='130.17px' lengthAdjust='spacingAndGlyphs'>A x for the unit circle</text>
 </g>
 <g clip-path='url(#cpMjguODB8MzE2LjgwfDI4LjgwfDI3My42MA==)'>
 <polyline points='248.36,113.42 249.51,111.06 250.59,108.73 251.59,106.45 252.51,104.21 253.36,102.01 254.12,99.87 254.80,97.78 255.40,95.74 255.92,93.75 256.35,91.83 256.70,89.96 256.97,88.15 257.15,86.41 257.25,84.73 257.27,83.12 257.20,81.57 257.05,80.10 256.81,78.70 256.49,77.36 256.09,76.10 255.60,74.92 255.03,73.81 254.38,72.78 253.65,71.83 252.83,70.96 251.94,70.16 250.97,69.45 249.92,68.82 248.79,68.27 247.59,67.80 246.31,67.42 244.96,67.12 243.54,66.91 242.05,66.77 240.48,66.73 238.85,66.76 237.16,66.88 235.40,67.09 233.58,67.38 231.70,67.75 229.75,68.20 227.76,68.74 225.70,69.36 223.60,70.07 221.44,70.85 219.24,71.71 216.99,72.65 214.69,73.67 212.36,74.77 209.98,75.94 207.57,77.19 205.12,78.52 202.64,79.91 200.13,81.38 197.59,82.91 195.03,84.52 192.45,86.19 189.84,87.92 187.22,89.72 184.59,91.58 181.94,93.50 179.29,95.48 176.62,97.51 173.96,99.59 171.29,101.73 168.63,103.92 165.97,106.15 163.31,108.43 160.67,110.75 158.03,113.11 155.41,115.51 152.81,117.94 150.23,120.41 147.67,122.91 145.14,125.44 142.63,127.99 140.16,130.57 137.72,133.16 135.31,135.78 132.94,138.41 130.60,141.05 128.32,143.70 126.07,146.36 123.87,149.03 121.72,151.69 119.62,154.36 117.58,157.02 115.59,159.68 113.65,162.33 111.78,164.97 109.97,167.59 108.22,170.20 106.53,172.79 104.91,175.35 103.36,177.90 101.87,180.41 100.46,182.90 99.12,185.36 97.85,187.78 96.66,190.17 95.54,192.51 94.50,194.82 93.54,197.08 92.66,199.30 91.85,201.46 91.13,203.58 90.49,205.65 89.93,207.66 89.46,209.62 89.06,211.51 88.75,213.35 88.53,215.13 88.39,216.84 88.33,218.48 88.35,220.06 88.47,221.57 88.66,223.01 88.94,224.38 89.30,225.68 89.75,226.90 90.27,228.04 90.89,229.11 91.58,230.10 92.35,231.02 93.20,231.85 94.14,232.60 95.15,233.28 96.24,233.87 97.40,234.37 98.64,234.80 99.96,235.14 101.34,235.40 102.80,235.57 104.33,235.66 105.92,235.67 107.59,235.59 109.31,235.42 111.10,235.18 112.96,234.85 114.87,234.43 116.84,233.94 118.86,233.36 120.94,232.70 123.07,231.95 125.25,231.13 127.48,230.23 129.75,229.25 132.07,228.19 134.43,227.05 136.82,225.84 139.25,224.55 141.72,223.19 144.21,221.76 146.74,220.26 149.28,218.69 151.86,217.06 154.45,215.35 157.06,213.59 159.69,211.76 162.33,209.87 164.98,207.92 167.64,205.91 170.31,203.86 172.97,201.74 175.64,199.58 178.30,197.37 180.96,195.12 183.61,192.82 186.25,190.48 188.88,188.09 191.49,185.68 194.08,183.23 196.65,180.74 199.20,178.23 201.72,175.69 204.21,173.12 206.67,170.54 209.09,167.93 211.48,165.31 213.83,162.67 216.15,160.03 218.41,157.37 220.63,154.71 222.81,152.04 224.93,149.37 227.01,146.71 229.02,144.05 230.99,141.39 232.89,138.75 234.73,136.12 236.52,133.50 238.24,130.90 239.89,128.33 241.48,125.77 243.00,123.24 244.44,120.74 245.82,118.27 247.13,115.83 248.36,113.42 ' style='stroke-width: 1.50;' />
@@ -1529,18 +1529,18 @@ for (i in 1:2) {
 <polyline points='197.65,131.44 199.51,124.49 192.56,126.35 ' style='stroke-width: 1.50; stroke: #4169E1;' />
 <line x1='172.80' y1='151.20' x2='252.94' y2='71.06' style='stroke-width: 1.50; stroke: #B22222;' />
 <polyline points='251.08,78.02 252.94,71.06 245.98,72.92 ' style='stroke-width: 1.50; stroke: #B22222;' />
-<text x='264.96' y='51.84' text-anchor='middle' style='font-size: 12.00px;fill: #B22222; font-family: "Arial";' textLength='26.34px' lengthAdjust='spacingAndGlyphs'>λ = 3</text>
+<text x='264.96' y='51.84' text-anchor='middle' style='font-size: 12.00px; font-style: italic;fill: #B22222; font-family: "Times New Roman";' textLength='25.30px' lengthAdjust='spacingAndGlyphs'>λ = 3</text>
 <line x1='172.80' y1='151.20' x2='146.09' y2='124.49' style='stroke-width: 1.50; stroke: #4169E1;' />
 <polyline points='153.04,126.35 146.09,124.49 147.95,131.44 ' style='stroke-width: 1.50; stroke: #4169E1;' />
 <line x1='172.80' y1='151.20' x2='146.09' y2='124.49' style='stroke-width: 1.50; stroke: #B22222;' />
 <polyline points='153.04,126.35 146.09,124.49 147.95,131.44 ' style='stroke-width: 1.50; stroke: #B22222;' />
-<text x='142.08' y='113.28' text-anchor='middle' style='font-size: 12.00px;fill: #B22222; font-family: "Arial";' textLength='26.34px' lengthAdjust='spacingAndGlyphs'>λ = 1</text>
+<text x='142.08' y='113.28' text-anchor='middle' style='font-size: 12.00px; font-style: italic;fill: #B22222; font-family: "Times New Roman";' textLength='25.30px' lengthAdjust='spacingAndGlyphs'>λ = 1</text>
 </g>
 </g>
 </svg></p>
 <div class="caption">
 <p><span class="ref-number-fig">7</span>
-特征向量只被放缩：蓝色为 x，红色为 Ax</p>
+特征向量只被放缩：蓝色为 $$x$$，红色为 $$Ax$$</p>
 </div>
 </div>
 <p>对于任意的 \(n \times n\) 矩阵，在复数范围内（重根计重数）有 \(n\) 个特征值，其和等于矩阵对角线元素之和，称为迹（trace），其乘积等于矩阵的行列式。</p>
@@ -1994,7 +1994,7 @@ panel &lt;- function(pts, vecs, ttl, lim = 2.8) {
   draw_vec(vecs[, 1], col = col_a)
   draw_vec(vecs[, 2], col = col_p)
 }
-par(mfrow = c(1, 4), mar = c(2, 2, 2, 1))
+par(mfrow = c(1, 4), mar = c(2, 2, 2, 1), font.main = 3)      # 四个面板标题都是公式，斜体
 panel(circ,                    V,       &quot;x (v₁, v₂)&quot;)
 panel(t(V) %*% circ,           diag(2), &quot;Vᵀx&quot;)
 panel(D %*% t(V) %*% circ,     D,       &quot;ΣVᵀx&quot;)
@@ -2046,13 +2046,13 @@ panel(U %*% D %*% t(V) %*% circ, U %*% D, &quot;UΣVᵀx = Mx&quot;)
 <line x1='119.80' y1='189.79' x2='119.80' y2='194.54' style='stroke-width: 0.75;' />
 <line x1='144.85' y1='189.79' x2='144.85' y2='194.54' style='stroke-width: 0.75;' />
 <line x1='169.89' y1='189.79' x2='169.89' y2='194.54' style='stroke-width: 0.75;' />
-<text x='19.61' y='206.90' text-anchor='middle' style='font-size: 7.92px; font-family: "Arial";' textLength='7.03px' lengthAdjust='spacingAndGlyphs'>-3</text>
-<text x='44.66' y='206.90' text-anchor='middle' style='font-size: 7.92px; font-family: "Arial";' textLength='7.03px' lengthAdjust='spacingAndGlyphs'>-2</text>
-<text x='69.70' y='206.90' text-anchor='middle' style='font-size: 7.92px; font-family: "Arial";' textLength='7.03px' lengthAdjust='spacingAndGlyphs'>-1</text>
-<text x='94.75' y='206.90' text-anchor='middle' style='font-size: 7.92px; font-family: "Arial";' textLength='4.39px' lengthAdjust='spacingAndGlyphs'>0</text>
-<text x='119.80' y='206.90' text-anchor='middle' style='font-size: 7.92px; font-family: "Arial";' textLength='4.39px' lengthAdjust='spacingAndGlyphs'>1</text>
-<text x='144.85' y='206.90' text-anchor='middle' style='font-size: 7.92px; font-family: "Arial";' textLength='4.39px' lengthAdjust='spacingAndGlyphs'>2</text>
-<text x='169.89' y='206.90' text-anchor='middle' style='font-size: 7.92px; font-family: "Arial";' textLength='4.39px' lengthAdjust='spacingAndGlyphs'>3</text>
+<text x='19.61' y='206.90' text-anchor='middle' style='font-size: 7.92px; font-family: "Times New Roman";' textLength='6.59px' lengthAdjust='spacingAndGlyphs'>-3</text>
+<text x='44.66' y='206.90' text-anchor='middle' style='font-size: 7.92px; font-family: "Times New Roman";' textLength='6.59px' lengthAdjust='spacingAndGlyphs'>-2</text>
+<text x='69.70' y='206.90' text-anchor='middle' style='font-size: 7.92px; font-family: "Times New Roman";' textLength='6.59px' lengthAdjust='spacingAndGlyphs'>-1</text>
+<text x='94.75' y='206.90' text-anchor='middle' style='font-size: 7.92px; font-family: "Times New Roman";' textLength='3.95px' lengthAdjust='spacingAndGlyphs'>0</text>
+<text x='119.80' y='206.90' text-anchor='middle' style='font-size: 7.92px; font-family: "Times New Roman";' textLength='3.95px' lengthAdjust='spacingAndGlyphs'>1</text>
+<text x='144.85' y='206.90' text-anchor='middle' style='font-size: 7.92px; font-family: "Times New Roman";' textLength='3.95px' lengthAdjust='spacingAndGlyphs'>2</text>
+<text x='169.89' y='206.90' text-anchor='middle' style='font-size: 7.92px; font-family: "Times New Roman";' textLength='3.95px' lengthAdjust='spacingAndGlyphs'>3</text>
 <line x1='19.01' y1='179.54' x2='19.01' y2='29.26' style='stroke-width: 0.75;' />
 <line x1='19.01' y1='179.54' x2='14.26' y2='179.54' style='stroke-width: 0.75;' />
 <line x1='19.01' y1='154.50' x2='14.26' y2='154.50' style='stroke-width: 0.75;' />
@@ -2061,13 +2061,13 @@ panel(U %*% D %*% t(V) %*% circ, U %*% D, &quot;UΣVᵀx = Mx&quot;)
 <line x1='19.01' y1='79.35' x2='14.26' y2='79.35' style='stroke-width: 0.75;' />
 <line x1='19.01' y1='54.30' x2='14.26' y2='54.30' style='stroke-width: 0.75;' />
 <line x1='19.01' y1='29.26' x2='14.26' y2='29.26' style='stroke-width: 0.75;' />
-<text transform='translate(7.60,179.54) rotate(-90)' text-anchor='middle' style='font-size: 7.92px; font-family: "Arial";' textLength='7.03px' lengthAdjust='spacingAndGlyphs'>-3</text>
-<text transform='translate(7.60,154.50) rotate(-90)' text-anchor='middle' style='font-size: 7.92px; font-family: "Arial";' textLength='7.03px' lengthAdjust='spacingAndGlyphs'>-2</text>
-<text transform='translate(7.60,129.45) rotate(-90)' text-anchor='middle' style='font-size: 7.92px; font-family: "Arial";' textLength='7.03px' lengthAdjust='spacingAndGlyphs'>-1</text>
-<text transform='translate(7.60,104.40) rotate(-90)' text-anchor='middle' style='font-size: 7.92px; font-family: "Arial";' textLength='4.39px' lengthAdjust='spacingAndGlyphs'>0</text>
-<text transform='translate(7.60,79.35) rotate(-90)' text-anchor='middle' style='font-size: 7.92px; font-family: "Arial";' textLength='4.39px' lengthAdjust='spacingAndGlyphs'>1</text>
-<text transform='translate(7.60,54.30) rotate(-90)' text-anchor='middle' style='font-size: 7.92px; font-family: "Arial";' textLength='4.39px' lengthAdjust='spacingAndGlyphs'>2</text>
-<text transform='translate(7.60,29.26) rotate(-90)' text-anchor='middle' style='font-size: 7.92px; font-family: "Arial";' textLength='4.39px' lengthAdjust='spacingAndGlyphs'>3</text>
+<text transform='translate(7.60,179.54) rotate(-90)' text-anchor='middle' style='font-size: 7.92px; font-family: "Times New Roman";' textLength='6.59px' lengthAdjust='spacingAndGlyphs'>-3</text>
+<text transform='translate(7.60,154.50) rotate(-90)' text-anchor='middle' style='font-size: 7.92px; font-family: "Times New Roman";' textLength='6.59px' lengthAdjust='spacingAndGlyphs'>-2</text>
+<text transform='translate(7.60,129.45) rotate(-90)' text-anchor='middle' style='font-size: 7.92px; font-family: "Times New Roman";' textLength='6.59px' lengthAdjust='spacingAndGlyphs'>-1</text>
+<text transform='translate(7.60,104.40) rotate(-90)' text-anchor='middle' style='font-size: 7.92px; font-family: "Times New Roman";' textLength='3.95px' lengthAdjust='spacingAndGlyphs'>0</text>
+<text transform='translate(7.60,79.35) rotate(-90)' text-anchor='middle' style='font-size: 7.92px; font-family: "Times New Roman";' textLength='3.95px' lengthAdjust='spacingAndGlyphs'>1</text>
+<text transform='translate(7.60,54.30) rotate(-90)' text-anchor='middle' style='font-size: 7.92px; font-family: "Times New Roman";' textLength='3.95px' lengthAdjust='spacingAndGlyphs'>2</text>
+<text transform='translate(7.60,29.26) rotate(-90)' text-anchor='middle' style='font-size: 7.92px; font-family: "Times New Roman";' textLength='3.95px' lengthAdjust='spacingAndGlyphs'>3</text>
 <polygon points='19.01,189.79 170.50,189.79 170.50,19.01 19.01,19.01 ' style='stroke-width: 0.75;' />
 </g>
 <defs>
@@ -2076,7 +2076,7 @@ panel(U %*% D %*% t(V) %*% circ, U %*% D, &quot;UΣVᵀx = Mx&quot;)
   </clipPath>
 </defs>
 <g clip-path='url(#cpMC4wMHwxODAuMDB8MC4wMHwyMDguODA=)'>
-<text x='94.75' y='12.90' text-anchor='middle' style='font-size: 9.50px; font-weight: bold; font-family: "Arial";' textLength='40.33px' lengthAdjust='spacingAndGlyphs'>x (v₁, v₂)</text>
+<text x='94.75' y='12.65' text-anchor='middle' style='font-size: 9.50px; font-style: italic; font-family: "Times New Roman";' textLength='31.78px' lengthAdjust='spacingAndGlyphs'>x (v₁, v₂)</text>
 </g>
 <g clip-path='url(#cpMTkuMDF8MTcwLjUwfDE5LjAxfDE4OS43OQ==)'>
 <line x1='19.01' y1='104.40' x2='170.50' y2='104.40' style='stroke-width: 0.75; stroke: #D9D9D9;' />
@@ -2103,13 +2103,13 @@ panel(U %*% D %*% t(V) %*% circ, U %*% D, &quot;UΣVᵀx = Mx&quot;)
 <line x1='299.80' y1='189.79' x2='299.80' y2='194.54' style='stroke-width: 0.75;' />
 <line x1='324.85' y1='189.79' x2='324.85' y2='194.54' style='stroke-width: 0.75;' />
 <line x1='349.89' y1='189.79' x2='349.89' y2='194.54' style='stroke-width: 0.75;' />
-<text x='199.61' y='206.90' text-anchor='middle' style='font-size: 7.92px; font-family: "Arial";' textLength='7.03px' lengthAdjust='spacingAndGlyphs'>-3</text>
-<text x='224.66' y='206.90' text-anchor='middle' style='font-size: 7.92px; font-family: "Arial";' textLength='7.03px' lengthAdjust='spacingAndGlyphs'>-2</text>
-<text x='249.70' y='206.90' text-anchor='middle' style='font-size: 7.92px; font-family: "Arial";' textLength='7.03px' lengthAdjust='spacingAndGlyphs'>-1</text>
-<text x='274.75' y='206.90' text-anchor='middle' style='font-size: 7.92px; font-family: "Arial";' textLength='4.39px' lengthAdjust='spacingAndGlyphs'>0</text>
-<text x='299.80' y='206.90' text-anchor='middle' style='font-size: 7.92px; font-family: "Arial";' textLength='4.39px' lengthAdjust='spacingAndGlyphs'>1</text>
-<text x='324.85' y='206.90' text-anchor='middle' style='font-size: 7.92px; font-family: "Arial";' textLength='4.39px' lengthAdjust='spacingAndGlyphs'>2</text>
-<text x='349.89' y='206.90' text-anchor='middle' style='font-size: 7.92px; font-family: "Arial";' textLength='4.39px' lengthAdjust='spacingAndGlyphs'>3</text>
+<text x='199.61' y='206.90' text-anchor='middle' style='font-size: 7.92px; font-family: "Times New Roman";' textLength='6.59px' lengthAdjust='spacingAndGlyphs'>-3</text>
+<text x='224.66' y='206.90' text-anchor='middle' style='font-size: 7.92px; font-family: "Times New Roman";' textLength='6.59px' lengthAdjust='spacingAndGlyphs'>-2</text>
+<text x='249.70' y='206.90' text-anchor='middle' style='font-size: 7.92px; font-family: "Times New Roman";' textLength='6.59px' lengthAdjust='spacingAndGlyphs'>-1</text>
+<text x='274.75' y='206.90' text-anchor='middle' style='font-size: 7.92px; font-family: "Times New Roman";' textLength='3.95px' lengthAdjust='spacingAndGlyphs'>0</text>
+<text x='299.80' y='206.90' text-anchor='middle' style='font-size: 7.92px; font-family: "Times New Roman";' textLength='3.95px' lengthAdjust='spacingAndGlyphs'>1</text>
+<text x='324.85' y='206.90' text-anchor='middle' style='font-size: 7.92px; font-family: "Times New Roman";' textLength='3.95px' lengthAdjust='spacingAndGlyphs'>2</text>
+<text x='349.89' y='206.90' text-anchor='middle' style='font-size: 7.92px; font-family: "Times New Roman";' textLength='3.95px' lengthAdjust='spacingAndGlyphs'>3</text>
 <line x1='199.01' y1='179.54' x2='199.01' y2='29.26' style='stroke-width: 0.75;' />
 <line x1='199.01' y1='179.54' x2='194.26' y2='179.54' style='stroke-width: 0.75;' />
 <line x1='199.01' y1='154.50' x2='194.26' y2='154.50' style='stroke-width: 0.75;' />
@@ -2118,13 +2118,13 @@ panel(U %*% D %*% t(V) %*% circ, U %*% D, &quot;UΣVᵀx = Mx&quot;)
 <line x1='199.01' y1='79.35' x2='194.26' y2='79.35' style='stroke-width: 0.75;' />
 <line x1='199.01' y1='54.30' x2='194.26' y2='54.30' style='stroke-width: 0.75;' />
 <line x1='199.01' y1='29.26' x2='194.26' y2='29.26' style='stroke-width: 0.75;' />
-<text transform='translate(187.60,179.54) rotate(-90)' text-anchor='middle' style='font-size: 7.92px; font-family: "Arial";' textLength='7.03px' lengthAdjust='spacingAndGlyphs'>-3</text>
-<text transform='translate(187.60,154.50) rotate(-90)' text-anchor='middle' style='font-size: 7.92px; font-family: "Arial";' textLength='7.03px' lengthAdjust='spacingAndGlyphs'>-2</text>
-<text transform='translate(187.60,129.45) rotate(-90)' text-anchor='middle' style='font-size: 7.92px; font-family: "Arial";' textLength='7.03px' lengthAdjust='spacingAndGlyphs'>-1</text>
-<text transform='translate(187.60,104.40) rotate(-90)' text-anchor='middle' style='font-size: 7.92px; font-family: "Arial";' textLength='4.39px' lengthAdjust='spacingAndGlyphs'>0</text>
-<text transform='translate(187.60,79.35) rotate(-90)' text-anchor='middle' style='font-size: 7.92px; font-family: "Arial";' textLength='4.39px' lengthAdjust='spacingAndGlyphs'>1</text>
-<text transform='translate(187.60,54.30) rotate(-90)' text-anchor='middle' style='font-size: 7.92px; font-family: "Arial";' textLength='4.39px' lengthAdjust='spacingAndGlyphs'>2</text>
-<text transform='translate(187.60,29.26) rotate(-90)' text-anchor='middle' style='font-size: 7.92px; font-family: "Arial";' textLength='4.39px' lengthAdjust='spacingAndGlyphs'>3</text>
+<text transform='translate(187.60,179.54) rotate(-90)' text-anchor='middle' style='font-size: 7.92px; font-family: "Times New Roman";' textLength='6.59px' lengthAdjust='spacingAndGlyphs'>-3</text>
+<text transform='translate(187.60,154.50) rotate(-90)' text-anchor='middle' style='font-size: 7.92px; font-family: "Times New Roman";' textLength='6.59px' lengthAdjust='spacingAndGlyphs'>-2</text>
+<text transform='translate(187.60,129.45) rotate(-90)' text-anchor='middle' style='font-size: 7.92px; font-family: "Times New Roman";' textLength='6.59px' lengthAdjust='spacingAndGlyphs'>-1</text>
+<text transform='translate(187.60,104.40) rotate(-90)' text-anchor='middle' style='font-size: 7.92px; font-family: "Times New Roman";' textLength='3.95px' lengthAdjust='spacingAndGlyphs'>0</text>
+<text transform='translate(187.60,79.35) rotate(-90)' text-anchor='middle' style='font-size: 7.92px; font-family: "Times New Roman";' textLength='3.95px' lengthAdjust='spacingAndGlyphs'>1</text>
+<text transform='translate(187.60,54.30) rotate(-90)' text-anchor='middle' style='font-size: 7.92px; font-family: "Times New Roman";' textLength='3.95px' lengthAdjust='spacingAndGlyphs'>2</text>
+<text transform='translate(187.60,29.26) rotate(-90)' text-anchor='middle' style='font-size: 7.92px; font-family: "Times New Roman";' textLength='3.95px' lengthAdjust='spacingAndGlyphs'>3</text>
 <polygon points='199.01,189.79 350.50,189.79 350.50,19.01 199.01,19.01 ' style='stroke-width: 0.75;' />
 </g>
 <defs>
@@ -2133,7 +2133,7 @@ panel(U %*% D %*% t(V) %*% circ, U %*% D, &quot;UΣVᵀx = Mx&quot;)
   </clipPath>
 </defs>
 <g clip-path='url(#cpMTgwLjAwfDM2MC4wMHwwLjAwfDIwOC44MA==)'>
-<text x='274.75' y='12.90' text-anchor='middle' style='font-size: 9.50px; font-weight: bold; font-family: "Arial";' textLength='15.73px' lengthAdjust='spacingAndGlyphs'>Vᵀx</text>
+<text x='274.75' y='12.65' text-anchor='middle' style='font-size: 9.50px; font-style: italic; font-family: "Times New Roman";' textLength='13.69px' lengthAdjust='spacingAndGlyphs'>Vᵀx</text>
 </g>
 <g clip-path='url(#cpMTk5LjAxfDM1MC41MHwxOS4wMXwxODkuNzk=)'>
 <line x1='199.01' y1='104.40' x2='350.50' y2='104.40' style='stroke-width: 0.75; stroke: #D9D9D9;' />
@@ -2160,13 +2160,13 @@ panel(U %*% D %*% t(V) %*% circ, U %*% D, &quot;UΣVᵀx = Mx&quot;)
 <line x1='479.80' y1='189.79' x2='479.80' y2='194.54' style='stroke-width: 0.75;' />
 <line x1='504.85' y1='189.79' x2='504.85' y2='194.54' style='stroke-width: 0.75;' />
 <line x1='529.89' y1='189.79' x2='529.89' y2='194.54' style='stroke-width: 0.75;' />
-<text x='379.61' y='206.90' text-anchor='middle' style='font-size: 7.92px; font-family: "Arial";' textLength='7.03px' lengthAdjust='spacingAndGlyphs'>-3</text>
-<text x='404.66' y='206.90' text-anchor='middle' style='font-size: 7.92px; font-family: "Arial";' textLength='7.03px' lengthAdjust='spacingAndGlyphs'>-2</text>
-<text x='429.70' y='206.90' text-anchor='middle' style='font-size: 7.92px; font-family: "Arial";' textLength='7.03px' lengthAdjust='spacingAndGlyphs'>-1</text>
-<text x='454.75' y='206.90' text-anchor='middle' style='font-size: 7.92px; font-family: "Arial";' textLength='4.39px' lengthAdjust='spacingAndGlyphs'>0</text>
-<text x='479.80' y='206.90' text-anchor='middle' style='font-size: 7.92px; font-family: "Arial";' textLength='4.39px' lengthAdjust='spacingAndGlyphs'>1</text>
-<text x='504.85' y='206.90' text-anchor='middle' style='font-size: 7.92px; font-family: "Arial";' textLength='4.39px' lengthAdjust='spacingAndGlyphs'>2</text>
-<text x='529.89' y='206.90' text-anchor='middle' style='font-size: 7.92px; font-family: "Arial";' textLength='4.39px' lengthAdjust='spacingAndGlyphs'>3</text>
+<text x='379.61' y='206.90' text-anchor='middle' style='font-size: 7.92px; font-family: "Times New Roman";' textLength='6.59px' lengthAdjust='spacingAndGlyphs'>-3</text>
+<text x='404.66' y='206.90' text-anchor='middle' style='font-size: 7.92px; font-family: "Times New Roman";' textLength='6.59px' lengthAdjust='spacingAndGlyphs'>-2</text>
+<text x='429.70' y='206.90' text-anchor='middle' style='font-size: 7.92px; font-family: "Times New Roman";' textLength='6.59px' lengthAdjust='spacingAndGlyphs'>-1</text>
+<text x='454.75' y='206.90' text-anchor='middle' style='font-size: 7.92px; font-family: "Times New Roman";' textLength='3.95px' lengthAdjust='spacingAndGlyphs'>0</text>
+<text x='479.80' y='206.90' text-anchor='middle' style='font-size: 7.92px; font-family: "Times New Roman";' textLength='3.95px' lengthAdjust='spacingAndGlyphs'>1</text>
+<text x='504.85' y='206.90' text-anchor='middle' style='font-size: 7.92px; font-family: "Times New Roman";' textLength='3.95px' lengthAdjust='spacingAndGlyphs'>2</text>
+<text x='529.89' y='206.90' text-anchor='middle' style='font-size: 7.92px; font-family: "Times New Roman";' textLength='3.95px' lengthAdjust='spacingAndGlyphs'>3</text>
 <line x1='379.01' y1='179.54' x2='379.01' y2='29.26' style='stroke-width: 0.75;' />
 <line x1='379.01' y1='179.54' x2='374.26' y2='179.54' style='stroke-width: 0.75;' />
 <line x1='379.01' y1='154.50' x2='374.26' y2='154.50' style='stroke-width: 0.75;' />
@@ -2175,13 +2175,13 @@ panel(U %*% D %*% t(V) %*% circ, U %*% D, &quot;UΣVᵀx = Mx&quot;)
 <line x1='379.01' y1='79.35' x2='374.26' y2='79.35' style='stroke-width: 0.75;' />
 <line x1='379.01' y1='54.30' x2='374.26' y2='54.30' style='stroke-width: 0.75;' />
 <line x1='379.01' y1='29.26' x2='374.26' y2='29.26' style='stroke-width: 0.75;' />
-<text transform='translate(367.60,179.54) rotate(-90)' text-anchor='middle' style='font-size: 7.92px; font-family: "Arial";' textLength='7.03px' lengthAdjust='spacingAndGlyphs'>-3</text>
-<text transform='translate(367.60,154.50) rotate(-90)' text-anchor='middle' style='font-size: 7.92px; font-family: "Arial";' textLength='7.03px' lengthAdjust='spacingAndGlyphs'>-2</text>
-<text transform='translate(367.60,129.45) rotate(-90)' text-anchor='middle' style='font-size: 7.92px; font-family: "Arial";' textLength='7.03px' lengthAdjust='spacingAndGlyphs'>-1</text>
-<text transform='translate(367.60,104.40) rotate(-90)' text-anchor='middle' style='font-size: 7.92px; font-family: "Arial";' textLength='4.39px' lengthAdjust='spacingAndGlyphs'>0</text>
-<text transform='translate(367.60,79.35) rotate(-90)' text-anchor='middle' style='font-size: 7.92px; font-family: "Arial";' textLength='4.39px' lengthAdjust='spacingAndGlyphs'>1</text>
-<text transform='translate(367.60,54.30) rotate(-90)' text-anchor='middle' style='font-size: 7.92px; font-family: "Arial";' textLength='4.39px' lengthAdjust='spacingAndGlyphs'>2</text>
-<text transform='translate(367.60,29.26) rotate(-90)' text-anchor='middle' style='font-size: 7.92px; font-family: "Arial";' textLength='4.39px' lengthAdjust='spacingAndGlyphs'>3</text>
+<text transform='translate(367.60,179.54) rotate(-90)' text-anchor='middle' style='font-size: 7.92px; font-family: "Times New Roman";' textLength='6.59px' lengthAdjust='spacingAndGlyphs'>-3</text>
+<text transform='translate(367.60,154.50) rotate(-90)' text-anchor='middle' style='font-size: 7.92px; font-family: "Times New Roman";' textLength='6.59px' lengthAdjust='spacingAndGlyphs'>-2</text>
+<text transform='translate(367.60,129.45) rotate(-90)' text-anchor='middle' style='font-size: 7.92px; font-family: "Times New Roman";' textLength='6.59px' lengthAdjust='spacingAndGlyphs'>-1</text>
+<text transform='translate(367.60,104.40) rotate(-90)' text-anchor='middle' style='font-size: 7.92px; font-family: "Times New Roman";' textLength='3.95px' lengthAdjust='spacingAndGlyphs'>0</text>
+<text transform='translate(367.60,79.35) rotate(-90)' text-anchor='middle' style='font-size: 7.92px; font-family: "Times New Roman";' textLength='3.95px' lengthAdjust='spacingAndGlyphs'>1</text>
+<text transform='translate(367.60,54.30) rotate(-90)' text-anchor='middle' style='font-size: 7.92px; font-family: "Times New Roman";' textLength='3.95px' lengthAdjust='spacingAndGlyphs'>2</text>
+<text transform='translate(367.60,29.26) rotate(-90)' text-anchor='middle' style='font-size: 7.92px; font-family: "Times New Roman";' textLength='3.95px' lengthAdjust='spacingAndGlyphs'>3</text>
 <polygon points='379.01,189.79 530.50,189.79 530.50,19.01 379.01,19.01 ' style='stroke-width: 0.75;' />
 </g>
 <defs>
@@ -2190,7 +2190,7 @@ panel(U %*% D %*% t(V) %*% circ, U %*% D, &quot;UΣVᵀx = Mx&quot;)
   </clipPath>
 </defs>
 <g clip-path='url(#cpMzYwLjAwfDU0MC4wMHwwLjAwfDIwOC44MA==)'>
-<text x='454.75' y='12.90' text-anchor='middle' style='font-size: 9.50px; font-weight: bold; font-family: "Arial";' textLength='21.44px' lengthAdjust='spacingAndGlyphs'>ΣVᵀx</text>
+<text x='454.75' y='12.65' text-anchor='middle' style='font-size: 9.50px; font-style: italic; font-family: "Times New Roman";' textLength='19.33px' lengthAdjust='spacingAndGlyphs'>ΣVᵀx</text>
 </g>
 <g clip-path='url(#cpMzc5LjAxfDUzMC41MHwxOS4wMXwxODkuNzk=)'>
 <line x1='379.01' y1='104.40' x2='530.50' y2='104.40' style='stroke-width: 0.75; stroke: #D9D9D9;' />
@@ -2217,13 +2217,13 @@ panel(U %*% D %*% t(V) %*% circ, U %*% D, &quot;UΣVᵀx = Mx&quot;)
 <line x1='659.80' y1='189.79' x2='659.80' y2='194.54' style='stroke-width: 0.75;' />
 <line x1='684.85' y1='189.79' x2='684.85' y2='194.54' style='stroke-width: 0.75;' />
 <line x1='709.89' y1='189.79' x2='709.89' y2='194.54' style='stroke-width: 0.75;' />
-<text x='559.61' y='206.90' text-anchor='middle' style='font-size: 7.92px; font-family: "Arial";' textLength='7.03px' lengthAdjust='spacingAndGlyphs'>-3</text>
-<text x='584.66' y='206.90' text-anchor='middle' style='font-size: 7.92px; font-family: "Arial";' textLength='7.03px' lengthAdjust='spacingAndGlyphs'>-2</text>
-<text x='609.70' y='206.90' text-anchor='middle' style='font-size: 7.92px; font-family: "Arial";' textLength='7.03px' lengthAdjust='spacingAndGlyphs'>-1</text>
-<text x='634.75' y='206.90' text-anchor='middle' style='font-size: 7.92px; font-family: "Arial";' textLength='4.39px' lengthAdjust='spacingAndGlyphs'>0</text>
-<text x='659.80' y='206.90' text-anchor='middle' style='font-size: 7.92px; font-family: "Arial";' textLength='4.39px' lengthAdjust='spacingAndGlyphs'>1</text>
-<text x='684.85' y='206.90' text-anchor='middle' style='font-size: 7.92px; font-family: "Arial";' textLength='4.39px' lengthAdjust='spacingAndGlyphs'>2</text>
-<text x='709.89' y='206.90' text-anchor='middle' style='font-size: 7.92px; font-family: "Arial";' textLength='4.39px' lengthAdjust='spacingAndGlyphs'>3</text>
+<text x='559.61' y='206.90' text-anchor='middle' style='font-size: 7.92px; font-family: "Times New Roman";' textLength='6.59px' lengthAdjust='spacingAndGlyphs'>-3</text>
+<text x='584.66' y='206.90' text-anchor='middle' style='font-size: 7.92px; font-family: "Times New Roman";' textLength='6.59px' lengthAdjust='spacingAndGlyphs'>-2</text>
+<text x='609.70' y='206.90' text-anchor='middle' style='font-size: 7.92px; font-family: "Times New Roman";' textLength='6.59px' lengthAdjust='spacingAndGlyphs'>-1</text>
+<text x='634.75' y='206.90' text-anchor='middle' style='font-size: 7.92px; font-family: "Times New Roman";' textLength='3.95px' lengthAdjust='spacingAndGlyphs'>0</text>
+<text x='659.80' y='206.90' text-anchor='middle' style='font-size: 7.92px; font-family: "Times New Roman";' textLength='3.95px' lengthAdjust='spacingAndGlyphs'>1</text>
+<text x='684.85' y='206.90' text-anchor='middle' style='font-size: 7.92px; font-family: "Times New Roman";' textLength='3.95px' lengthAdjust='spacingAndGlyphs'>2</text>
+<text x='709.89' y='206.90' text-anchor='middle' style='font-size: 7.92px; font-family: "Times New Roman";' textLength='3.95px' lengthAdjust='spacingAndGlyphs'>3</text>
 <line x1='559.01' y1='179.54' x2='559.01' y2='29.26' style='stroke-width: 0.75;' />
 <line x1='559.01' y1='179.54' x2='554.26' y2='179.54' style='stroke-width: 0.75;' />
 <line x1='559.01' y1='154.50' x2='554.26' y2='154.50' style='stroke-width: 0.75;' />
@@ -2232,13 +2232,13 @@ panel(U %*% D %*% t(V) %*% circ, U %*% D, &quot;UΣVᵀx = Mx&quot;)
 <line x1='559.01' y1='79.35' x2='554.26' y2='79.35' style='stroke-width: 0.75;' />
 <line x1='559.01' y1='54.30' x2='554.26' y2='54.30' style='stroke-width: 0.75;' />
 <line x1='559.01' y1='29.26' x2='554.26' y2='29.26' style='stroke-width: 0.75;' />
-<text transform='translate(547.60,179.54) rotate(-90)' text-anchor='middle' style='font-size: 7.92px; font-family: "Arial";' textLength='7.03px' lengthAdjust='spacingAndGlyphs'>-3</text>
-<text transform='translate(547.60,154.50) rotate(-90)' text-anchor='middle' style='font-size: 7.92px; font-family: "Arial";' textLength='7.03px' lengthAdjust='spacingAndGlyphs'>-2</text>
-<text transform='translate(547.60,129.45) rotate(-90)' text-anchor='middle' style='font-size: 7.92px; font-family: "Arial";' textLength='7.03px' lengthAdjust='spacingAndGlyphs'>-1</text>
-<text transform='translate(547.60,104.40) rotate(-90)' text-anchor='middle' style='font-size: 7.92px; font-family: "Arial";' textLength='4.39px' lengthAdjust='spacingAndGlyphs'>0</text>
-<text transform='translate(547.60,79.35) rotate(-90)' text-anchor='middle' style='font-size: 7.92px; font-family: "Arial";' textLength='4.39px' lengthAdjust='spacingAndGlyphs'>1</text>
-<text transform='translate(547.60,54.30) rotate(-90)' text-anchor='middle' style='font-size: 7.92px; font-family: "Arial";' textLength='4.39px' lengthAdjust='spacingAndGlyphs'>2</text>
-<text transform='translate(547.60,29.26) rotate(-90)' text-anchor='middle' style='font-size: 7.92px; font-family: "Arial";' textLength='4.39px' lengthAdjust='spacingAndGlyphs'>3</text>
+<text transform='translate(547.60,179.54) rotate(-90)' text-anchor='middle' style='font-size: 7.92px; font-family: "Times New Roman";' textLength='6.59px' lengthAdjust='spacingAndGlyphs'>-3</text>
+<text transform='translate(547.60,154.50) rotate(-90)' text-anchor='middle' style='font-size: 7.92px; font-family: "Times New Roman";' textLength='6.59px' lengthAdjust='spacingAndGlyphs'>-2</text>
+<text transform='translate(547.60,129.45) rotate(-90)' text-anchor='middle' style='font-size: 7.92px; font-family: "Times New Roman";' textLength='6.59px' lengthAdjust='spacingAndGlyphs'>-1</text>
+<text transform='translate(547.60,104.40) rotate(-90)' text-anchor='middle' style='font-size: 7.92px; font-family: "Times New Roman";' textLength='3.95px' lengthAdjust='spacingAndGlyphs'>0</text>
+<text transform='translate(547.60,79.35) rotate(-90)' text-anchor='middle' style='font-size: 7.92px; font-family: "Times New Roman";' textLength='3.95px' lengthAdjust='spacingAndGlyphs'>1</text>
+<text transform='translate(547.60,54.30) rotate(-90)' text-anchor='middle' style='font-size: 7.92px; font-family: "Times New Roman";' textLength='3.95px' lengthAdjust='spacingAndGlyphs'>2</text>
+<text transform='translate(547.60,29.26) rotate(-90)' text-anchor='middle' style='font-size: 7.92px; font-family: "Times New Roman";' textLength='3.95px' lengthAdjust='spacingAndGlyphs'>3</text>
 <polygon points='559.01,189.79 710.50,189.79 710.50,19.01 559.01,19.01 ' style='stroke-width: 0.75;' />
 </g>
 <defs>
@@ -2247,7 +2247,7 @@ panel(U %*% D %*% t(V) %*% circ, U %*% D, &quot;UΣVᵀx = Mx&quot;)
   </clipPath>
 </defs>
 <g clip-path='url(#cpNTQwLjAwfDcyMC4wMHwwLjAwfDIwOC44MA==)'>
-<text x='634.75' y='12.90' text-anchor='middle' style='font-size: 9.50px; font-weight: bold; font-family: "Arial";' textLength='52.31px' lengthAdjust='spacingAndGlyphs'>UΣVᵀx = Mx</text>
+<text x='634.75' y='12.65' text-anchor='middle' style='font-size: 9.50px; font-style: italic; font-family: "Times New Roman";' textLength='49.47px' lengthAdjust='spacingAndGlyphs'>UΣVᵀx = Mx</text>
 </g>
 <g clip-path='url(#cpNTU5LjAxfDcxMC41MHwxOS4wMXwxODkuNzk=)'>
 <line x1='559.01' y1='104.40' x2='710.50' y2='104.40' style='stroke-width: 0.75; stroke: #D9D9D9;' />
