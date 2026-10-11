@@ -3,6 +3,9 @@ title: "Health/Economic Statistics"
 date: "2025-02-02"
 output:
   html:
+    options:
+      toc:
+        depth: 3
     meta:
       lang: "zh-CN"
 ---
@@ -247,7 +250,7 @@ $P(A_1 \cap A_2 \cap ... \cap A_n) = P(A_1)P(A_2|A_1)P(A_3|A_1 \cap A_2) ... P(A
    
 # Parametric Statistics
 
-## Sampling Distribution for $\chi^2, F, t$
+## Sampling Distribution for χ², F, t
 
 首先给出各分布构造的定义：
 
@@ -336,7 +339,7 @@ $P(A_1 \cap A_2 \cap ... \cap A_n) = P(A_1)P(A_2|A_1)P(A_3|A_1 \cap A_2) ... P(A
 $$\frac{(\bar{x} - \bar{y}) - (\mu_1 - \mu_2)}{s_p \cdot \sqrt{\frac{1}{m} + \frac{1}{n}}} \sim t(m + n - 2)$$
 :::
 
-## $t/z$ Test
+## t/z Test
 
 ### Assumptions and Its Application Case
 
@@ -375,7 +378,7 @@ $$\frac{X}{\sqrt{\chi^2_{(n - 1)}/(n-1)}}, \quad X \sim \mathcal{N}(0, 1) \text{
 
  在应用 $t$ 检验时,我们往往只有一个或两个样本的均值与方差,计算的关键就在于如何利用样本方差计算得到均值分布的方差。
 
-### One Sample $t$-Test
+### One Sample t-Test
 
 1. $\bar{x} \sim \mathcal{N}(\mu, \frac{1}{n}\sigma^2)  \rightarrow \frac{\bar{x} - \mu}{\sigma \cdot \sqrt{\frac{1}{n}}} \sim \mathcal{N}(0, 1)$
 2. $\frac{\bar{x} - \mu}{s \cdot \sqrt{\frac{1}{n}}} \sim t(n-1)$
@@ -385,7 +388,7 @@ $$\frac{X}{\sqrt{\chi^2_{(n - 1)}/(n-1)}}, \quad X \sim \mathcal{N}(0, 1) \text{
 1. 小样本时,总体近似服从正态分布。
 2. 大样本时,由中心极限定理可放宽对总体分布的要求。
 
-### Paired $t$-Test
+### Paired t-Test
 
 $t(\nu) = \frac{\bar{d} - 0}{s_{\bar{d}}} = \frac{\bar{d}}{s_{\bar{d}}}, \ \nu = n - 1, \ s_{\bar{d}} = s_d \cdot \sqrt{\frac{1}{n}}$, 其中 $n$ 为对子数
 
@@ -399,7 +402,7 @@ $t(\nu) = \frac{\bar{d} - 0}{s_{\bar{d}}} = \frac{\bar{d}}{s_{\bar{d}}}, \ \nu =
 1. 小样本下, $d$ 服从于正态分布。
 2. 大样本。
 
-### Independent Two Sample $t$-Test
+### Independent Two Sample t-Test
 
 两个总体的比较需要对方差齐性进行检验：
 
@@ -420,7 +423,7 @@ When $\sigma_1 \neq \sigma_2 \text{ 或未知} \rightarrow \text{ Welch's t-Test
 
 1. $\nu = \frac{(\frac{s_1^2}{m} + \frac{s_2^2}{n})^2}{\frac{s_1^4}{m^2}/(m-1) + \frac{s_2^4}{n^2}/(n-1)}$
 
-## $B(n, p)/Po(\lambda) \text{ Test}$
+## B(n, p)/Po(λ) Test
 
 设事件 $A$ 发生的概率为 $\pi$, 那么在 $n$ 次伯努利试验中,该事件发生次数 $k$:
 
@@ -508,7 +511,7 @@ When $\sigma_1 \neq \sigma_2 \text{ 或未知} \rightarrow \text{ Welch's t-Test
 
 1. $\alpha' = 1 - (1 - \alpha)^c$
 
-### $q$ -Test / Student-Newman-Keuls
+### q-Test / Student-Newman-Keuls
 
 $q$ 检验用于任意两组之间的相互比较。SNK法是逐步比较法,依据两个均值之间的跨度 $r$ 选用不同的临界值;<!-- TODO: 核对 SNK 与 Tukey、Bonferroni 在检验效能与族系误差控制上的说法 --> 当比较均值的组数较多时,Tukey法比Bonferroni法更有效,组数较少时,Bonferroni法更有效。
 
@@ -523,7 +526,7 @@ $q$ 检验用于任意两组之间的相互比较。SNK法是逐步比较法,依
 
 其中 $\bar{Y}_i, \bar{Y}_h$ 及 $n_i, n_h$ 分别是两个比较组的均数以及样本例数, $MS_{\text{within group}}$ 为进行方差分析得到的组内均方。以自由度 $\nu = N - a$ 和跨度 $r$ 查 $q$ 界值表。
 
-### Dunnett- $t$ Test
+### Dunnett t-Test
 
 $t_D$ 统计量处理组与对照组的比较,该统计量的计算如下：
 
@@ -567,7 +570,7 @@ FWER 的要求在比较次数 $c$ 很大时过于严格:只要 $c$ 到成千上�
 
 # Non-parametric Statistics
 
-## $\chi^2 \text{ Test}$
+## χ² Test
 
 卡方检验用于观测变量为无序分类变量时, 用于检验零假设下观测频数与理论频数(将所有组合并为一个组计算出的每个结局的频率分布,然后乘以原组的频数)之间偏离如此大范围的概率(如果观测变量为有序的分类变量,则该使用秩相关的检验)。该方法应用的条件如下：
 

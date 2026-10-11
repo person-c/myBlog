@@ -119,6 +119,87 @@ section.footnotes {
 <div class="date"><h3>2025-02-02</h3></div>
 </div>
 <div class="body">
+<div id="TOC">
+<ul>
+<li><a href="#chp:_1">概率</a>
+<ul>
+<li><a href="#sec:1">1. 概率的哲学基础：数据生成过程</a></li>
+<li><a href="#sec:2">2. 事件、集合与空间：概率论的语言</a></li>
+<li><a href="#sec:3">3. 概率公理与概率空间</a></li>
+<li><a href="#sec:4">4. 计数：从排列到组合的逻辑</a></li>
+<li><a href="#sec:5">5. 条件概率与独立性：信息与关联</a></li>
+<li><a href="#sec:6">6. 全概率公式与贝叶斯定理：推断的核心</a></li>
+</ul>
+</li>
+<li><a href="#chp:_2">统计描述</a>
+<ul>
+<li><a href="#sec:_1">数值变量</a></li>
+<li><a href="#sec:_2">分类变量</a></li>
+</ul>
+</li>
+<li><a href="#chp:_3">实验设计与调查研究</a>
+<ul>
+<li><a href="#sec:_3">实验设计</a></li>
+<li><a href="#sec:_4">调查研究</a></li>
+</ul>
+</li>
+<li><a href="#chp:parametric-statistics">Parametric Statistics</a>
+<ul>
+<li><a href="#sec:sampling-distribution-for-f-t">Sampling Distribution for χ², F, t</a></li>
+<li><a href="#sec:t-z-test">t/z Test</a>
+<ul>
+<li><a href="#sec:assumptions-and-its-application-case">Assumptions and Its Application Case</a></li>
+<li><a href="#sec:one-sample-t-test">One Sample t-Test</a></li>
+<li><a href="#sec:paired-t-test">Paired t-Test</a></li>
+<li><a href="#sec:independent-two-sample-t-test">Independent Two Sample t-Test</a></li>
+</ul>
+</li>
+<li><a href="#sec:b-n-p-po-test">B(n, p)/Po(λ) Test</a></li>
+<li><a href="#sec:analysis-of-variance">Analysis of Variance</a>
+<ul>
+<li><a href="#sec:one-way-anova">One Way ANOVA</a></li>
+<li><a href="#sec:special-two-way-anova-random-block-design">Special Two Way ANOVA - Random Block Design</a></li>
+</ul>
+</li>
+<li><a href="#sec:multiple-hypothesis-test">Multiple Hypothesis Test</a>
+<ul>
+<li><a href="#sec:q-test-student-newman-keuls">q-Test / Student-Newman-Keuls</a></li>
+<li><a href="#sec:dunnett-t-test">Dunnett t-Test</a></li>
+<li><a href="#sec:holm-test-bonferroni-step-down">Holm Test / Bonferroni Step-Down</a></li>
+<li><a href="#sec:benjamini-hochberg-test-fdr">Benjamini-Hochberg Test / FDR</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#chp:non-parametric-statistics">Non-parametric Statistics</a>
+<ul>
+<li><a href="#sec:test">χ² Test</a></li>
+<li><a href="#sec:rank-based-test">Rank  Based Test</a>
+<ul>
+<li><a href="#sec:wilcoxon-signed-rank-test-for-paired-sample">Wilcoxon Signed Rank Test for Paired Sample</a></li>
+<li><a href="#sec:wilcoxon-rank-sum-test-mann-whitney-test-for-independent-two-samples">Wilcoxon Rank Sum Test/Mann Whitney Test for Independent Two Samples</a></li>
+<li><a href="#sec:anova-for-rank">ANOVA for Rank</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#chp:correlation-and-linear-regression">Correlation and Linear Regression</a>
+<ul>
+<li><a href="#sec:pearson-spearman-correlation">Pearson/Spearman Correlation</a></li>
+<li><a href="#sec:simple-linear-regression">Simple Linear Regression</a></li>
+</ul>
+</li>
+<li><a href="#chp:_4">关于假设检验中若干问题</a>
+<ul>
+<li><a href="#sec:_5">假设检验原理</a></li>
+<li><a href="#sec:_6">假设检验与置信区间</a></li>
+<li><a href="#sec:i-and-ii-type-error-and-power">I and II type error and power</a></li>
+<li><a href="#sec:bootstrap">统计量分布计算的Bootstrap以及置换检验</a></li>
+<li><a href="#sec:_7">假设检验与线性回归参数检验的等效性</a></li>
+</ul>
+</li>
+</ul>
+</div>
 <h1 id="chp:_1">概率</h1>
 <h2 id="sec:1">1. 概率的哲学基础：数据生成过程</h2>
 <p>现代统计分析建立在一个核心的哲学观念上：我们观察到的数据，并非确定性的，而是由一个潜在的、不可观测的随机过程所产生的。这个过程被称为数据生成过程 (Data Generating Process, DGP)。</p>
@@ -369,7 +450,7 @@ section.footnotes {
 <li>进行抽样复查。</li>
 </ol>
 <h1 id="chp:parametric-statistics">Parametric Statistics</h1>
-<h2 id="sec:sampling-distribution-for-chi-2-f-t">Sampling Distribution for \(\chi^2, F, t\)</h2>
+<h2 id="sec:sampling-distribution-for-f-t">Sampling Distribution for χ², F, t</h2>
 <p>首先给出各分布构造的定义：</p>
 <ul>
 <li>若 \(\left\{  X_i \right\}_{i=1}^n\) 独立同分布于 \(N(0, 1)\), 那么 \(\sum{X_i^2} \sim \chi^2(n)\), 其 \(E(\chi^2) = n, Var(\chi^2) = 2n\).</li>
@@ -452,7 +533,7 @@ section.footnotes {
 <p>由 \(\bar{x}, \bar{y}\) 与 \(s_x^2, s_y^2\) 的独立性(定理 1 的第 3 条)以及两样本的独立性,上面的标准正态变量与卡方变量相互独立。按 \(t\) 分布的构造,将前者除以 \(\sqrt{\frac{s_p^2 (m + n - 2)/\sigma^2}{m + n - 2}} = \frac{s_p}{\sigma}\), \(\sigma\) 约去,即得：</p>
 <p>$$\frac{(\bar{x} - \bar{y}) - (\mu_1 - \mu_2)}{s_p \cdot \sqrt{\frac{1}{m} + \frac{1}{n}}} \sim t(m + n - 2)$$</p>
 </div>
-<h2 id="sec:t-z-test">\(t/z\) Test</h2>
+<h2 id="sec:t-z-test">t/z Test</h2>
 <h3 id="sec:assumptions-and-its-application-case">Assumptions and Its Application Case</h3>
 <p>From <a href="https://en.wikipedia.org/wiki/Student%27s_t-test#Assumptions">wikipedia</a>:</p>
 <blockquote>
@@ -491,7 +572,7 @@ section.footnotes {
 </blockquote>
 <p>而大样本下 \(t\) 分布近似于 \(z\) 分布。所以 \(t\) 分布可以应用于小样本下的正态总体,以及大样本下的任意总体的均值的检验。</p>
 <p>在应用 \(t\) 检验时,我们往往只有一个或两个样本的均值与方差,计算的关键就在于如何利用样本方差计算得到均值分布的方差。</p>
-<h3 id="sec:one-sample-t-test">One Sample \(t\)-Test</h3>
+<h3 id="sec:one-sample-t-test">One Sample t-Test</h3>
 <ol>
 <li>\(\bar{x} \sim \mathcal{N}(\mu, \frac{1}{n}\sigma^2)  \rightarrow \frac{\bar{x} - \mu}{\sigma \cdot \sqrt{\frac{1}{n}}} \sim \mathcal{N}(0, 1)\)</li>
 <li>\(\frac{\bar{x} - \mu}{s \cdot \sqrt{\frac{1}{n}}} \sim t(n-1)\)</li>
@@ -501,7 +582,7 @@ section.footnotes {
 <li>小样本时,总体近似服从正态分布。</li>
 <li>大样本时,由中心极限定理可放宽对总体分布的要求。</li>
 </ol>
-<h3 id="sec:paired-t-test">Paired \(t\)-Test</h3>
+<h3 id="sec:paired-t-test">Paired t-Test</h3>
 <p>\(t(\nu) = \frac{\bar{d} - 0}{s_{\bar{d}}} = \frac{\bar{d}}{s_{\bar{d}}}, \ \nu = n - 1, \ s_{\bar{d}} = s_d \cdot \sqrt{\frac{1}{n}}\), 其中 \(n\) 为对子数</p>
 <p>证明：</p>
 <ol>
@@ -513,7 +594,7 @@ section.footnotes {
 <li>小样本下, \(d\) 服从于正态分布。</li>
 <li>大样本。</li>
 </ol>
-<h3 id="sec:independent-two-sample-t-test">Independent Two Sample \(t\)-Test</h3>
+<h3 id="sec:independent-two-sample-t-test">Independent Two Sample t-Test</h3>
 <p>两个总体的比较需要对方差齐性进行检验：</p>
 <ol>
 <li>\(F = \frac{S_1^2}{S_2^2}, \nu_1 = n_1 - 1, \nu_2 = n_2 - 1\), 其中 \(S_1^2\) 是比较大的那个。</li>
@@ -534,7 +615,7 @@ section.footnotes {
 <ol>
 <li>\(\nu = \frac{(\frac{s_1^2}{m} + \frac{s_2^2}{n})^2}{\frac{s_1^4}{m^2}/(m-1) + \frac{s_2^4}{n^2}/(n-1)}\)</li>
 </ol>
-<h2 id="sec:b-n-p-po-lambda-text-test">\(B(n, p)/Po(\lambda) \text{ Test}\)</h2>
+<h2 id="sec:b-n-p-po-test">B(n, p)/Po(λ) Test</h2>
 <p>设事件 \(A\) 发生的概率为 \(\pi\), 那么在 \(n\) 次伯努利试验中,该事件发生次数 \(k\):</p>
 <ol>
 <li>\(P(k) = \binom{n}{k} \pi^k \cdot(1-\pi)^{n - k}, \text{ 其中 } \binom{n}{k} = \frac{n!}{k!\cdot(n-k)!}\)</li>
@@ -625,7 +706,7 @@ section.footnotes {
 <ol>
 <li>\(\alpha' = 1 - (1 - \alpha)^c\)</li>
 </ol>
-<h3 id="sec:q-test-student-newman-keuls">\(q\) -Test / Student-Newman-Keuls</h3>
+<h3 id="sec:q-test-student-newman-keuls">q-Test / Student-Newman-Keuls</h3>
 <p>\(q\) 检验用于任意两组之间的相互比较。SNK法是逐步比较法,依据两个均值之间的跨度 \(r\) 选用不同的临界值;<!-- TODO: 核对 SNK 与 Tukey、Bonferroni 在检验效能与族系误差控制上的说法 --> 当比较均值的组数较多时,Tukey法比Bonferroni法更有效,组数较少时,Bonferroni法更有效。</p>
 <p>其计算过程如下：</p>
 <ol>
@@ -637,7 +718,7 @@ section.footnotes {
 <li>\(q = \frac{{\bar{Y}_i - \bar{Y}_h}}{\sqrt{\frac{MS_{\text{within group}}}{2}(\frac{1}{n_i} + \frac{1}{n_h})}}\)</li>
 </ol>
 <p>其中 \(\bar{Y}_i, \bar{Y}_h\) 及 \(n_i, n_h\) 分别是两个比较组的均数以及样本例数, \(MS_{\text{within group}}\) 为进行方差分析得到的组内均方。以自由度 \(\nu = N - a\) 和跨度 \(r\) 查 \(q\) 界值表。</p>
-<h3 id="sec:dunnett-t-test">Dunnett- \(t\) Test</h3>
+<h3 id="sec:dunnett-t-test">Dunnett t-Test</h3>
 <p>\(t_D\) 统计量处理组与对照组的比较,该统计量的计算如下：</p>
 <ol>
 <li>\(t_D = \frac{\bar{Y}_i - \bar{Y}_c}{\sqrt{MS_{\text{within group}} \times (\frac{1}{n_i} + \frac{1}{n_c})}}\)</li>
@@ -675,7 +756,7 @@ section.footnotes {
 <p>两种校正都作用在 p 值上,因此与前面各节的检验统计量无关:无论用的是 \(t\) 检验、 \(q\) 检验还是秩和检验,只要把得到的 p 值按上面的次序排好再校正即可。</p>
 </blockquote>
 <h1 id="chp:non-parametric-statistics">Non-parametric Statistics</h1>
-<h2 id="sec:chi-2-text-test">\(\chi^2 \text{ Test}\)</h2>
+<h2 id="sec:test">χ² Test</h2>
 <p>卡方检验用于观测变量为无序分类变量时, 用于检验零假设下观测频数与理论频数(将所有组合并为一个组计算出的每个结局的频率分布,然后乘以原组的频数)之间偏离如此大范围的概率(如果观测变量为有序的分类变量,则该使用秩相关的检验)。该方法应用的条件如下：</p>
 <blockquote>
 <ol>
