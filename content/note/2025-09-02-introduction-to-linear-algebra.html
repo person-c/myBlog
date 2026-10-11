@@ -112,7 +112,6 @@ section.footnotes {
 }
 </style>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.47/dist/katex.min.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@xiee/utils@1.14.37/css/prism-xcode.min.css">
 </head>
 <body>
 <div class="frontmatter">
@@ -185,7 +184,6 @@ section.footnotes {
 </ul>
 </li>
 <li><a href="#chp:_6">各种分解总览</a></li>
-<li><a href="#chp:r">用 R 做数值验证</a></li>
 </ul>
 </div>
 <style type="text/css">
@@ -251,25 +249,6 @@ x_2 \begin{bmatrix} 3 \\ -1 \end{bmatrix} =
 \begin{bmatrix} 8 \\ 1 \end{bmatrix}$$</p>
 <p>从列视角看，线性方程组有解的条件显然是：目标向量 \(\mathbf{b}\) 位于 \(A\) 的所有列向量张成的空间（列空间）之中。</p>
 <p>下面把开头的例子画出来：左图是行视角（两条直线的交点），右图是列视角（用 \(\mathbf{a}_1, \mathbf{a}_2\) 的线性组合拼出 \(\mathbf{b}\)）。</p>
-<pre><code class="language-r">A &lt;- matrix(c(2, 3, 1, -1), 2, byrow = TRUE); b &lt;- c(8, 1)
-x &lt;- solve(A, b)
-par(mfrow = c(1, 2), mar = c(2.5, 2.5, 2, 1), font.lab = 3)   # x1、x2 是变量，斜体
-
-# 行视角：每个方程是一条直线
-plot(NA, xlim = c(0, 5), ylim = c(-1, 3.5), asp = 1,
-     xlab = &quot;x1&quot;, ylab = &quot;x2&quot;, main = &quot;row picture&quot;)
-abline(a = 8/3, b = -2/3, col = col_a, lwd = 2)   # 2 x1 + 3 x2 = 8
-abline(a = -1,  b = 1,    col = col_p, lwd = 2)   # x1 - x2 = 1
-points(x[1], x[2], pch = 19)
-text(x[1], x[2], &quot;(2.2, 1.2)&quot;, pos = 4)
-
-# 列视角：x1 * a1 + x2 * a2 = b
-plot(NA, xlim = c(-0.5, 9), ylim = c(-1.8, 3), asp = 1,
-     xlab = &quot;&quot;, ylab = &quot;&quot;, main = &quot;column picture&quot;)
-draw_vec(x[1] * A[, 1], col = col_a, lab = &quot;x₁a₁&quot;, pos = 3)
-draw_vec(x[2] * A[, 2], from = x[1] * A[, 1], col = col_p, lab = &quot;x₂a₂&quot;, pos = 1)
-draw_vec(b, col = &quot;black&quot;, lab = &quot;b&quot;, pos = 3)
-</code></pre>
 <div id="fig:fig-row-col" class="figure">
 <p><svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' width='504.00pt' height='244.80pt' viewBox='0 0 504.00 244.80' alt="行视角（左）与列视角（右）">
 <g class='svglite'>
@@ -509,63 +488,6 @@ $$E_{21} = \begin{bmatrix} 1 &amp; 0 &amp; 0 \\ -\ell_{21} &amp; 1 &amp; 0 \\ 0 
 </tr>
 </tbody>
 </table>
-<pre><code class="language-r"># 四个子空间的大小要正比于各自的维数（按面积算）：行空间与列空间同为 r 所以一样大，
-# 零空间是 n − r、左零空间是 m − r，各自不同。菱形面积 = 2d²，故半对角线 d ∝ √维数。
-# 取一个具体例子：m = 6、n = 7、r = 4（图注里写明）
-m &lt;- 6; n &lt;- 7; r &lt;- 4
-d_of &lt;- function(dim) 1.25 * sqrt(dim / r)
-d_row &lt;- d_of(r); d_col &lt;- d_of(r); d_null &lt;- d_of(n - r); d_lnull &lt;- d_of(m - r)
-
-# 每个子空间画成一个旋转 45° 的正方形（菱形），同一个空间里的两块只在一个顶点相接：
-# 接触点上四条边的夹角恰是直角（边长不同也仍是直角），正交就画在这里；两块若重叠成一片，
-# 这个意思就读不出来了
-mx1 &lt;- 2.8; mx2 &lt;- 7.2; my &lt;- 2.9              # 左右两个&quot;空间原点&quot;（两块相接的那个顶点）
-diamond &lt;- function(cx, cy, d, col = col_a, lwd = 1.5) {
-  polygon(c(cx, cx + d, cx, cx - d), c(cy - d, cy, cy + d, cy), border = col, lwd = lwd)
-}
-
-# 面板上的 R 与它的上标分开画：Unicode 的上标 n、m（U+207F、U+1D50）在 svglite 用的字体里没有，
-# 直接写会渲染成豆腐块；分开画一个小的、抬高的字母最稳妥
-rsup &lt;- function(x, y, s) {
-  text(x - 0.05, y, &quot;R&quot;, font = 4, cex = 1.15)
-  text(x + 0.14, y + 0.15, s, cex = 0.8, font = 3)
-}
-
-par(mar = c(0.5, 0.5, 0.5, 0.5))
-plot(NA, xlim = c(0, 10), ylim = c(0, 5.75), asp = 1, axes = FALSE, xlab = &quot;&quot;, ylab = &quot;&quot;)
-
-# ---- 左：R^n = 行空间 ⊕ 零空间 ----
-diamond(mx1, my + d_row, d_row)
-diamond(mx1, my - d_null, d_null)
-text(mx1, my + d_row + 0.30, &quot;Row space&quot;, font = 2, col = col_a, cex = 0.9)
-text(mx1, my + d_row - 0.10, &quot;all Aᵀy&quot;, cex = 0.9, font = 3)
-rsup(mx1 - 0.35, my, &quot;n&quot;)         # 接触点左右两侧上下两块都占不到，正好放 R^n 与垂直标注
-text(mx1 + 0.25, my + 0.12, &quot;Perpendicular&quot;, adj = 0, cex = 0.85)
-text(mx1 + 0.25, my - 0.17, &quot;xᵀ(Aᵀy) = 0&quot;, adj = 0, cex = 0.85, font = 3)
-text(mx1, my - d_null + 0.45, &quot;x in&quot;, font = 2, col = col_a, cex = 0.9)
-text(mx1, my - d_null, &quot;Nullspace&quot;, font = 2, col = col_a, cex = 0.9)
-text(mx1, my - d_null - 0.45, &quot;Ax = 0&quot;, cex = 0.9, font = 3)
-text(0.30, my + d_row + 0.50, &quot;C(Aᵀ)&quot;, font = 4, adj = 0)
-text(0.30, my - d_null - 0.50, &quot;N(A)&quot;, font = 4, adj = 0)
-text(0.30, my + d_row, &quot;dim r&quot;, adj = 0, cex = 0.9, font = 3)
-text(0.30, my - d_null, &quot;dim n − r&quot;, adj = 0, cex = 0.9, font = 3)
-
-# ---- 右：R^m = 列空间 ⊕ 左零空间 ----
-diamond(mx2, my + d_col, d_col)
-diamond(mx2, my - d_lnull, d_lnull)
-text(mx2, my + d_col + 0.30, &quot;Column space&quot;, font = 2, col = col_a, cex = 0.9)
-text(mx2, my + d_col - 0.10, &quot;all Ax&quot;, cex = 0.9, font = 3)
-rsup(mx2 + 0.35, my, &quot;m&quot;)
-text(mx2 - 0.25, my + 0.12, &quot;Perpendicular&quot;, adj = 1, cex = 0.85)
-text(mx2 - 0.25, my - 0.17, &quot;yᵀ(Ax) = 0&quot;, adj = 1, cex = 0.85, font = 3)
-text(mx2, my - d_lnull + 0.42, &quot;y in&quot;, font = 2, col = col_a, cex = 0.9)
-text(mx2, my - d_lnull, &quot;Nullspace of Aᵀ&quot;, font = 2, col = col_a, cex = 0.9)
-text(mx2, my - d_lnull - 0.42, &quot;Aᵀy = 0&quot;, cex = 0.9, font = 3)
-text(9.70, my + d_col + 0.50, &quot;C(A)&quot;, font = 4, adj = 1)
-text(9.70, my - d_lnull - 0.50, &quot;N(Aᵀ)&quot;, font = 4, adj = 1)
-text(9.70, my + d_col, &quot;dim r&quot;, adj = 1, cex = 0.9, font = 3)
-text(9.70, my - d_lnull, &quot;dim m − r&quot;, adj = 1, cex = 0.9, font = 3)
-</code></pre>
 <div id="fig:fig-four-subspaces" class="figure">
 <p><svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' width='576.00pt' height='331.20pt' viewBox='0 0 576.00 331.20' alt="四个基本子空间（以 $$m = 6$$、$$n = 7$$、$$r = 4$$ 为例，各块面积与维数成正比）：左为 $$\mathbb{R}^n$$，行空间与零空间互为正交补；右为 $$\mathbb{R}^m$$，列空间与左零空间互为正交补">
 <g class='svglite'>
@@ -697,22 +619,6 @@ text(9.70, my - d_lnull, &quot;dim m − r&quot;, adj = 1, cex = 0.9, font = 3)
 <p>$$\mathbf{a}^{\mathrm{T}}(\mathbf{b}-\mathbf{p}) = 0 \rightarrow \mathbf{a}^{\mathrm{T}}(\mathbf{b}-\hat{x}\mathbf{a}) = 0 \rightarrow \mathbf{a}^{\mathrm{T}}\mathbf{a}\,\hat{x} = \mathbf{a}^{\mathrm{T}}\mathbf{b}$$</p>
 <p>解得 \(\hat{x} = \frac{\mathbf{a}^{\mathrm{T}}\mathbf{b}}{\mathbf{a}^{\mathrm{T}}\mathbf{a}}\)， \(\mathbf{p} = \mathbf{a}\frac{\mathbf{a}^{\mathrm{T}}\mathbf{b}}{\mathbf{a}^{\mathrm{T}}\mathbf{a}}\)。从 \(\mathbf{p}\) 中可以分离出矩阵 \(P = \frac{\mathbf{a}\mathbf{a}^{\mathrm{T}}}{\mathbf{a}^{\mathrm{T}}\mathbf{a}}\)，称为 <strong>投影矩阵</strong>，它把向量 \(\mathbf{b}\) 投影到 \(\mathbf{a}\) 的方向。</p>
 <p>几何上， \(\mathbf{p}\) 是 \(\mathbf{b}\) 在直线上“垂直落下”的点，误差 \(\mathbf{e}\) 与 \(\mathbf{a}\) 成直角：</p>
-<pre><code class="language-r">a &lt;- c(3, 1); b &lt;- c(2, 3)
-p &lt;- sum(a * b) / sum(a * a) * a      # 投影
-e &lt;- b - p                            # 误差，与 a 正交
-
-par(mar = c(2, 2, 1, 1))
-plot(NA, xlim = c(0, 4), ylim = c(0, 3.5), asp = 1, xlab = &quot;&quot;, ylab = &quot;&quot;,
-     main = &quot;projection of b onto a&quot;)
-abline(0, a[2] / a[1], col = &quot;grey80&quot;)                  # a 所在的直线
-draw_vec(a, col = col_a, lab = &quot;a&quot;, pos = 4)
-draw_vec(b, col = &quot;black&quot;, lab = &quot;b&quot;, pos = 3)
-draw_vec(p, col = col_p)
-text(p[1] + 0.18, p[2] - 0.28, &quot;p&quot;, col = col_p, font = 3)                  # 让开直角标记
-segments(p[1], p[2], b[1], b[2], lty = 2, lwd = 2, col = col_e)   # e
-text((p[1] + b[1]) / 2, (p[2] + b[2]) / 2, &quot;e&quot;, pos = 4, col = col_e, font = 3)
-right_angle(p, -a, e)
-</code></pre>
 <div id="fig:fig-proj-line" class="figure">
 <p><svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' width='360.00pt' height='273.60pt' viewBox='0 0 360.00 273.60' alt="$$\mathbf{b}$$ 在 $$\mathbf{a}$$ 方向上的投影 $$\mathbf{p}$$ 与误差 $$\mathbf{e}$$">
 <g class='svglite'>
@@ -817,26 +723,6 @@ $$\mathbf{b}$$ 在 $$\mathbf{a}$$ 方向上的投影 $$\mathbf{p}$$ 与误差 $$
 <li>最后单位化： \(\mathbf{q}_i = \mathbf{w}_i / \|\mathbf{w}_i\|\)。</li>
 </ul>
 <p>二维情形的图示： \(\mathbf{w}_2\) 就是 \(\mathbf{a}_2\) 减去它在 \(\mathbf{a}_1\) 上的投影，再单位化得到 \(\mathbf{q}_1, \mathbf{q}_2\)。</p>
-<pre><code class="language-r">a1 &lt;- c(3, 1); a2 &lt;- c(2, 3)
-p  &lt;- sum(a1 * a2) / sum(a1 * a1) * a1       # a2 在 a1 上的投影
-w2 &lt;- a2 - p
-q1 &lt;- a1 / sqrt(sum(a1^2)); q2 &lt;- w2 / sqrt(sum(w2^2))
-
-par(mar = c(2, 2, 2, 1))
-plot(NA, xlim = c(-1.5, 4), ylim = c(-0.5, 3.5), asp = 1, xlab = &quot;&quot;, ylab = &quot;&quot;,
-     main = &quot;Gram-Schmidt&quot;)
-abline(h = 0, v = 0, col = &quot;grey90&quot;)
-draw_vec(a1, col = col_a, lab = &quot;a₁&quot;, pos = 4)
-draw_vec(a2, col = &quot;black&quot;, lab = &quot;a₂&quot;, pos = 3)
-draw_vec(p, col = col_p, lab = &quot;p&quot;, pos = 1)
-segments(p[1], p[2], a2[1], a2[2], lty = 2, col = col_e)   # a2 - p
-draw_vec(w2, col = col_e, lab = &quot;w₂&quot;, pos = 2)
-draw_vec(q1, col = col_a, lwd = 4)
-draw_vec(q2, col = col_e, lwd = 4)
-text(q1[1], q1[2], &quot;q₁&quot;, pos = 1, col = col_a, font = 3)
-text(q2[1], q2[2], &quot;q₂&quot;, pos = 2, col = col_e, font = 3)
-right_angle(c(0, 0), q1, q2)
-</code></pre>
 <div id="fig:fig-gram-schmidt" class="figure">
 <p><svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' width='360.00pt' height='273.60pt' viewBox='0 0 360.00 273.60' alt="Gram-Schmidt：从 $$a_1$$、$$a_2$$ 得到标准正交的 $$q_1$$、$$q_2$$">
 <g class='svglite'>
@@ -939,57 +825,7 @@ Gram-Schmidt：从 $$a_1$$、$$a_2$$ 得到标准正交的 $$q_1$$、$$q_2$$</p>
 <p>（ \(A^{\mathrm{T}}A\) 可逆的原因： \(A^{\mathrm{T}}A\mathbf{x} = \mathbf{0} \Rightarrow \mathbf{x}^{\mathrm{T}}A^{\mathrm{T}}A\mathbf{x} = \|A\mathbf{x}\|^2 = 0 \Rightarrow A\mathbf{x} = \mathbf{0}\)，所以 \(N(A^{\mathrm{T}}A) = N(A)\)， \(A\) 列满秩时即为 \(\{\mathbf{0}\}\)。）</p>
 <p>与投影到一条直线相比，这里的特别之处在于： \(\mathbf{b}\) 位于 \(\mathbb{R}^m\) 中，而列空间 \(C(A)\) 与左零空间 \(N(A^{\mathrm{T}})\) 互为 \(\mathbb{R}^m\) 中的正交补。所以把 \(\mathbf{b}\) 投影到 \(C(A)\)，实际上是把 \(\mathbf{b}\) 分解为两部分： \(\mathbf{p}\) 在列空间中， \(\mathbf{e}\) 在左零空间中；而投影到左零空间的投影矩阵就是 \(I - P\)。</p>
 <p>三维中的情形如下（可以用鼠标拖动旋转、滚轮缩放）：蓝色平面是 \(A\) 的两列张成的列空间， \(\mathbf{b}\) 被分解为落在平面内的 \(\mathbf{p}\) 和垂直于平面的 \(\mathbf{e}\)，而 \(\mathbf{e}\) 位于左零空间中。</p>
-<pre><code class="language-r"># 载入 plotly.js：vest() 解析 npm 别名并把资源缓存到本地（默认 embed_resources = &quot;local&quot; 不内嵌 https 资源，页面仍引用 CDN）
-litedown::vest(js = '@npm/plotly.js@2.11.1/dist/plotly.min.js')
-</code></pre>
 <script src="https://cdn.jsdelivr.net/npm/plotly.js@2.11.1/dist/plotly.min.js" defer></script>
-<pre><code class="language-r">library(plotly)
-A &lt;- cbind(c(1, 0, 0.5), c(0, 1, 0.5))            # 两列张成列空间（一个平面）
-b &lt;- c(2, 1.5, 3)
-p &lt;- drop(A %*% solve(t(A) %*% A, t(A) %*% b))    # 投影 p = A (A^{\mathrm{T}} A)^{-1} A^{\mathrm{T}} b
-e &lt;- b - p                                        # 误差
-
-ss &lt;- seq(-1, 3.5, length.out = 20)
-PX &lt;- outer(ss, ss, function(u, v) u * A[1, 1] + v * A[1, 2])
-PY &lt;- outer(ss, ss, function(u, v) u * A[2, 1] + v * A[2, 2])
-PZ &lt;- outer(ss, ss, function(u, v) u * A[3, 1] + v * A[3, 2])
-
-fig &lt;- plot_ly() %&gt;%
-  add_surface(x = PX, y = PY, z = PZ, opacity = 0.5, showscale = FALSE,
-              colorscale = list(c(0, 1), c(&quot;lightblue&quot;, &quot;lightblue&quot;)),
-              name = &quot;C(A)&quot;, hoverinfo = &quot;skip&quot;) %&gt;%
-  add_trace(type = &quot;scatter3d&quot;, mode = &quot;lines+markers+text&quot;, name = &quot;b&quot;,
-            x = c(0, b[1]), y = c(0, b[2]), z = c(0, b[3]),
-            text = c(&quot;&quot;, &quot;b&quot;), textposition = &quot;top center&quot;,
-            line = list(color = &quot;black&quot;, width = 6), marker = list(size = 3, color = &quot;black&quot;)) %&gt;%
-  add_trace(type = &quot;scatter3d&quot;, mode = &quot;lines+markers+text&quot;, name = &quot;p&quot;,
-            x = c(0, p[1]), y = c(0, p[2]), z = c(0, p[3]),
-            text = c(&quot;&quot;, &quot;p&quot;), textposition = &quot;bottom center&quot;,
-            line = list(color = &quot;firebrick&quot;, width = 6), marker = list(size = 3, color = &quot;firebrick&quot;)) %&gt;%
-  add_trace(type = &quot;scatter3d&quot;, mode = &quot;lines&quot;, name = &quot;e&quot;,
-            x = c(p[1], b[1]), y = c(p[2], b[2]), z = c(p[3], b[3]),
-            line = list(color = &quot;grey40&quot;, width = 6, dash = &quot;dash&quot;)) %&gt;%
-  layout(scene = list(aspectmode = &quot;data&quot;,
-                      xaxis = list(title = &quot;x&quot;), yaxis = list(title = &quot;y&quot;), zaxis = list(title = &quot;z&quot;)),
-         legend = list(orientation = &quot;h&quot;))
-
-# 验证：e 与平面内的每个方向（A 的每一列）都正交，即 A^{\mathrm{T}} e = 0
-round(crossprod(A, e), 10)
-</code></pre>
-<table>
-<tbody>
-<tr>
-<td align="right">0</td>
-</tr>
-<tr>
-<td align="right">0</td>
-</tr>
-</tbody>
-</table>
-<pre><code class="language-r"># 交给 plotly.js 的 JS API 渲染（litedown 不走 htmlwidgets），
-# 写法见 reference/litedown/examples/022-dygraphs.Rmd
-spec &lt;- plotly::plotly_build(fig)$x[c(&quot;data&quot;, &quot;layout&quot;)]
-</code></pre>
 <script type="module">const spec = {
   "data": [
     {
@@ -1189,21 +1025,6 @@ Plotly.newPlot(document.getElementById('la-proj-plane'), spec.data, spec.layout,
 </div>
 <div class="caption">$$\mathbf{b}$$ 投影到列空间（平面）：$$\mathbf{b} = \mathbf{p} + \mathbf{e}$$，$$\mathbf{e}$$ 垂直于平面（可旋转）</div>
 <p>最小二乘拟合直线可以看作同样的投影：数据向量 \(\mathbf{b}\) 被投影到 \(A\) 的列空间，拟合值 \(\mathbf{p}=A\hat{\mathbf{x}}\) 就是图中直线上的点，残差 \(\mathbf{e}\) 就是竖直的虚线段。</p>
-<pre><code class="language-r">tt &lt;- c(0, 1, 2); y &lt;- c(1, 2, 2)
-X &lt;- cbind(1, tt)
-beta &lt;- solve(t(X) %*% X, t(X) %*% y)     # 正规方程
-fit &lt;- drop(X %*% beta)                   # p = X beta
-
-par(mar = c(3, 3, 1, 1), font.lab = 3)                        # t、y 是变量，斜体
-plot(tt, y, pch = 19, xlim = c(-0.3, 2.3), ylim = c(0.5, 2.7), xlab = &quot;t&quot;, ylab = &quot;y&quot;,
-     main = &quot;least squares fit&quot;)
-abline(a = beta[1], b = beta[2], col = col_a, lwd = 2)
-segments(tt, fit, tt, y, lty = 2, col = col_e)
-points(tt, fit, pch = 1, col = col_p, cex = 1.5)
-legend(&quot;topleft&quot;, bty = &quot;n&quot;, cex = 0.8, text.font = 3,   # 图例里带变量，整条斜体
-       legend = c(&quot;data (b)&quot;, &quot;fitted (p)&quot;, &quot;residual (e)&quot;),
-       pch = c(19, 1, NA), lty = c(NA, NA, 2), col = c(&quot;black&quot;, col_p, col_e))
-</code></pre>
 <div id="fig:fig-ls-fit" class="figure">
 <p><svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' width='345.60pt' height='273.60pt' viewBox='0 0 345.60 273.60' alt="最小二乘拟合直线：数据点、拟合值与残差">
 <g class='svglite'>
@@ -1342,19 +1163,6 @@ C_{1n} &amp; \dots &amp; C_{nn}
 <p>克莱姆法则主要有理论价值，实际求解线性方程组时计算量远大于消元。</p>
 <h3 id="sec:_12">几何意义</h3>
 <p>行列式的绝对值 \(|\det A|\) 是由 \(A\) 的行向量（或列向量）构成的平行体（二维为平行四边形，三维为平行六面体）的体积，符号则表示定向（是否翻转）。</p>
-<pre><code class="language-r">A &lt;- matrix(c(2, 0.5, 1, 1.5), 2)           # 列为 (2, 0.5) 和 (1, 1.5)
-a1 &lt;- A[, 1]; a2 &lt;- A[, 2]
-par(mar = c(2, 2, 2, 1), font.main = 3)                       # 标题是公式，斜体
-plot(NA, xlim = c(-0.3, 3.5), ylim = c(-0.3, 2.3), asp = 1, xlab = &quot;&quot;, ylab = &quot;&quot;,
-     main = paste0(&quot;|det A| = &quot;, abs(det(A))))
-polygon(c(0, 1, 1, 0), c(0, 0, 1, 1), col = &quot;#e5e5e5&quot;, border = &quot;grey50&quot;)
-polygon(c(0, a1[1], a1[1] + a2[1], a2[1]), c(0, a1[2], a1[2] + a2[2], a2[2]),
-        col = adjustcolor(col_a, alpha.f = 0.15), border = col_a, lwd = 2)
-draw_vec(a1, col = col_a, lwd = 3, lab = &quot;A e₁&quot;, pos = 1)
-draw_vec(a2, col = col_a, lwd = 3, lab = &quot;A e₂&quot;, pos = 2)
-text(0.5, 0.5, &quot;1&quot;, col = &quot;grey30&quot;)
-text(1.5, 1, &quot;A(unit square)&quot;, col = col_a)
-</code></pre>
 <div id="fig:fig-det-area" class="figure">
 <p><svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' width='360.00pt' height='259.20pt' viewBox='0 0 360.00 259.20' alt="单位正方形经 $$A$$ 变成平行四边形，面积为 $$|\det A|$$">
 <g class='svglite'>
@@ -1436,22 +1244,6 @@ text(1.5, 1, &quot;A(unit square)&quot;, col = col_a)
 <p>上式的含义就是该矩阵操作只对这个向量进行放缩。上式存在非零解的充要条件是：</p>
 <p>$$\det(A - \lambda I) = 0$$</p>
 <p>下图中，虚线是单位圆，实线是它被 \(A\) 变换后的椭圆。蓝色是特征向量，红色是变换后的结果：它们方向不变，只被放缩了 \(\lambda\) 倍。</p>
-<pre><code class="language-r">A &lt;- matrix(c(2, 1, 1, 2), 2)
-ev &lt;- eigen(A)
-th &lt;- seq(0, 2 * pi, length.out = 200); circ &lt;- rbind(cos(th), sin(th))
-
-par(mar = c(2, 2, 2, 1))
-plot(t(circ), type = &quot;l&quot;, asp = 1, xlim = c(-3, 3), ylim = c(-3, 3),
-     col = &quot;grey60&quot;, lty = 2, xlab = &quot;&quot;, ylab = &quot;&quot;, main = &quot;A x for the unit circle&quot;)
-lines(t(A %*% circ), lwd = 2)
-for (i in 1:2) {
-  v &lt;- ev$vectors[, i]
-  draw_vec(v, col = col_a)
-  draw_vec(ev$values[i] * v, col = col_p)
-  text(1.15 * ev$values[i] * v[1], 1.15 * ev$values[i] * v[2],
-       paste0(&quot;λ = &quot;, round(ev$values[i], 2)), col = col_p, pos = 3, font = 3)   # 标签挪到箭头之外
-}
-</code></pre>
 <div id="fig:fig-eigen" class="figure">
 <p><svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' width='331.20pt' height='302.40pt' viewBox='0 0 331.20 302.40' alt="特征向量只被放缩：蓝色为 $$x$$，红色为 $$Ax$$">
 <g class='svglite'>
@@ -1599,28 +1391,6 @@ AS &amp;= A \begin{bmatrix} \mathbf{x}_1 &amp; \mathbf{x}_2 &amp; \dots &amp; \m
 <p>其中主元（ \(D\) 的对角元素）就是平方项的系数， \(L\) 中的乘数 3 就是配方项 \((x+3y)\) 中 \(y\) 的系数。两个主元都为正，所以 \(f\) 恒为正，矩阵正定。</p>
 <p>作为对比， \(2x^2 + 12xy + 7y^2 = 2(x+3y)^2 - 11y^2\)，第二个主元为负，函数在某些方向上取负值，对应的矩阵是不定的。</p>
 <p>两个二次型的曲面如下（可拖动旋转；曲面底部投影出了等高线，鼠标悬停可以看到 \(f\) 的取值）：左边的 \(f\) 是“碗”，等高线是椭圆，有最小值；右边的 \(f\) 是“马鞍”，等高线是双曲线，在某些方向上取负值。</p>
-<pre><code class="language-r">library(plotly)
-g  &lt;- seq(-2, 2, length.out = 61)
-f1 &lt;- outer(g, g, function(x, y) 2 * x^2 + 12 * x * y + 20 * y^2)   # 正定
-f2 &lt;- outer(g, g, function(x, y) 2 * x^2 + 12 * x * y +  7 * y^2)   # 不定
-cont &lt;- list(z = list(show = TRUE, usecolormap = TRUE, project = list(z = TRUE)))
-ax &lt;- list(xaxis = list(title = &quot;x&quot;), yaxis = list(title = &quot;y&quot;), zaxis = list(title = &quot;f&quot;))
-
-fig &lt;- plot_ly() %&gt;%
-  add_surface(x = g, y = g, z = t(f1), scene = &quot;scene&quot;,  showscale = FALSE,
-              colorscale = &quot;Viridis&quot;, contours = cont) %&gt;%
-  add_surface(x = g, y = g, z = t(f2), scene = &quot;scene2&quot;, showscale = FALSE,
-              colorscale = &quot;Viridis&quot;, contours = cont) %&gt;%
-  layout(scene  = c(list(domain = list(x = c(0, 0.5))), ax),
-         scene2 = c(list(domain = list(x = c(0.5, 1))), ax),
-         annotations = list(
-           list(text = &quot;positive definite&quot;, x = 0.2, y = 1, xref = &quot;paper&quot;, yref = &quot;paper&quot;, showarrow = FALSE),
-           list(text = &quot;indefinite (saddle)&quot;, x = 0.8, y = 1, xref = &quot;paper&quot;, yref = &quot;paper&quot;, showarrow = FALSE)))
-
-# 交给 plotly.js 的 JS API 渲染（litedown 不走 htmlwidgets），
-# 写法见 reference/litedown/examples/022-dygraphs.Rmd
-spec &lt;- plotly::plotly_build(fig)$x[c(&quot;data&quot;, &quot;layout&quot;)]
-</code></pre>
 <script type="module">const spec = {
   "data": [
     {
@@ -1983,23 +1753,6 @@ MV = U\Sigma \rightarrow M = U\Sigma V^{\mathrm{T}}$$</p>
 <p>可以看到奇异值分解与特征值分解的区别在于：特征值分解输入与输出使用 <strong>同一组基</strong>（特征向量），所以变换只剩缩放 \(\Lambda\)；奇异值分解的输入与输出使用 <strong>两组不同的标准正交基</strong> \(V\) 与 \(U\)，二者之间的错位表现为额外的旋转 \(E\)。而“投影”（降维）并不来自 \(E\)（ \(E\) 是正交矩阵），而是来自 \(\Sigma\) 中为 0 的奇异值。</p>
 <p>需要注意的是，虽然上面从视角转换的角度解释了特征分解以及奇异值分解，但矩阵分解同样可以从空间变换的角度理解。例如对于奇异值分解有如下解释：第一个变换 \(V^{\mathrm{T}}\) 把标准正交向量 \(\mathbf{v}_1, \mathbf{v}_2\) 转到水平和垂直方向（标准基方向）； \(\Sigma\) 对这两个方向分别放缩（单位圆变成椭圆， \(\sigma_i\) 是半轴长）； \(U\) 再把放缩后的椭圆旋转（或反射）到最后的位置。</p>
 <p>下面把 SVD 的三步变换画出来： \(V^{\mathrm{T}}\) 把 \(\mathbf{v}_1, \mathbf{v}_2\) 转到坐标轴方向， \(\Sigma\) 沿坐标轴缩放（单位圆变成椭圆，半轴长为 \(\sigma_i\)）， \(U\) 再把椭圆转到最终位置。</p>
-<pre><code class="language-r">th &lt;- seq(0, 2 * pi, length.out = 200); circ &lt;- rbind(cos(th), sin(th))
-M &lt;- matrix(c(2, 0, 1, 1.5), 2)               # 即 [[2, 1], [0, 1.5]]
-s &lt;- svd(M); V &lt;- s$v; U &lt;- s$u; D &lt;- diag(s$d)
-
-panel &lt;- function(pts, vecs, ttl, lim = 2.8) {
-  plot(t(pts), type = &quot;l&quot;, asp = 1, xlim = c(-lim, lim), ylim = c(-lim, lim),
-       xlab = &quot;&quot;, ylab = &quot;&quot;, main = ttl)
-  abline(h = 0, v = 0, col = &quot;grey85&quot;)
-  draw_vec(vecs[, 1], col = col_a)
-  draw_vec(vecs[, 2], col = col_p)
-}
-par(mfrow = c(1, 4), mar = c(2, 2, 2, 1), font.main = 3)      # 四个面板标题都是公式，斜体
-panel(circ,                    V,       &quot;x (v₁, v₂)&quot;)
-panel(t(V) %*% circ,           diag(2), &quot;Vᵀx&quot;)
-panel(D %*% t(V) %*% circ,     D,       &quot;ΣVᵀx&quot;)
-panel(U %*% D %*% t(V) %*% circ, U %*% D, &quot;UΣVᵀx = Mx&quot;)
-</code></pre>
 <div id="fig:fig-svd-steps" class="figure">
 <p><svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' width='720.00pt' height='208.80pt' viewBox='0 0 720.00 208.80' alt="SVD 的几何意义：$$x \to V^{\mathrm{T}} x \to \Sigma V^{\mathrm{T}} x \to U \Sigma V^{\mathrm{T}} x$$">
 <g class='svglite'>
@@ -2320,122 +2073,9 @@ SVD 的几何意义：$$x \to V^{\mathrm{T}} x \to \Sigma V^{\mathrm{T}} x \to U
 </tr>
 </tbody>
 </table>
-<h1 id="chp:r">用 R 做数值验证</h1>
-<p>下面用几个小例子验证前面的结论。</p>
-<p><strong>解方程组并检验</strong>（开头的例子，解为 \(x_1 = 2.2,\ x_2 = 1.2\)）：</p>
-<pre><code class="language-r">A &lt;- matrix(c(2, 3, 1, -1), 2, byrow = TRUE)
-b &lt;- c(8, 1)
-x &lt;- solve(A, b)
-x
-</code></pre>
-<pre><code>#&gt; [1] 2.2 1.2
-</code></pre>
-<pre><code class="language-r">A %*% x   # 应等于 b
-</code></pre>
-<table>
-<tbody>
-<tr>
-<td align="right">8</td>
-</tr>
-<tr>
-<td align="right">1</td>
-</tr>
-</tbody>
-</table>
-<p><strong>最小二乘： \(QR\) 分解与正规方程给出相同的解</strong>（拟合直线 \(y = c_0 + c_1 t\)）：</p>
-<pre><code class="language-r">X &lt;- cbind(1, c(0, 1, 2))
-y &lt;- c(1, 2, 2)
-qr_X &lt;- qr(X)
-Q &lt;- qr.Q(qr_X); R &lt;- qr.R(qr_X)
-all.equal(Q %*% R, X)                          # X = QR
-</code></pre>
-<pre><code>#&gt; [1] TRUE
-</code></pre>
-<pre><code class="language-r">backsolve(R, t(Q) %*% y)                       # 解 R x = Q^{\mathrm{T}} y
-</code></pre>
-<table>
-<tbody>
-<tr>
-<td align="right">1.167</td>
-</tr>
-<tr>
-<td align="right">0.500</td>
-</tr>
-</tbody>
-</table>
-<pre><code class="language-r">solve(t(X) %*% X, t(X) %*% y)                  # 正规方程，结果相同
-</code></pre>
-<table>
-<tbody>
-<tr>
-<td align="right">1.167</td>
-</tr>
-<tr>
-<td align="right">0.500</td>
-</tr>
-</tbody>
-</table>
-<p><strong>正定性判断</strong>：</p>
-<pre><code class="language-r">S &lt;- matrix(c(2, 6, 6, 20), 2)
-eigen(S)$values        # 全为正，说明正定
-</code></pre>
-<pre><code>#&gt; [1] 21.8166538  0.1833462
-</code></pre>
-<pre><code class="language-r">chol(S)                # 能成功分解（R^{\mathrm{T}} R），也说明正定
-</code></pre>
-<table>
-<tbody>
-<tr>
-<td align="right">1.414</td>
-<td align="right">4.243</td>
-</tr>
-<tr>
-<td align="right">0.000</td>
-<td align="right">1.414</td>
-</tr>
-</tbody>
-</table>
-<pre><code class="language-r">S2 &lt;- matrix(c(2, 6, 6, 7), 2)
-eigen(S2)$values        # 有负特征值，不定
-</code></pre>
-<pre><code>#&gt; [1] 11 -2
-</code></pre>
-<p><strong>SVD 与伪逆</strong>（秩为 1 的 \(2 \times 3\) 矩阵， \(A\) 不可逆但有伪逆）：</p>
-<pre><code class="language-r">M &lt;- matrix(c(1, 2, 3,
-              2, 4, 6), 2, byrow = TRUE)
-s &lt;- svd(M)
-s$d                                    # 第二个奇异值（数值上）为 0
-</code></pre>
-<pre><code>#&gt; [1] 8.366600e+00 5.617334e-16
-</code></pre>
-<pre><code class="language-r">M_plus &lt;- MASS::ginv(M)
-M_plus
-</code></pre>
-<table>
-<tbody>
-<tr>
-<td align="right">0.014</td>
-<td align="right">0.029</td>
-</tr>
-<tr>
-<td align="right">0.029</td>
-<td align="right">0.057</td>
-</tr>
-<tr>
-<td align="right">0.043</td>
-<td align="right">0.086</td>
-</tr>
-</tbody>
-</table>
-<pre><code class="language-r">all.equal(M %*% M_plus %*% M, M)       # 伪逆的基本性质 A A^+ A = A
-</code></pre>
-<pre><code>#&gt; [1] TRUE
-</code></pre>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/@xiee/utils@1.14.37/js/fold-details.min.js" defer></script>
 <script src="https://cdn.jsdelivr.net/combine/npm/katex@0.16.47/dist/katex.min.js,npm/katex@0.16.47/dist/contrib/auto-render.min.js" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/@xiee/utils@1.14.37/js/render-katex.min.js" defer></script>
-<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-core.min.js" defer></script>
-<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js" defer></script>
 </body>
 </html>

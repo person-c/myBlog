@@ -15,7 +15,7 @@ output:
 #| label: setup
 #| include: false
 #| fig.path: NA
-# 需要的包：plotly（交互式三维图，仅 HTML 输出有效）；MASS（文末伪逆示例，R 自带）；svglite（SVG 图设备）
+# 需要的包：plotly（交互式三维图，仅 HTML 输出有效）；svglite（SVG 图设备）
 # litedown 用 reactor() 管理 chunk 选项，knitr::opts_chunk$set 无效（见 reference/litedown/docs/02-fuse.Rmd）
 # litedown 不走 htmlwidgets 框架，plotly 图改用 plotly.js 的 JS API 渲染（见 reference/litedown/docs/06-widgets.Rmd）
 # 设备必须用 svglite：cairo 的 svg() 把字形写成 <defs> 里的 id="glyph-*"，多张图内联进同一页时 id 冲突，
@@ -23,9 +23,10 @@ output:
 # 图内文字用衬线族、变量用斜体（font = 3，粗体斜体是 4）：这样图里的字母与旁边 KaTeX 排的图注
 # 观感一致。svglite 没有 family 参数，字体走它的 system_fonts 别名表——把默认族 sans 指向
 # Times New Roman，于是所有没特别指定的文字都是衬线；读者机器上没有这个字体时由浏览器回退
+# echo = FALSE：全篇只显示图，不显示画图的代码（与统计笔记一致）
 litedown::reactor(dev = "svglite::svglite",
                   dev.args = list(system_fonts = list(sans = "Times New Roman")),
-                  message = FALSE, warning = FALSE)
+                  message = FALSE, warning = FALSE, echo = FALSE)
 
 # 全文统一的颜色约定：b 黑色，a 蓝色，p（投影/拟合值）红色，e（误差）灰色虚线
 col_a <- "royalblue"; col_p <- "firebrick"; col_e <- "grey40"
@@ -498,8 +499,9 @@ fig <- plot_ly() %>%
                       xaxis = list(title = "x"), yaxis = list(title = "y"), zaxis = list(title = "z")),
          legend = list(orientation = "h"))
 
-# 验证：e 与平面内的每个方向（A 的每一列）都正交，即 A^{\mathrm{T}} e = 0
-round(crossprod(A, e), 10)
+# 自检：e 与平面内的每个方向（A 的每一列）都正交，即 A^T e = 0。
+# 用 stopifnot 而不是把结果打出来——这条检查只属于渲染过程，不该出现在页面上
+stopifnot(all(abs(crossprod(A, e)) < 1e-10))
 
 # 交给 plotly.js 的 JS API 渲染（litedown 不走 htmlwidgets），
 # 写法见 reference/litedown/examples/022-dygraphs.Rmd
@@ -959,52 +961,3 @@ panel(U %*% D %*% t(V) %*% circ, U %*% D, "UΣVᵀx = Mx")
 | $A = Q\Lambda Q^{\mathrm{T}}$ | 实对称矩阵 | 无（总可以） | 标准正交的特征向量 | 二次型、正定性 |
 | $A = U\Sigma V^{\mathrm{T}}$ | 任意矩阵 | 无（总可以） | 两组正交基之间的缩放 | 低秩逼近、伪逆 |
 | 若尔当标准形 | 复方阵 | 无（总可以） | 不能对角化时的最简形式 | 理论分析 |
-
-# 用 R 做数值验证
-
-下面用几个小例子验证前面的结论。
-
-**解方程组并检验**（开头的例子，解为 $x_1 = 2.2,\ x_2 = 1.2$）：
-
-```{r}
-A <- matrix(c(2, 3, 1, -1), 2, byrow = TRUE)
-b <- c(8, 1)
-x <- solve(A, b)
-x
-A %*% x   # 应等于 b
-```
-
-**最小二乘： $QR$ 分解与正规方程给出相同的解**（拟合直线 $y = c_0 + c_1 t$）：
-
-```{r}
-X <- cbind(1, c(0, 1, 2))
-y <- c(1, 2, 2)
-qr_X <- qr(X)
-Q <- qr.Q(qr_X); R <- qr.R(qr_X)
-all.equal(Q %*% R, X)                          # X = QR
-backsolve(R, t(Q) %*% y)                       # 解 R x = Q^{\mathrm{T}} y
-solve(t(X) %*% X, t(X) %*% y)                  # 正规方程，结果相同
-```
-
-**正定性判断**：
-
-```{r}
-S <- matrix(c(2, 6, 6, 20), 2)
-eigen(S)$values        # 全为正，说明正定
-chol(S)                # 能成功分解（R^{\mathrm{T}} R），也说明正定
-
-S2 <- matrix(c(2, 6, 6, 7), 2)
-eigen(S2)$values        # 有负特征值，不定
-```
-
-**SVD 与伪逆**（秩为 1 的 $2 \times 3$ 矩阵， $A$ 不可逆但有伪逆）：
-
-```{r}
-M <- matrix(c(1, 2, 3,
-              2, 4, 6), 2, byrow = TRUE)
-s <- svd(M)
-s$d                                    # 第二个奇异值（数值上）为 0
-M_plus <- MASS::ginv(M)
-M_plus
-all.equal(M %*% M_plus %*% M, M)       # 伪逆的基本性质 A A^+ A = A
-```
