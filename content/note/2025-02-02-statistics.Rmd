@@ -10,6 +10,37 @@ output:
       lang: "zh-CN"
 ---
 
+```{r}
+#| label: setup
+#| include: false
+#| fig.path: NA
+# 需要的包：ggplot2（画图）；svglite（SVG 图设备）
+# litedown 用 reactor() 管理 chunk 选项，knitr::opts_chunk$set 无效（见 reference/litedown/docs/02-fuse.Rmd）
+# 设备必须用 svglite：cairo 的 svg() 把字形写成 <defs> 里的 id="glyph-*"，多张图内联进同一页时 id 冲突，
+# 标题与坐标轴文字会错位重叠（roam 不内联，所以只看 roam 发现不了）。svglite 用 <text>、不写 id，详见 docs/litedown.md
+# 图内文字只写 ASCII 与希腊字母、上下标：svglite 按命名字体量文字宽度，中文要等浏览器回退字体，宽度对不上会串行
+# echo = FALSE 是全文默认：本笔记只显示图，不显示画图的代码（chunk 里写 echo: true 可单独覆盖，
+# 见 reference/litedown/docs/02-fuse.Rmd）。线代笔记的做法是把代码折叠起来（YAML 里的 js: ["@fold-details"]）
+litedown::reactor(dev = "svglite::svglite", message = FALSE, warning = FALSE, echo = FALSE)
+
+library(ggplot2)
+# 主题不写 theme_set()：check-fresh 在同一个 R 进程里依次渲染所有笔记，全局设置会漏给后面的笔记
+# 图内文字用衬线族、变量用斜体，接近旁边 KaTeX 图注的观感。族名只写通用的 serif：
+# 读者机器上没有 Times 时由浏览器回退到系统衬线体，而写字体会回退成无衬线
+# geom_text/annotate 不继承主题的 base_family，那些调用要单独传 family = font_fig
+font_fig <- "serif"
+theme_fig <- theme_minimal(base_size = 11, base_family = font_fig)
+
+# 颜色沿用线代笔记的约定：数据/黑，拟合或 a/蓝，p/红，辅助线或灰/灰
+col_a <- "royalblue"; col_p <- "firebrick"; col_g <- "grey40"
+```
+
+```{css, echo = FALSE}
+/* 图注里只能写 $$...$$（markdown 会把 \( \) 反转义成括号），这里把 KaTeX 的
+   display 版式压回行内，免得公式在图注句子里另起一行 */
+.caption .katex-display { display: inline-block; margin: 0; }
+```
+
 # 概率
 
 ## 1. 概率的哲学基础：数据生成过程
@@ -156,6 +187,62 @@ $P(A_1 \cap A_2 \cap ... \cap A_n) = P(A_1)P(A_2|A_1)P(A_3|A_1 \cap A_2) ... P(A
 
 > 贝叶斯更新过程的直观理解：这是一个信念迭代更新的循环。我们从一个初始的“先验”信念出发，当“新证据”出现时，我们利用“似然”来评估证据在不同假设下的支持度，最终得到一个融合了先验知识和新证据的、更可靠的“后验”信念——我们已知的条件是先验概率，以及似然概率；当结果 A 出现后就会更新我们的先验概率 $B_i$。
 
+下图把上面两条公式共用的图像画出来：样本空间 S 被分成互斥且穷尽的 $B_1, \dots, B_4$ 四块，每块的宽度就是 $P(B_i)$；事件 A 是横跨各块的那团蓝色区域，它落在第 $i$ 块里的部分就是分量 $A \cap B_i$，于是 $P(A)$ 是这四块分量之和。贝叶斯定理是同一张图的另一种读法——已知结果落在 A 里，问它来自哪一块。
+
+```{r}
+#| label: fig-total-prob
+#| fig.width: 5
+#| fig.height: 3.4
+#| fig.cap: "样本空间 $$S$$ 的一个分割与事件 $$A$$（蓝色椭圆）：竖线把 $$S$$ 分成互斥且穷尽的四块，画在椭圆内的线段为白色，$$A$$ 因此被分成四份，每份即 $$A \cap B_i$$"
+w <- c(.10, .20, .30, .40)                  # B1..B4 的宽度即各自的概率
+x1 <- cumsum(w); x0 <- c(0, head(x1, -1))
+# 事件 A 的配色：想换只改这两行（steelblue 与站点链接色同族，也和另外三张图的蓝一致）
+col_A <- "steelblue"; col_A_dark <- "steelblue4"
+# 四块只用白与浅灰相间：铺满灰色再叠颜色会发闷，白底上色才干净
+strips <- data.frame(xmin = x0, xmax = x1, lab = c("B₁", "B₂", "B₃", "B₄"),
+                     fill = c("white", "grey93", "white", "grey93"))
+
+# 事件 A 画成横跨整个样本空间的椭圆：四块怎么分它都同时落在四块里，A ∩ B_i 四份都非空
+#（画成圆就不行：正方形里最大的圆够不到最窄的那块）。面板宽高比定成 1:0.68 与 y 的取值域一致，
+# 数据单位在两个方向上等长，椭圆的胖瘦才是本意
+ytop <- .68
+cx <- .50; cy <- .34; rx <- .44; ry <- .26
+th <- seq(0, 2 * pi, length.out = 160)
+A <- data.frame(x = cx + rx * cos(th), y = cy + ry * sin(th))
+
+# 分隔线分两段画：椭圆内用白色（压在实心蓝上才看得清），椭圆外仍用灰色
+segs_in <- do.call(rbind, lapply(x0[-1], function(xb) {
+  dx <- (xb - cx) / rx
+  if (abs(dx) >= 1) return(NULL)
+  h <- ry * sqrt(1 - dx^2)
+  data.frame(x = xb, ymin = cy - h, ymax = cy + h, col = "white")
+}))
+segs_out <- do.call(rbind, lapply(x0[-1], function(xb) {
+  dx <- (xb - cx) / rx
+  h <- if (abs(dx) < 1) ry * sqrt(1 - dx^2) else 0
+  data.frame(x = xb, ymin = c(0, cy + h), ymax = c(cy - h, ytop), col = "grey75")
+}))
+segs <- rbind(segs_in, segs_out)
+
+ggplot() +
+  geom_rect(data = strips, aes(xmin = xmin, xmax = xmax, ymin = 0, ymax = ytop, fill = fill),
+            colour = "grey75", linewidth = .3) +
+  scale_fill_identity() +
+  # 椭圆画成基本实心：A 被切成四份靠白色分隔线读出来，不再靠透出来的底色
+  geom_polygon(data = A, aes(x, y), fill = col_A, alpha = .78, colour = col_A_dark, linewidth = .8) +
+  geom_segment(data = segs, aes(x = x, xend = x, y = ymin, yend = ymax, colour = col),
+               linewidth = .45) +
+  scale_colour_identity() +
+  geom_text(data = strips, aes(x = (xmin + xmax) / 2, y = .03, label = lab),
+            size = 3.5, colour = "grey25", fontface = "italic", family = font_fig) +
+  annotate("text", x = .03, y = ytop - .05, label = "S", size = 4, hjust = 0,
+           colour = "grey25", fontface = "italic", family = font_fig) +
+  annotate("text", x = cx, y = cy, label = "A", size = 4.5,
+           colour = "white", fontface = "italic", family = font_fig) +
+  coord_cartesian(xlim = c(0, 1), ylim = c(0, ytop), expand = FALSE) +
+  theme_void()
+```
+
 # 统计描述
 
 首先了解数据的频数分布,选用合适的集中以及离散趋势描述数据。
@@ -257,6 +344,57 @@ $P(A_1 \cap A_2 \cap ... \cap A_n) = P(A_1)P(A_2|A_1)P(A_3|A_1 \cap A_2) ... P(A
 - 若 $\left\{  X_i \right\}_{i=1}^n$ 独立同分布于 $N(0, 1)$, 那么 $\sum{X_i^2} \sim \chi^2(n)$, 其 $E(\chi^2) = n, Var(\chi^2) = 2n$.
 - 若有相互独立的 $\chi^2_1(m)$ 与 $\chi^2_2(n)$, 那么 $\frac{\frac{\chi_1^2}{m}}{\frac{\chi_2^2}{n}} \sim F(m, n).$
 - 若有 $X \sim \mathcal{N}(0, 1)$, 以及与之相互独立的 $\chi^2(n)$, 那么 $\frac{X}{\sqrt{\frac{\chi^2(n)}{n}}} \sim t(n)$
+
+三条构造对应的密度画在下面： $\chi^2$ 与 $F$ 都只取正值、向右偏，自由度越大越接近对称； $t$ 关于 $0$ 对称，自由度越大越贴近标准正态，图中的灰色虚线就是标准正态。同一族内，颜色由深到浅对应自由度增大。
+
+```{r}
+#| label: fig-sampling-dist
+#| fig.width: 8
+#| fig.height: 3.6
+#| fig.cap: "$$\chi^2(n)$$、$$F(m, n)$$ 与 $$t(n)$$ 的密度：同族内颜色由深到浅对应自由度增大，$$t$$ 面板中的灰色虚线是标准正态"
+xs_pos <- seq(0, 15, length.out = 400)      # χ² 与 F 只在正半轴
+xs_sym <- seq(-5, 5, length.out = 400)      # t 与标准正态对称
+
+dens <- rbind(
+  do.call(rbind, lapply(c(2, 5, 10), function(k)
+    data.frame(panel = "χ²(n)", lab = paste0("χ²: n = ", k),
+               x = xs_pos, y = dchisq(xs_pos, k)))),
+  do.call(rbind, lapply(list(c(2, 10), c(10, 20)), function(k)
+    data.frame(panel = "F(m, n)", lab = paste0("F: (", k[1], ", ", k[2], ")"),
+               x = xs_pos, y = df(xs_pos, k[1], k[2])))),
+  do.call(rbind, lapply(c(1, 5), function(k)
+    data.frame(panel = "t(n)", lab = paste0("t: n = ", k),
+               x = xs_sym, y = dt(xs_sym, k))))
+)
+dens$lab <- factor(dens$lab, levels = c("χ²: n = 2", "χ²: n = 5", "χ²: n = 10",
+                                        "F: (2, 10)", "F: (10, 20)",
+                                        "t: n = 1", "t: n = 5"))
+fam <- c("χ²: n = 2" = "firebrick4", "χ²: n = 5" = "firebrick3", "χ²: n = 10" = "firebrick2",
+         "F: (2, 10)" = "grey30", "F: (10, 20)" = "grey60",
+         "t: n = 1" = "royalblue4", "t: n = 5" = "royalblue2")
+
+ref <- data.frame(panel = "t(n)", x = xs_sym, y = dnorm(xs_sym))   # 参照线：标准正态
+ref_lab <- data.frame(panel = "t(n)", x = -3.8, y = .30, lab = "N(0, 1)")
+
+# 面板按 χ²、F、t 排列（facet 默认按字母序，会排成 F、t、χ²）
+lvl <- c("χ²(n)", "F(m, n)", "t(n)")
+dens$panel <- factor(dens$panel, levels = lvl)
+ref$panel <- factor(ref$panel, levels = lvl)
+ref_lab$panel <- factor(ref_lab$panel, levels = lvl)
+
+ggplot(dens, aes(x, y)) +
+  geom_line(aes(colour = lab), linewidth = .6) +
+  geom_line(data = ref, aes(x, y), linetype = "dashed", colour = col_g) +
+  # annotate() 会画进每个面板，参照线的文字必须以带 panel 列的数据传进来
+  geom_text(data = ref_lab, aes(x, y, label = lab), inherit.aes = FALSE,
+            size = 3, colour = col_g, hjust = 0, fontface = "italic", family = font_fig) +
+  facet_wrap(~ panel, scales = "free") +
+  scale_colour_manual(values = fam, name = NULL) +
+  labs(x = NULL, y = "density") +
+  theme_fig +
+  theme(legend.text = element_text(face = "italic"),
+        strip.text = element_text(face = "italic"))   # 面板标题也是变量，跟图例一样用斜体
+```
 
 ::: {#thm-th1}
 
@@ -746,6 +884,36 @@ $F = \frac{H/(a-1)}{(N-1-H)/(N-a)}$
 
 其中 $S = \sqrt{MS_{\text{residuals}}}$, $t_{\alpha, \nu}$ 为双侧界值, $\nu = n - 2$。
 
+下面把这两个式子画在一起：蓝线是拟合的回归直线，窄的蓝色带是总体均值 $\mu_{Y|X_0}$ 的置信带（第一个式子），宽的灰色带是单个新观测 $Y_0$ 的预测带（第二个式子）。两个式子只差根号里多出的那个 $1$，图上就是两条带一宽一窄的差别；两条带都在 $X$ 远离 $\bar{X}$ 时变宽——回归线在自变量取中部时最可靠。
+
+```{r}
+#| label: fig-reg-band
+#| fig.width: 5.4
+#| fig.height: 3.6
+#| fig.cap: "回归的均值响应置信带（蓝色窄带）与个体预测带（灰色宽带）：两者都在 $$X$$ 远离均值处变宽"
+set.seed(1)                                 # 固定种子：重渲染不应改动画上的数字
+n <- 24
+x <- seq(1, 10, length.out = n)
+y <- 2 + 1.3 * x + rnorm(n, sd = 1.6)
+fit <- lm(y ~ x)
+
+xg <- data.frame(x = seq(1, 10, length.out = 80))
+ci <- cbind(xg, predict(fit, xg, interval = "confidence"))   # 均值响应的置信带
+# 变量名不要覆盖 base 里的名字：check-fresh 与 render-force 在同一个 R 进程里依次渲染所有
+# 笔记，泄漏过去的变量会让后面的笔记失败（本行曾写作 pi，线代笔记的 seq(0, 2*pi) 随即拿到
+# 数据框，报 'to' must be of length 1）
+band_pi <- cbind(xg, predict(fit, xg, interval = "prediction"))   # 个体预测带，多一个 1
+
+ggplot() +
+  geom_ribbon(data = band_pi, aes(x, ymin = lwr, ymax = upr), fill = "grey70", alpha = .50) +
+  geom_ribbon(data = ci, aes(x, ymin = lwr, ymax = upr), fill = col_a, alpha = .35) +
+  geom_line(data = ci, aes(x, fit), colour = col_a, linewidth = .7) +
+  geom_point(data = data.frame(x = x, y = y), aes(x, y), size = 1.1) +
+  labs(x = "x", y = "y") +
+  theme_fig +
+  theme(axis.title = element_text(face = "italic"))   # x、y 是变量，按 LaTeX 的习惯用斜体
+```
+
 利用上面的第二个式子可以进行统计控制,即如果想要将 $Y$ 控制在一定范围,则可以通过控制 $X$ 将个体预测值控制在一定范围之中。注意,这是用 $X$ 去控制 $Y$ 的反向应用,隐含了 $X$ 对 $Y$ 具有因果作用这一前提; 若 $X$ 与 $Y$ 之间只有预测关系,干预 $X$ 未必能改变 $Y$。
 
 # 关于假设检验中若干问题
@@ -769,6 +937,50 @@ $F = \frac{H/(a-1)}{(N-1-H)/(N-a)}$
 ## I and II type error and power
 
 $H_0$ 没有差异为阴性结果, $H_1$ 为具有差异,阳性结果。I 型错误是 $H_0$ 为真时拒绝 $H_0$ 所犯的错误,其概率为 $\alpha$; II 型错误是 $H_1$ 为真时不拒绝 $H_0$ 所犯的错误,其概率为 $\beta$。 $1 - \beta$ 即为检验功效,即在 $H_1$ 为真的情况下,在指定的 $\alpha$ 检出其存在差异的概率,类似于诊断试验中的敏感度(sensitivity).
+
+下图按双侧检验把这三者的关系画出来：黑线是 $H_0$ 下统计量的分布，蓝线是 $H_1$ 下的分布，两条虚线是 $\pm c$（临界值）。 $H_0$ 的两条红色尾部各是 $\alpha/2$，两侧合计才是 $\alpha$； $H_1$ 落在两条临界值之间的灰色部分是 $\beta$，落在它们之外的浅蓝色部分是功效 $1 - \beta$（左侧那块面积极小，图上几乎看不见）。把临界值往外移（检验标准更严）， $\alpha$ 变小而 $\beta$ 变大：两者此消彼长，要同时改善只能增大样本量（两条曲线变窄）或增大真实的差异。
+
+```{r}
+#| label: fig-power
+#| fig.width: 5.6
+#| fig.height: 3.4
+#| fig.cap: "$$H_0$$（黑）与 $$H_1$$（蓝）下统计量的分布（双侧检验）：两侧尾部各为 $$\alpha/2$$，$$H_1$$ 在两条临界值之间的灰色部分是 $$\beta$$，其外的浅蓝色部分即功效 $$1 - \beta$$"
+se <- .5                            # 样本均值的标准误
+mu1 <- 1.2                          # H1 下的均值偏离 1.2 个标准误
+crit <- qnorm(.975, 0, se)          # 双侧检验的临界值：两侧各 α/2 = 0.025
+beta_err <- pnorm(crit, mu1, se) - pnorm(-crit, mu1, se)   # β = H1 为真时统计量落在两条临界值之间（不叫 beta，免得盖掉 base 的函数）
+
+xs <- seq(-2.5, 3.5, length.out = 500)
+d <- data.frame(x = xs, h0 = dnorm(xs, 0, se), h1 = dnorm(xs, mu1, se))
+
+ggplot(d, aes(x)) +
+  # α/2：H0 的两条尾部各占一半，双侧检验的拒绝域
+  geom_area(data = subset(d, x >= crit), aes(y = h0), fill = col_p, alpha = .40) +
+  geom_area(data = subset(d, x <= -crit), aes(y = h0), fill = col_p, alpha = .40) +
+  # β：H1 落在两条临界值之间（即不拒绝 H0 的那部分）
+  geom_area(data = subset(d, x >= -crit & x <= crit), aes(y = h1), fill = "grey50", alpha = .35) +
+  # 1 − β：H1 落在两条临界值之外。必须拆成两个图层：同一个 geom_area 里放两段不连续的
+  # x，中间的空档会被一条斜边连起来，左半边会凭空多出一大块。左侧那块面积极小（约 6e-6）
+  geom_area(data = subset(d, x >= crit), aes(y = h1), fill = col_a, alpha = .35) +
+  geom_area(data = subset(d, x <= -crit), aes(y = h1), fill = col_a, alpha = .35) +
+  geom_line(aes(y = h0), colour = "black", linewidth = .7) +
+  geom_line(aes(y = h1), colour = col_a, linewidth = .7) +
+  geom_vline(xintercept = c(-crit, crit), linetype = "dashed", colour = col_g, linewidth = .4) +
+  annotate("text", x = crit + .30, y = .10, label = "α/2", size = 4.5,
+           colour = col_p, fontface = "italic", family = font_fig) +
+  annotate("text", x = -crit - .30, y = .05, label = "α/2", size = 4.5,
+           colour = col_p, fontface = "italic", family = font_fig) +
+  annotate("text", x = .45, y = .11, label = "β", size = 4.5,
+           colour = col_g, fontface = "italic", family = font_fig) +
+  annotate("text", x = 2.0, y = .10, label = "1 − β", size = 4.5,
+           colour = col_a, fontface = "italic", family = font_fig) +
+  annotate("text", x = crit, y = .86, label = "c", size = 3.5,
+           fontface = "italic", family = font_fig) +
+  annotate("text", x = -crit, y = .86, label = "−c", size = 3.5,
+           fontface = "italic", family = font_fig) +
+  labs(x = "statistic", y = "density") +
+  theme_fig
+```
 
 ## 统计量分布计算的Bootstrap以及置换检验
 
