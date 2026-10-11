@@ -247,7 +247,68 @@ NOTE： $U \rightarrow R$ 只需要行变换。如果为了写成上面的标准
 | 行空间 | $C(A^{\mathrm{T}})$ | $\mathbb{R}^n$ | $r$ | $R$ 的前 $r$ 行 |
 | 左零空间 | $N(A^{\mathrm{T}})$ | $\mathbb{R}^m$ | $m-r$ | $E$ 中对应 $R$ 零行的那些行 |
 
-![矩阵 $A$ 的四个基本子空间](../../static/images-note/four_subspace.png)
+```{r}
+#| label: fig-four-subspaces
+#| fig.width: 8
+#| fig.height: 4.6
+#| fig.cap: "四个基本子空间（以 $$m = 6$$、$$n = 7$$、$$r = 4$$ 为例，各块面积与维数成正比）：左为 $$\mathbb{R}^n$$，行空间与零空间互为正交补；右为 $$\mathbb{R}^m$$，列空间与左零空间互为正交补"
+# 四个子空间的大小要正比于各自的维数（按面积算）：行空间与列空间同为 r 所以一样大，
+# 零空间是 n − r、左零空间是 m − r，各自不同。菱形面积 = 2d²，故半对角线 d ∝ √维数。
+# 取一个具体例子：m = 6、n = 7、r = 4（图注里写明）
+m <- 6; n <- 7; r <- 4
+d_of <- function(dim) 1.25 * sqrt(dim / r)
+d_row <- d_of(r); d_col <- d_of(r); d_null <- d_of(n - r); d_lnull <- d_of(m - r)
+
+# 每个子空间画成一个旋转 45° 的正方形（菱形），同一个空间里的两块只在一个顶点相接：
+# 接触点上四条边的夹角恰是直角（边长不同也仍是直角），正交就画在这里；两块若重叠成一片，
+# 这个意思就读不出来了
+mx1 <- 2.8; mx2 <- 7.2; my <- 2.9              # 左右两个"空间原点"（两块相接的那个顶点）
+diamond <- function(cx, cy, d, col = col_a, lwd = 1.5) {
+  polygon(c(cx, cx + d, cx, cx - d), c(cy - d, cy, cy + d, cy), border = col, lwd = lwd)
+}
+
+# 面板上的 R 与它的上标分开画：Unicode 的上标 n、m（U+207F、U+1D50）在 svglite 用的字体里没有，
+# 直接写会渲染成豆腐块；分开画一个小的、抬高的字母最稳妥
+rsup <- function(x, y, s) {
+  text(x - 0.05, y, "R", font = 2, cex = 1.15)
+  text(x + 0.14, y + 0.15, s, cex = 0.8)
+}
+
+par(mar = c(0.5, 0.5, 0.5, 0.5))
+plot(NA, xlim = c(0, 10), ylim = c(0, 5.75), asp = 1, axes = FALSE, xlab = "", ylab = "")
+
+# ---- 左：R^n = 行空间 ⊕ 零空间 ----
+diamond(mx1, my + d_row, d_row)
+diamond(mx1, my - d_null, d_null)
+text(mx1, my + d_row + 0.30, "Row space", font = 2, col = col_a, cex = 0.9)
+text(mx1, my + d_row - 0.10, "all Aᵀy", cex = 0.9)
+rsup(mx1 - 0.35, my, "n")         # 接触点左右两侧上下两块都占不到，正好放 R^n 与垂直标注
+text(mx1 + 0.25, my + 0.12, "Perpendicular", adj = 0, cex = 0.85)
+text(mx1 + 0.25, my - 0.17, "xᵀ(Aᵀy) = 0", adj = 0, cex = 0.85)
+text(mx1, my - d_null + 0.45, "x in", font = 2, col = col_a, cex = 0.9)
+text(mx1, my - d_null, "Nullspace", font = 2, col = col_a, cex = 0.9)
+text(mx1, my - d_null - 0.45, "Ax = 0", cex = 0.9)
+text(0.30, my + d_row + 0.50, "C(Aᵀ)", font = 2, adj = 0)
+text(0.30, my - d_null - 0.50, "N(A)", font = 2, adj = 0)
+text(0.30, my + d_row, "dim r", adj = 0, cex = 0.9)
+text(0.30, my - d_null, "dim n − r", adj = 0, cex = 0.9)
+
+# ---- 右：R^m = 列空间 ⊕ 左零空间 ----
+diamond(mx2, my + d_col, d_col)
+diamond(mx2, my - d_lnull, d_lnull)
+text(mx2, my + d_col + 0.30, "Column space", font = 2, col = col_a, cex = 0.9)
+text(mx2, my + d_col - 0.10, "all Ax", cex = 0.9)
+rsup(mx2 + 0.35, my, "m")
+text(mx2 - 0.25, my + 0.12, "Perpendicular", adj = 1, cex = 0.85)
+text(mx2 - 0.25, my - 0.17, "yᵀ(Ax) = 0", adj = 1, cex = 0.85)
+text(mx2, my - d_lnull + 0.42, "y in", font = 2, col = col_a, cex = 0.9)
+text(mx2, my - d_lnull, "Nullspace of Aᵀ", font = 2, col = col_a, cex = 0.9)
+text(mx2, my - d_lnull - 0.42, "Aᵀy = 0", cex = 0.9)
+text(9.70, my + d_col + 0.50, "C(A)", font = 2, adj = 1)
+text(9.70, my - d_lnull - 0.50, "N(Aᵀ)", font = 2, adj = 1)
+text(9.70, my + d_col, "dim r", adj = 1, cex = 0.9)
+text(9.70, my - d_lnull, "dim m − r", adj = 1, cex = 0.9)
+```
 
 其中 $\dim C(A) + \dim N(A) = r + (n-r) = n$，这就是 **秩-零化度定理**（rank–nullity theorem）。
 
