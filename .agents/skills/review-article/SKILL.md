@@ -152,7 +152,7 @@ Rscript scripts/check-meta.R <file>   # front matter (directive 3.3)
 Rscript scripts/check-render.R <file> # rendered .Rmd pages: TeX parse, leaked '$', TOC, figures
 ```
 
-Everything they report is a P0 item. Math problems are fixed in the `.Rmd`, never only in the rendered `.html`. `check-render.R` reads the sibling `.html`, so it needs the page to exist; it lints the formulas the browser will actually feed to KaTeX, which is the only place a missing brace or `\left` without `\right` shows up.
+Everything they report as a failure is a P0 item. A `warn` line from `check-render.R` is graded by its effect: a figure without a caption is `[Clarity]`, a loaded `@fold-details` with nothing to fold is `[Suggestion]`. Math problems are fixed in the `.Rmd`, never only in the rendered `.html`. `check-render.R` reads the sibling `.html`, so it needs the page to exist; it lints the formulas the browser will actually feed to KaTeX, which is the only place a missing brace or `\left` without `\right` shows up.
 
 #### Step 1: Add Executive Summary at the top
 
