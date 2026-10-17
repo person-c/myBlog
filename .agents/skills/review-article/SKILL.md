@@ -4,10 +4,12 @@ description: |-
   Review an article in this Hugo blog (content/blog, content/note, content/slides, content/ramblings) and annotate it in place with evidence-based critiques, then print a P0–P3 summary.
   TRIGGER — use whenever the user says 审查文章 / 审稿 / review, names an article or file path to check, or asks to critique or proofread an article before publishing.
   It runs the deterministic checks first (scripts/check-math.R, scripts/check-meta.R), writes [Accuracy]/[Clarity]/[Suggestion]/[Kudos]/[Question] annotation blocks into the source file, and keeps the review itself out of the terminal.
-  SKIP for reviewing a code diff (use code-review) and for writing a new article from scratch.
+  SKIP for reviewing a code diff and for writing a new article from scratch.
 ---
 
 # Review an article
+
+> This is the canonical, tool-neutral workflow (Open Agent Skills format). Any agent that can read files can follow it; no vendor-specific skill mechanism is required.
 
 Act as a meticulous, exacting reviewer — a senior researcher and technical editor. The defining characteristic: **every critique is evidence-based**. State the principle from a canonical source before applying it, and downgrade to `[Suggestion]` when no authoritative source can be found. The citation protocol and the tier lists are in `references/sources.md`.
 
@@ -48,7 +50,7 @@ The per-language checklists (R, Python) and the front-matter rules are in `refer
 
 ## Workflow
 
-**CRITICAL — Do NOT output the review in the terminal.** Edit the original file directly with the Edit tool. Insert annotations as styled HTML blocks that render with a red left border and proper paragraph separation. Only after all edits, output a brief 2-3 sentence summary in the terminal.
+**CRITICAL — Do NOT output the review in the terminal.** Edit the original source file directly, with whatever file-editing tool the agent provides. Insert annotations as styled HTML blocks that render with a red left border and proper paragraph separation. Only after all edits, output a brief 2-3 sentence summary in the terminal.
 
 **Scope:** Annotate EVERY substantive issue (factual errors, formula mistakes, incomplete proofs, missing assumptions, structural problems, unclear logic). The only things you may fix silently without annotation are: spelling mistakes, punctuation errors, and grammar fixes.
 
@@ -210,6 +212,6 @@ After the terminal summary, run the preview script and report the URL it prints.
 sh scripts/preview.sh <reviewed-file>     # a directory works too
 ```
 
-- The preview must be rooted at the directory of the **reviewed article**, and only one server should run at a time. If the script reports that another directory is being served (exit 2), stop that server first (`TaskStop`), then run it again.
+- The preview must be rooted at the directory of the **reviewed article**, and only one server should run at a time. If the script reports that another directory is being served (exit 2), stop that server first, then run it again.
 - `<...>/x.html` serves the on-disk `.html` byte-for-byte — the page the site publishes. Do **not** append `?preview=1` (roam's own listing does): that makes roam render the file as a document, which escapes the whole page. `<...>/x.Rmd` serves the source text.
 - roam is litedown, not Hugo: no shortcodes, no theme. A `.md` page still needs `hugo server` as the last check before publishing.

@@ -10,6 +10,7 @@
 #   * the dead `paginate` config key -> Hugo ignores it and uses its own default
 #   * a malformed workflow YAML -> only discovered when GitHub runs it
 #   * a missing robots.txt -> the sitemap goes undeclared
+#   * a broken AGENTS.md import -> a coding agent silently gets no project rules
 #
 # Usage: Rscript scripts/check-repo.R
 # Exit status: 0 = all invariants hold, 1 = findings.
@@ -24,7 +25,7 @@ warn <- function(...) { cat("   ", ..., "\n", sep = ""); n_warn <<- n_warn + 1L 
 ok <- function(...) cat("   ", ..., " ok\n", sep = "")
 
 # content/ramblings is a gitlink whose files are not in this repository at all
-# (see CLAUDE.md).  Its _index.md only exists in a working copy that still has the
+# (see AGENTS.md).  Its _index.md only exists in a working copy that still has the
 # submodule, and the section is excluded from production builds -- so a dead
 # layout there is reported, not failed, until the submodule question is settled.
 SUBMODULE_PATHS <- "content/ramblings"
@@ -84,6 +85,30 @@ if (!file.exists(".github/workflows/content-checks.yml")) fail("content-checks.y
 # ---- static assets ----------------------------------------------------------
 cat("== static assets ==\n")
 if (file.exists("static/robots.txt")) ok("static/robots.txt") else fail("static/robots.txt missing (sitemap undeclared)")
+
+# ---- agent instruction files ------------------------------------------------
+# AGENTS.md is the single source of truth.  CLAUDE.md is a thin adapter that
+# imports it, and the review workflow lives in .agents/skills/ so every agent
+# can find it.  A broken pointer is silent: the tool simply loads no
+# project rules, which looks the same as a project that has none.
+cat("== agent instruction files (AGENTS.md is the source of truth) ==\n")
+rd <- function(f) if (file.exists(f)) xfun::read_utf8(f) else character()
+for (f in c("AGENTS.md", "CLAUDE.md")) {
+  if (length(rd(f)) > 0) ok(f, " exists") else fail(f, " MISSING or empty")
+}
+if (any(grepl("^@AGENTS\\.md[[:space:]]*$", rd("CLAUDE.md")))) {
+  ok("CLAUDE.md imports @AGENTS.md")
+} else fail("CLAUDE.md does not import @AGENTS.md -- Claude Code would miss the shared rules")
+skill <- ".agents/skills/review-article/SKILL.md"
+sk <- rd(skill)
+if (length(sk) > 0 &&
+    any(grepl("^name:[[:space:]]*review-article[[:space:]]*$", sk)) &&
+    any(grepl("^description:", sk))) {
+  ok(skill, " (name/description front matter)")
+} else fail(skill, " MISSING or lacks the required name/description front matter")
+if (any(grepl(".agents/skills/review-article/SKILL.md", rd("AGENTS.md"), fixed = TRUE))) {
+  ok("AGENTS.md points at the review workflow")
+} else fail("AGENTS.md does not point at .agents/skills/review-article/SKILL.md")
 
 cat(sprintf("\n%d invariant(s) broken, %d warning(s)\n", n_bad, n_warn))
 if (n_bad > 0) quit(status = 1)

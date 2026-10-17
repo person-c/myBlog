@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 
 # Check the YAML front matter of content files (.md for Hugo, .Rmd for litedown).
-# See .claude/skills/review-article/references/code-checks.md (front matter rules).
+# See .agents/skills/review-article/references/code-checks.md (front matter rules).
 #
 # Usage: Rscript scripts/check-meta.R [file-or-dir ...]      (default: content)
 # Exit status: 0 = no errors, 1 = errors.  Informational notes do not fail.

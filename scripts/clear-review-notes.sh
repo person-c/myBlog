@@ -17,7 +17,7 @@
 #
 # An annotation is a <div> whose opening tag carries class="review-note" or the
 # palette signature of the review templates (border-left: 4px solid #<palette>).
-# See .claude/skills/review-article/SKILL.md.
+# See .agents/skills/review-article/SKILL.md.
 #
 # Caveat: an annotation must not contain a nested <div>, or the removal stops at
 # the inner </div> -- keep quoted HTML inside fenced code blocks instead.

@@ -25,7 +25,7 @@ jobs:
       - name: Annotations that are public (in .md)
         run: |
           if ! sh scripts/clear-review-notes.sh --published; then
-            echo "::notice title=Published annotations::Annotation blocks in .md files are rendered on the site (intentional -- see CLAUDE.md)."
+            echo "::notice title=Published annotations::Annotation blocks in .md files are rendered on the site (intentional -- see AGENTS.md)."
           fi
 
       - name: Annotations in the sources (.Rmd)

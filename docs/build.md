@@ -1,6 +1,6 @@
 # build, checks and this checkout's quirks
 
-Reference material for how this repo is built and checked. `CLAUDE.md` keeps the
+Reference material for how this repo is built and checked. `AGENTS.md` keeps the
 project-level rules and points here; the detail behind those rules — the Makefile
 targets, what each checker can and cannot see, and the environment problems this
 particular checkout has — lives here.
