@@ -2,6 +2,13 @@
 
 > **Agent instruction files.** This file is the single source of truth and is read natively by most coding agents (Codex, Cursor, GitHub Copilot, Windsurf, Aider, …). `CLAUDE.md` (Claude Code) is a thin adapter that imports it. The article-review workflow lives in `.agents/skills/review-article/` (Open Agent Skills format), so any agent can discover and follow it. Edit the rules here — never duplicate them into the adapters.
 
+## 改动纪律
+
+- **只做被明确要求的事。** 用户点名范围之外的文件、句子、格式一律不动：不补措辞、不修"顺手看到"的小错、不重构、不做"既然来了就一起"的改动。
+- **发现问题先报告，等同意再解决。** 报告写成"问题 / 建议 / 影响 / 需要你确认什么"，然后停下。即使当前任务因此做不下去（构建失败、检查不通过），也先报告等指示，不自行修复。
+- **一次授权只覆盖一次。** 之前批准过的方案、同类问题的处理，不自动延伸到新出现的另一处；下一处重新确认。
+- **报告能对上账。** 每条改动都要能追溯到用户一句具体的请求；报告分"已改（对应哪句要求）/ 建议但未改 / 未触碰"三栏，让用户清楚你具体做了什么。
+
 ## Project Overview
 
 Hugo-based personal blog using theme [Nothing](https://github.com/person-c/Nothing) (self-built, imported as a Hugo Module — the pinned version lives in `go.mod`), deployed on Vercel (https://cying.org).
