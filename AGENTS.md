@@ -70,6 +70,7 @@ Pipeline facts worth remembering:
 - **Annotation language: Chinese.** Annotation blocks and the review summary are written in Chinese; quoted source text stays as it is.
 - **Notation: consistent within an article — and an article that is already self-consistent keeps its own choice** (see the convention note in `.agents/skills/review-article/references/sources.md`). Do not rewrite notation wholesale; flag mixing as `[Clarity]` and name both forms.
 - **Annotations** carry `class="review-note"`, and publishing them is intentional — some articles are meant to show the review notes so readers can judge the author's and the AI's views side by side. Raw HTML passes through litedown untouched (verified), so an annotation in a `.Rmd` reaches the page as soon as that `.Rmd` is re-rendered, and in a `.md` file Hugo renders it via `unsafe = true` — either way, a committed annotation is a published one. Use `scripts/clear-review-notes.sh` when the clean version is wanted; `.github/workflows/annotation-guard.yml` just reports what is public.
+- **Math in annotations:** Formulas intended to be rendered by KaTeX must be written as standard `$formula$` or `$$...$$` with proper whitespace protection, **never** wrapped in code backticks (e.g. write `$c = \binom{k}{2}$`, never `` `$c = \binom{k}{2}$` `` — backticks compile to `<code>`, which KaTeX skips, leaving raw LaTeX in the browser). Reserve code backticks strictly for quoting broken/malformed snippets (e.g. `` `t_b \pm` ``).
 
 | Convention | Adopted form |
 | --- | --- |
