@@ -1,0 +1,1701 @@
+---
+title: "Highlights of Calculus"
+date: "2024-08-07"
+output:
+  html:
+    options:
+      toc:
+        depth: 3
+    meta:
+      lang: "zh-CN"
+---
+
+```{r}
+#| label: setup
+#| include: false
+#| fig.path: NA
+# litedown 用 reactor() 管理 chunk 选项，knitr::opts_chunk$set() 在 litedown 下无效（见 reference/litedown/docs/02-fuse.Rmd）
+# 设备必须用 svglite：cairo 的 svg() 把字形写成 <defs> 里的 id="glyph-*"，多张图内联进同一页时 id 冲突，
+# 标题与坐标轴文字会错位重叠（roam 不内联，所以只看 roam 发现不了）。svglite 用 <text>、不写 id，详见 docs/litedown.md
+# 图内文字用衬线族：把默认族 sans 指向 Times New Roman，读者机器上没有这个字体时由浏览器回退到系统衬线体。
+# 图内只写 ASCII 与希腊字母——svglite 按命名字体量文字宽度，中文要等浏览器回退字体，宽度对不上会串行
+# echo = FALSE：全篇不显示代码（与统计、线代笔记一致）
+litedown::reactor(dev = "svglite::svglite",
+                  dev.args = list(system_fonts = list(sans = "Times New Roman")),
+                  echo = FALSE, message = FALSE, warning = FALSE)
+```
+
+# 前言
+
+这篇笔记整理的是 Strang 的 *Highlights of Calculus*（MIT OCW 系列讲座）：不追求把微积分的每一个技巧都讲到，只讲最核心的那一批函数、法则和定理，以及它们之间的联系。
+
+## 一条主线
+
+微积分处理的是两件事：变化与累积。
+
+- 导数是局部的变化率，它给出一个函数在一点附近最好的线性近似： $f(a + h) \approx f(a) + f'(a)h$。
+- 积分把局部的变化累加成整体的变化。微积分基本定理说，这两个操作互为逆运算。
+- 一次近似不够时，就用多项式去逼近（泰勒级数）。多项式是最容易计算的一类函数。
+- 变化率与当前状态成比例（ $y' = cy$ ）的系统，给出了指数函数，微分方程把这些放在一起。
+
+所以全篇可以看成四层：
+
+1. 差分与求和（代数）取极限，得到导数与积分（微积分）。
+2. 六个函数、六条法则：怎样求出任何一个函数的导数。
+3. 近似（线性、多项式）与方程（微分方程）：怎样用导数去做事。
+4. 多元函数与机器学习：梯度、Jacobian、Hessian，反向传播与优化。前三层是一元的，第四层把它们推广到多个变量，这是机器学习用到的微积分。
+
+## 与另外几篇笔记的联系
+
+- 线性代数笔记：求导是函数空间上的线性变换， $e^{\lambda x}$ 是它的特征函数，所以线性微分方程 $\mathbf{u}' = A\mathbf{u}$ 的解是 $e^{At}\mathbf{u}(0)$。多元函数的二阶导数是 Hessian 矩阵，正定性决定极小点。
+- 概率统计笔记：密度函数的积分就是概率，泰勒展开给出 delta 方法，对数变换与对数似然都来自对数函数。
+- 聚类与降维笔记：t-SNE、UMAP 的优化都是梯度下降；在最优点附近的局部收敛速度受 Hessian 条件数影响（非凸问题还会遇到鞍点与平台）。
+
+
+
+- 机器学习：本笔记后半部分专门整理需要的多元微积分，包括梯度与链式法则（反向传播）、Hessian 与凸性、梯度下降及其变体，以及逻辑回归、softmax 等典型模型的推导。
+
+## 本笔记的路线
+
+一元部分：
+
+1. 极限与连续：“Δx → 0”到底是什么意思，不定式与洛必达法则。
+2. 导数与积分：从差分到导数，微积分基本定理，二阶导数与极值。
+3. 基本函数的导数：指数、正弦、余弦、幂函数，乘积与商的法则。
+4. 链式法则与反函数：对数、反三角函数的导数。
+5. 增长速度与对数坐标。
+6. 线性近似与牛顿法。
+7. 幂级数与欧拉公式：泰勒级数，用多项式近似函数。
+8. 微分方程：增长、运动、非线性方程与方程组。
+9. 六个函数、六条法则、六个定理：一元部分的总览。
+
+多元部分（面向机器学习）：
+
+10. 多元函数：偏导数、梯度、方向导数、Jacobian 与多元链式法则。
+11. 矩阵微积分与常用梯度公式。
+12. 链式法则与反向传播：前向与反向模式，自动微分，梯度消失。
+13. 二阶导数：Hessian、多元泰勒展开、极值判别、凸性与条件数。
+14. 梯度下降与优化：步长、收敛速度、牛顿法、动量与 Adam、SGD、拉格朗日乘子。
+15. 机器学习中的典型推导：线性回归、逻辑回归、softmax、正则化。
+16. 多重积分与概率：变量替换、密度变换、蒙特卡洛、对期望求导。
+
+最后：
+
+17. 更多视角：从一元到多元、线性映射与特征函数、积分与概率统计、数值计算，以及微积分与线性代数的对照。
+
+
+
+
+# 极限与连续
+
+> **本章的问题：** 导数和积分都是“ $\Delta x \rightarrow 0$ ”的结果。“趋于”在数学上到底是什么意思，遇到 $\frac{0}{0}$ 这类式子又该怎么办？
+
+## 极限的 ε-δ 定义
+
+$\lim_{x \rightarrow a} f(x) = L$ 的意思是：不管要求 $f(x)$ 离 $L$ 多近（误差 $\epsilon$ 多小），总能找到一个 $x$ 离 $a$ 的范围 $\delta$，只要 $x$ 在这个范围内， $f(x)$ 就满足这个要求。
+
+$$\text{对任意 } \epsilon > 0, \text{ 存在 } \delta > 0, \text{ 使得 } 0 < \lvert x - a \rvert < \delta \Rightarrow \lvert f(x) - L \rvert < \epsilon$$
+
+要注意顺序：先给定 $\epsilon$，再去找 $\delta$， $\delta$ 一般依赖于 $\epsilon$。去掉 $0 < \lvert x - a \rvert$ 中的“ $0 <$ ”并且取 $L = f(a)$，就得到 **连续** 的定义：
+
+$$\text{对任意 } \epsilon > 0, \text{ 存在 } \delta > 0, \text{ 使得 } \lvert x - a \rvert < \delta \Rightarrow \lvert f(x) - f(a) \rvert < \epsilon$$
+
+例如证明 $\lim_{x \rightarrow 2}(3x - 1) = 5$：
+
+$$\lvert (3x - 1) - 5 \rvert = 3\lvert x - 2 \rvert < \epsilon \quad \text{只要} \quad \lvert x - 2 \rvert < \frac{\epsilon}{3}$$
+
+所以取 $\delta = \epsilon/3$ 即可。
+
+```{r}
+#| label: fig-epsilon-delta
+#| fig.width: 4.8
+#| fig.height: 3.5
+#| fig.cap: "极限的 ε-δ 图示（f(x) = 3x - 1，a = 2，L = 5）。红色带是要求的误差范围 L ± ε，绿色带是对应的 x 的范围 a ± δ（δ = ε/3）：只要 x 落在绿色带内，函数值就落在红色带内。"
+cB <- "#1f77b4"; cR <- "#d62728"; cG <- "#2ca02c"; cO <- "#ff7f0e"
+a <- 2; L <- 5; eps <- 0.9; delta <- eps / 3
+f <- function(x) 3 * x - 1
+x <- seq(1.0, 3.0, length.out = 50)
+par(mar = c(3.2, 3.4, 1.0, 0.8), mgp = c(2, 0.5, 0))
+plot(x, f(x), type = "n", xlab = "x", ylab = "f(x)", xaxt = "n", yaxt = "n", ylim = c(3, 7))
+rect(a - delta, 2, a + delta, 8, col = adjustcolor(cG, 0.15), border = NA)
+rect(0, L - eps, 4, L + eps, col = adjustcolor(cR, 0.12), border = NA)
+abline(h = c(L - eps, L + eps), lty = 2, col = cR)
+abline(v = c(a - delta, a + delta), lty = 2, col = cG)
+lines(x, f(x), lwd = 2, col = cB)
+points(a, L, pch = 19)
+axis(1, at = c(a - delta, a, a + delta), labels = c("a - δ", "a", "a + δ"))
+axis(2, at = c(L - eps, L, L + eps), labels = c("L - ε", "L", "L + ε"))
+stopifnot(all(abs(f(seq(a - delta, a + delta, length.out = 101)) - L) <= eps + 1e-12))
+```
+
+几个常用的事实：
+
+- 极限可以逐项做四则运算（分母的极限不为 0 时）。
+- **夹逼准则**：如果 $g(x) \le f(x) \le h(x)$，且 $g, h$ 在 $a$ 处的极限都是 $L$，则 $f$ 的极限也是 $L$。后面 $\frac{\sin\theta}{\theta} \rightarrow 1$ 就是这样得到的。
+- 可导一定连续，连续不一定可导（例如 $\lvert x \rvert$ 在 0 处）。
+
+## 不定式与洛必达法则
+
+下面这几种形式，极限的值无法直接从“各部分的极限”读出，需要先化简，称为 **不定式**：
+
+$$\begin{aligned}
+&\frac{0}{0}, \quad \frac{\infty}{\infty} \\
+&0 \cdot \infty, \quad \infty - \infty \\
+&0^0, \quad 1^\infty, \quad \infty^0
+\end{aligned}$$
+
+处理的思路是把它们都化成前两种，再用洛必达法则：
+
+| 形式 | 化简的办法 | 例子 |
+| --- | --- | --- |
+| $\frac{0}{0}$， $\frac{\infty}{\infty}$ | 直接用洛必达法则 | $\lim_{x \rightarrow 0}\frac{1 - \cos x}{x^2} = \frac{1}{2}$ |
+| $0 \cdot \infty$ | 写成商，变成 $\frac{0}{0}$ 或 $\frac{\infty}{\infty}$ | $x\ln x = \frac{\ln x}{1/x} \rightarrow 0 \ (x \rightarrow 0^+)$ |
+| $\infty - \infty$ | 通分、有理化 | $\frac{1}{x} - \frac{1}{\sin x}$ 通分后化为 $\frac{0}{0}$ |
+| $0^0$， $1^\infty$， $\infty^0$ | 取对数： $f^g = e^{g\ln f}$，先求指数的极限 | $x^x = e^{x\ln x} \rightarrow e^0 = 1$ |
+
+**洛必达法则**：设 $f(a) = g(a) = 0$（或者两者都趋于 $\infty$ ），在 $a$ 的某去心邻域内 $f, g$ 可导且 $g'(x) \ne 0$，且 $\lim \frac{f'(x)}{g'(x)}$ 存在，则
+
+$$\lim_{x \rightarrow a}\frac{f(x)}{g(x)} = \lim_{x \rightarrow a}\frac{f'(x)}{g'(x)}$$
+
+
+
+
+对 $\frac{0}{0}$ 的情形，思路很直接：在 $a$ 附近 $f(x) \approx f'(a)(x - a)$， $g(x) \approx g'(a)(x - a)$，两者相除， $(x - a)$ 约去，剩下 $\frac{f'(a)}{g'(a)}$。也可以写成差商的比：
+
+$$\frac{f(x)}{g(x)} \rightarrow \frac{\frac{\Delta f}{\Delta x}}{\frac{\Delta g}{\Delta x}} \rightarrow \frac{f'}{g'}$$
+
+使用时要注意：
+
+- 条件必须成立。 $\lim \frac{f'}{g'}$ 不存在时，不能由此判断原极限不存在。
+- 不要循环论证。 $\lim_{x \rightarrow 0}\frac{\sin x}{x} = 1$ 不能用洛必达法则来证，因为 $\sin x$ 的导数本身就是用这个极限推出来的（见后面三角函数一节）。
+
+> **留下的问题：** 有了极限，导数和积分就能严格地定义了。它们之间是什么关系？
+
+# 导数与积分：微积分基本定理
+
+> **本章的问题：** 一个量的变化率（导数）和它的累积（积分）是什么关系？
+
+## 从差分到导数
+
+$$\begin{aligned}
+f'(x) &= \lim_{\Delta x \rightarrow 0}\frac{f(x + \Delta x) - f(x)}{\Delta x} \\
+&= \frac{df}{dx}
+\end{aligned}$$
+
+这里 $\Delta x$ 是 $x$ 上两点之间的差， $df$ 是 $x$ 的这个变化所引起的函数值的变化。 $\Delta x \rightarrow 0$ 就是从代数（差分）走到微积分（导数）的那一步。
+
+## 差分与求和：基本定理的离散版本
+
+考虑函数 $f$ 在点 $x_1, x_2, \dots, x_n$ 处的函数值 $f_1, f_2, \dots, f_n$，把相邻两个函数值的差累加起来，中间的项两两抵消：
+
+$$(f_2 - f_1) + (f_3 - f_2) + \dots + (f_n - f_{n-1}) = f_n - f_1$$
+
+也就是说，把差值累加，就还原出了函数值的变化。例如 $f_i = i^2$，则 $\Delta f_i = 2i + 1$，累加得
+
+$$\sum_{i=1}^{n-1}(2i + 1) = n^2 - 1 = f_n - f_1$$
+
+把差写成“斜率乘以宽度” $\Delta f = \frac{\Delta f}{\Delta x} \cdot \Delta x$，再令 $\Delta x \rightarrow 0$，求和就变成了积分：
+
+$$\begin{aligned}
+\sum \Delta f &= f_{\text{last}} - f_{\text{first}} \\
+\sum \frac{\Delta f}{\Delta x}\Delta x &\rightarrow \int_a^b f'(x)\,dx = f(b) - f(a)
+\end{aligned}$$
+
+这个式子可以这样读： $f'(x)$ 是矩形的“高度”， $dx$ 是它的“底”，高乘底是函数值的一小段增量，把所有的增量累加，得到的就是总的增量 $f(b) - f(a)$。所谓“面积”，其实是函数值的差。
+
+```{r}
+#| label: fig-ftc
+#| fig.width: 9
+#| fig.height: 3.4
+#| fig.cap: "左：把相邻函数值的差 Δf（红色竖线）累加起来，恰好等于 f(2) - f(0) = 4，中间的项两两抵消。右：同样的增量写成“斜率乘以宽度”，即以 f'(x) 为高、Δx 为底的矩形，8 个矩形的面积是 3.5，随着 Δx → 0 趋于 4。"
+cB <- "#1f77b4"; cR <- "#d62728"; cG <- "#2ca02c"; cO <- "#ff7f0e"
+n <- 8; b <- 2; dx <- b / n
+x <- seq(0, b, by = dx); f <- x^2
+xx <- seq(0, b, length.out = 200)
+par(mfrow = c(1, 2), mar = c(3.2, 3.4, 2.2, 0.8), mgp = c(2, 0.5, 0))
+plot(xx, xx^2, type = "l", lwd = 2, col = cB, xlab = "x", ylab = "f(x) = x^2",
+     main = sprintf("sum of increments = %.0f", sum(diff(f))))
+for (i in 2:length(x)) {
+  segments(x[i - 1], f[i - 1], x[i], f[i - 1], lty = 3, col = "grey50")
+  segments(x[i], f[i - 1], x[i], f[i], lwd = 3, col = cR)
+}
+points(x, f, pch = 19, cex = 0.6)
+plot(xx, 2 * xx, type = "l", lwd = 2, col = cB, xlab = "x", ylab = "f'(x) = 2x",
+     main = sprintf("rectangle area = %.2f (n = %d)", sum(2 * x[-length(x)] * dx), n))
+rect(x[-length(x)], 0, x[-1], 2 * x[-length(x)], col = adjustcolor(cR, 0.3), border = cR)
+stopifnot(abs(sum(diff(f)) - 4) < 1e-12, abs(sum(2 * x[-length(x)] * dx) - 3.5) < 1e-12)
+```
+
+
+
+
+## 微积分基本定理
+
+上面的式子就是微积分基本定理，完整的陈述有两部分（设 $f$ 连续）：
+
+1. 把积分当作上限的函数 $F(x) = \int_a^x f(t)\,dt$，则 $F'(x) = f(x)$。即积分之后再求导，回到原来的函数。
+2. 若 $F' = f$，则 $\int_a^b f(x)\,dx = F(b) - F(a)$。即求导之后再积分，得到的是函数值的差，不定积分 $\int f(x)\,dx = F(x) + C$ 里要多一个常数。
+
+所以微分是差分的极限，积分是求和的极限，基本定理是差分与求和互为逆运算在连续情形下的版本。
+
+## 导数作为线性映射
+
+对于微分，还有另一种理解：把它看成从一个函数变换到另一个函数的映射。这个映射的符号记作 $\frac{d}{dx}$，它把 $y$ 变成 $y'$：
+
+$$y' = \frac{d}{dx}\, y$$
+
+它是一个线性映射： $\frac{d}{dx}(af + bg) = a\frac{df}{dx} + b\frac{dg}{dx}$（见后面的“线性映射与特征函数”一节）。
+
+## 二阶导数、凸性与极值
+
+二阶导数的定义如下：
+
+$$y'' = \frac{d^2y}{dx^2}$$
+
+符号的含义是：
+
+> $dx^2 = (dx)^2$ 是分母；分子是 $f$ 的二阶差分 $d(df) = d^2f$，即 $\frac{\Delta\Delta f}{\Delta x \cdot \Delta x}$：对 $x$ 除了两次，对 $f$ 取了两次差分。
+
+
+
+
+二阶导数描述凸性：
+
+$$\begin{aligned}
+f''(x) > 0 &\rightarrow \text{convex function（下凸）} \\
+f''(x) < 0 &\rightarrow \text{concave function（上凸）}
+\end{aligned}$$
+
+一阶、二阶导数的主要应用是寻找图像上各种特殊的点：
+
+| 条件 | 含义 |
+| --- | --- |
+| $f'(x) = 0$ | 驻点（stationary point） |
+| $f''(x) = 0$，且 $f''$ 在该点两侧变号 | 拐点（inflection point） |
+| $f'(x) = 0$， $f''(x) > 0$ | 局部极小（local min） |
+| $f'(x) = 0$， $f''(x) < 0$ | 局部极大（local max） |
+| $f'(x) = 0$， $f''(x) = 0$ | 二阶判别失效，需要看更高阶导数或一阶导数的符号（比较 $x^3$ 与 $x^4$ 在 0 处） |
+
+最值要比较所有的驻点、区间的边界点，以及不可导的点。二阶判别在多元函数里推广为 Hessian 矩阵的正定性（见“二阶导数：Hessian、多元泰勒与凸性”一章）。
+
+```{r}
+#| label: fig-extrema
+#| fig.width: 5
+#| fig.height: 3.8
+#| fig.cap: "f(x) = x^3 - 3x。橙色区域 f'' < 0（上凸），蓝色区域 f'' > 0（下凸），拐点在二阶导数变号处（x = 0）。红点是局部极大（f' = 0 且 f'' < 0），绿点是局部极小（f' = 0 且 f'' > 0）。"
+cB <- "#1f77b4"; cR <- "#d62728"; cG <- "#2ca02c"; cO <- "#ff7f0e"
+f <- function(x) x^3 - 3 * x
+x <- seq(-2.3, 2.3, length.out = 300)
+par(mar = c(3.2, 3.4, 1.0, 0.8), mgp = c(2, 0.5, 0))
+plot(x, f(x), type = "n", xlab = "x", ylab = "f(x)", ylim = c(-4.2, 4.2))
+rect(-3, -6, 0, 6, col = adjustcolor(cO, 0.12), border = NA)
+rect(0, -6, 3, 6, col = adjustcolor(cB, 0.10), border = NA)
+lines(x, f(x), lwd = 2)
+points(c(-1, 1, 0), f(c(-1, 1, 0)), pch = c(19, 19, 17), col = c(cR, cG, "grey30"), cex = 1.2)
+text(-1, f(-1), "max", pos = 2)
+text(1, f(1), "min", pos = 4)
+text(0, 0, "inflection", pos = 4, cex = 0.85)
+text(-1.2, 4.0, "f'' < 0", cex = 0.9)
+text(1.2, 4.0, "f'' > 0", cex = 0.9)
+stopifnot(abs(3 * (-1)^2 - 3) < 1e-12, abs(3 * 1^2 - 3) < 1e-12, 6 * (-1) < 0, 6 * 1 > 0)
+```
+
+## 积分的两个技巧
+
+法则反过来就是积分的技巧：
+
+- 换元积分是链式法则反过来。
+- 分部积分是乘积法则反过来。由 $(fg)' = f'g + fg'$ 两边积分，得到
+
+$$\int f g'\,dx = fg - \int f' g\,dx$$
+
+> **留下的问题：** 导数的定义有了，具体的函数，比如 $e^x$、 $\sin x$，它们的导数是什么？
+
+# 指数、正弦、余弦与幂函数的导数
+
+> **本章的问题：** 什么样的函数，它的导数就是它自己？圆周上的运动，速度又是多少？
+
+## Exponential Function
+
+关键问题：哪个函数的导数等于它自己？
+
+$$\frac{df}{dx} = y \rightarrow \text{first differential equation}$$
+
+构造方法：要求 $y(0) = 1$。设 $y = a_0 + a_1x + a_2x^2 + \dots$，逐项求导后要和原来的级数相同，所以 $a_n$ 与 $a_{n-1}$ 之间满足 $n a_n = a_{n-1}$，即 $a_n = \frac{1}{n!}$：
+
+$$\begin{aligned}
+y(x) &= 1 + x + \frac{1}{2}x^2 + \frac{1}{3 \cdot 2 \cdot 1}x^3 + \dots + \frac{1}{n!}x^n + \dots \\
+\frac{dy}{dx} &= 1 + x + \frac{1}{2}x^2 + \dots + \frac{1}{(n-1)!}x^{n-1} + \dots
+\end{aligned}$$
+
+直观地看， $x = 0$ 处 $y = 1$，所以 $y' = 1$；而 $y'$ 也等于 $y$，所以 $y'' = 1$；如此逐阶递推，函数在 0 处的所有阶导数都是 1。这个级数称为指数级数，它定义了 $e^x$：
+
+$$e^x = 1 + x + \frac{1}{2}x^2 + \frac{1}{3 \cdot 2 \cdot 1}x^3 + \dots + \frac{1}{n!}x^n + \dots$$
+
+令 $x = 1$，得到 $e = 1 + 1 + \frac{1}{2} + \frac{1}{6} + \dots = 2.71828\ldots$，称为 Euler's Number。
+
+**指数函数的性质** $e^{a} \cdot e^{b} = e^{a + b}$ 可以用微分方程证明。令 $g(x) = e^{x}e^{a - x}$，由乘积法则和链式法则
+
+$$g'(x) = e^{x}e^{a-x} - e^{x}e^{a-x} = 0$$
+
+所以 $g$ 是常数， $g(x) = g(0) = e^a$。取 $x = b$ 就得到 $e^{b}e^{a-b} = e^a$，也就是上面的性质。
+
+Euler's Number 也可以通过如下的极限得到：
+
+$$e = \lim_{N \rightarrow \infty}\left(1 + \frac{1}{N}\right)^N$$
+
+对它用二项式定理展开，第 $k$ 项为 $\binom{N}{k}\frac{1}{N^k} = \frac{1}{k!}\left(1 - \frac{1}{N}\right)\cdots\left(1 - \frac{k-1}{N}\right) \rightarrow \frac{1}{k!}$，正好是指数级数的第 $k$ 项。
+
+对任意常数 $c$，由链式法则， $\frac{d}{dx}e^{cx} = ce^{cx}$；一般的指数函数写成 $a^x = e^{x\ln a}$，所以 $\frac{d}{dx}a^x = a^x\ln a$。
+
+## Trigonometric Function
+
+三角函数起源于勾股定理：
+
+$$\begin{aligned}
+a^2 + b^2 &= c^2 \\
+\left(\frac{a}{c}\right)^2 + \left(\frac{b}{c}\right)^2 &= 1 \\
+(\sin\theta)^2 + (\cos\theta)^2 &= 1
+\end{aligned}$$
+
+三角函数求导的关键，是用半径为 1 的圆描述周期运动，以及圆里的几个三角形。
+
+下面给出两个重要的极限。第一个：
+
+$$\begin{aligned}
+\sin\theta &< \theta \rightarrow \frac{\sin\theta}{\theta} < 1 \\
+\tan\theta &> \theta \rightarrow \frac{\sin\theta}{\theta} > \cos\theta \\
+\lim_{\theta \rightarrow 0}\frac{\sin\theta}{\theta} &= 1
+\end{aligned}$$
+
+前两个不等式（ $0 < \theta < \frac{\pi}{2}$ ）可由弧度制下的弧长和面积证明（三角形面积、扇形面积、大三角形面积依次变大）。最后的极限由夹逼准则得到，它就是 $\sin x$ 在 0 处的导数。
+
+第二个：
+
+$$\lim_{\theta \rightarrow 0}\frac{\cos\theta - 1}{\theta} = 0$$
+
+这个极限就是 $\cos x$ 在 0 处的导数。证明只需把分子乘以 $(\cos\theta + 1)$：
+
+$$\frac{\cos\theta - 1}{\theta} = -\frac{\sin^2\theta}{\theta(1 + \cos\theta)} = -\frac{\sin\theta}{\theta} \cdot \frac{\sin\theta}{1 + \cos\theta} \rightarrow -1 \cdot 0 = 0$$
+
+```{r}
+#| label: fig-trig
+#| fig.width: 9
+#| fig.height: 3.8
+#| fig.cap: "左：单位圆中 sin θ < θ < tan θ（θ 是粗弧的长度），由夹逼准则得到 sin θ/θ → 1。右：两个重要的极限一起画出来，θ → 0 时 sin θ/θ → 1，(cos θ - 1)/θ → 0。"
+cB <- "#1f77b4"; cR <- "#d62728"; cG <- "#2ca02c"; cO <- "#ff7f0e"
+th <- 0.9
+tt <- seq(0, 2 * pi, length.out = 300)
+par(mfrow = c(1, 2), mar = c(3.2, 3.4, 2.2, 0.8), mgp = c(2, 0.5, 0))
+plot(cos(tt), sin(tt), type = "l", col = "grey60", asp = 1, xlim = c(-0.2, 1.5), ylim = c(-0.2, 1.4),
+     xlab = "", ylab = "", main = sprintf("sin = %.2f < theta = %.2f < tan = %.2f", sin(th), th, tan(th)),
+     cex.main = 0.9)
+arc <- seq(0, th, length.out = 50)
+lines(cos(arc), sin(arc), lwd = 4, col = "grey30")
+segments(0, 0, cos(th), sin(th))
+segments(0, 0, 1, tan(th), lty = 2)
+segments(cos(th), 0, cos(th), sin(th), col = cR, lwd = 2)
+segments(0, 0, cos(th), 0, col = cB, lwd = 2)
+segments(1, 0, 1, tan(th), col = cG, lwd = 2)
+text(cos(th) / 2, -0.07, "cos", col = cB)
+text(cos(th) - 0.07, sin(th) / 2, "sin", col = cR)
+text(1.08, tan(th) / 2, "tan", col = cG)
+text(0.42 * cos(th / 2), 0.42 * sin(th / 2), "θ")
+u <- seq(-pi, pi, length.out = 401); u <- u[abs(u) > 1e-8]
+plot(u, sin(u) / u, type = "l", lwd = 2, col = cB, ylim = c(-1.1, 1.1), xlab = "θ", ylab = "",
+     main = "the two limits at 0", cex.main = 0.9)
+lines(u, (cos(u) - 1) / u, lwd = 2, col = cR)
+abline(h = c(0, 1), lty = 3, col = "grey50")
+legend("bottomleft", c("sin θ / θ", "(cos θ - 1) / θ"), col = c(cB, cR), lwd = 2, bty = "n", cex = 0.85)
+stopifnot(sin(th) < th, th < tan(th))
+```
+
+由加法公式 $\sin(x + \Delta x) = \sin x\cos\Delta x + \cos x\sin\Delta x$：
+
+$$\begin{aligned}
+\frac{\Delta \sin x}{\Delta x} &= \frac{\sin(x + \Delta x) - \sin x}{\Delta x} \\
+&= \sin x \cdot \frac{\cos\Delta x - 1}{\Delta x} + \cos x \cdot \frac{\sin\Delta x}{\Delta x} \\
+&\rightarrow \sin x \cdot 0 + \cos x \cdot 1 = \cos x
+\end{aligned}$$
+
+同样由 $\cos(x + \Delta x) = \cos x\cos\Delta x - \sin x\sin\Delta x$ 得到
+
+$$\frac{d\cos x}{dx} = -\sin x$$
+
+连续求两次导数， $(\sin x)'' = -\sin x$， $(\cos x)'' = -\cos x$：它们都满足 $y'' = -y$。圆周运动 $(\cos t, \sin t)$ 的速度是 $(-\sin t, \cos t)$，与位置垂直、长度恒为 1，也就是匀速圆周运动。
+
+## Product Rule, Quotient Rule, Power Function
+
+设 $q(x) = f(x)g(x)$。考虑边长分别为 $f(x), g(x)$ 的长方形，当两边分别改变 $\Delta f, \Delta g$ 时，面积的变化为：
+
+$$\Delta(fg) = f(x)\Delta g + g(x)\Delta f + \Delta f\,\Delta g$$
+
+最后一项 $\Delta f\,\Delta g$ 是二阶小量，当 $\Delta x \rightarrow 0$ 时可以略去：
+
+$$\begin{aligned}
+dq &= f(x)\,dg + g(x)\,df \\
+\frac{dq}{dx} &= f(x)\frac{dg}{dx} + g(x)\frac{df}{dx}
+\end{aligned}$$
+
+商的法则（quotient rule）可由乘积法则推导。令 $q = \frac{f}{g}$，则 $f = qg$，所以 $f' = q'g + qg'$，解出 $q'$：
+
+$$\left(\frac{f}{g}\right)' = \frac{f' - qg'}{g} = \frac{gf' - fg'}{g^2}$$
+
+例如 $(\tan x)' = \left(\frac{\sin x}{\cos x}\right)' = \frac{\cos^2 x + \sin^2 x}{\cos^2 x} = \frac{1}{\cos^2 x}$。
+
+幂函数的导数 $\frac{d}{dx}x^n = nx^{n-1}$ ：当 $n$ 为正整数时，可由乘积法则逐步推出（ $x^n = x \cdot x^{n-1}$ ），也可以用二项式展开 $(x + \Delta x)^n = x^n + nx^{n-1}\Delta x + \dots$ ；对 $x > 0$ 与任意实数 $n$ ，写成 $x^n = e^{n\ln x}$ ，由链式法则同样得到 $nx^{n-1}$ （见下一章； $x < 0$ 时只对整数 $n$ 有意义，另行处理）。
+
+
+
+
+> **留下的问题：** 复合函数（比如 $e^{\sin x}$）怎么求导？指数函数的逆函数 $\ln x$ 的导数又是什么？
+
+# 链式法则与反函数的导数：ln x、arcsin x、arccos x
+
+> **本章的问题：** 复合函数和反函数的变化率，怎么由已知函数的变化率得到？
+
+## Chain Rule
+
+$$\frac{d}{dx}f(y(x)) = \frac{df}{dy}\frac{dy}{dx}$$
+
+可以这样理解：两个“齿轮”串联，总的变化率是两个变化率的乘积。
+
+由链式法则可以推出：偶函数的导数是奇函数，奇函数的导数是偶函数。
+
+## Inverse Function
+
+$$y = f(x) \rightarrow x = f^{-1}(y)$$
+
+只有在单调的区间内才有反函数，并且 $f$ 与 $f^{-1}$ 的图像关于直线 $y = x$ 对称。
+
+对 $f(f^{-1}(y)) = y$ 两边求导，用链式法则得到反函数的导数：
+
+$$\frac{dx}{dy} = \frac{1}{\frac{dy}{dx}} \quad \left(\frac{dy}{dx} \ne 0\right)$$
+
+```{r}
+#| label: fig-inverse
+#| fig.width: 4.6
+#| fig.height: 4.6
+#| fig.cap: "y = exp(x) 与 y = ln x 互为反函数，图像关于直线 y = x 对称。在对称的两点处，切线的斜率互为倒数：dx/dy = 1/(dy/dx)。"
+cB <- "#1f77b4"; cR <- "#d62728"; cG <- "#2ca02c"; cO <- "#ff7f0e"
+a <- 0.5
+x1 <- seq(-1, 1.1, length.out = 200); x2 <- seq(exp(-1), 3, length.out = 200)
+par(mar = c(3.2, 3.4, 2.2, 0.8), mgp = c(2, 0.5, 0))
+plot(x1, exp(x1), type = "l", lwd = 2, col = cB, asp = 1, xlim = c(-1, 3), ylim = c(-1, 3),
+     xlab = "x", ylab = "y",
+     main = sprintf("slopes %.2f and %.2f, product = %.0f", exp(a), exp(-a), exp(a) * exp(-a)), cex.main = 0.9)
+lines(x2, log(x2), lwd = 2, col = cR)
+abline(0, 1, lty = 2, col = "grey50")
+P <- c(a, exp(a)); Q <- c(exp(a), a)
+seg <- function(p, s, col) segments(p[1] - 0.4, p[2] - 0.4 * s, p[1] + 0.4, p[2] + 0.4 * s, col = col, lwd = 2, lty = 3)
+seg(P, exp(a), cB); seg(Q, exp(-a), cR)
+points(rbind(P, Q), pch = 19)
+legend("topleft", c("y = exp(x)", "y = ln(x)", "y = x"), col = c(cB, cR, "grey50"), lty = c(1, 1, 2),
+       lwd = 2, bty = "n", cex = 0.8)
+stopifnot(abs(exp(a) * exp(-a) - 1) < 1e-12)
+```
+
+## Logarithmic Function
+
+指数函数的逆函数是对数函数，它求的是指数的值：
+
+$$x = \ln y$$
+
+它具有如下性质：
+
+$$\begin{aligned}
+\ln(ab) &= \ln a + \ln b \\
+\ln y^n &= n\ln y
+\end{aligned}$$
+
+## ln x、arcsin x、arccos x 的导数
+
+**对数。** 令
+
+$$\begin{aligned}
+y &= e^x \\
+x &= \ln y
+\end{aligned}$$
+
+则 $e^{\ln y} = y$，两边对 $y$ 求导，用链式法则：
+
+$$e^{\ln y} \cdot \frac{d\ln y}{dy} = 1, \quad \text{其中 } e^{\ln y} = y \ \Rightarrow \ \frac{d\ln y}{dy} = \frac{1}{y}$$
+
+对 $x < 0$ 也成立： $\frac{d}{dx}\ln\lvert x \rvert = \frac{1}{x}$。换底公式与一般底的对数的导数：
+
+$$\begin{aligned}
+\log_a b &= \frac{\ln b}{\ln a} \\
+\frac{d}{dx}\log_a \lvert x \rvert &= \frac{1}{x\ln a}
+\end{aligned}$$
+
+**反正弦。** 令
+
+$$\begin{aligned}
+y &= \sin x \\
+x &= \sin^{-1}y
+\end{aligned}$$
+
+则 $\sin(\sin^{-1}y) = y$，两边对 $y$ 求导：
+
+$$\cos(\sin^{-1}y) \cdot \frac{d\sin^{-1}y}{dy} = 1$$
+
+注意 $\sin^{-1}y$ 是一个角（不是 $\frac{1}{\sin y}$，所以更常写成 $\arcsin y$ ）。画一个斜边为 1、对边为 $y$ 的直角三角形，邻边就是 $\sqrt{1 - y^2}$，所以 $\cos(\sin^{-1}y) = \sqrt{1 - y^2}$，于是
+
+$$\frac{d\sin^{-1}y}{dy} = \frac{1}{\sqrt{1 - y^2}} \quad (\lvert y \rvert < 1)$$
+
+$\cos^{-1}y$ 的导数同样可以得到：
+
+$$\frac{d\cos^{-1}y}{dy} = -\frac{1}{\sqrt{1 - y^2}}$$
+
+两个导数恰好相反，因为 $\sin^{-1}y + \cos^{-1}y = \frac{\pi}{2}$ 是常数（两个角 $\theta + \alpha = \frac{\pi}{2}$ ），常数的导数为 0：
+
+$$\frac{d\cos^{-1}y}{dy} + \frac{d\sin^{-1}y}{dy} = 0$$
+
+**反正切。** 由 $\tan(\arctan y) = y$，两边求导，并用 $\frac{d}{dx}\tan x = \frac{1}{\cos^2 x} = 1 + \tan^2 x$：
+
+$$(1 + y^2) \cdot \frac{d\arctan y}{dy} = 1 \rightarrow \frac{d\arctan y}{dy} = \frac{1}{1 + y^2}$$
+
+把前面的结果放在一起，作为速查表：
+
+| $f(x)$ | $f'(x)$ |
+| --- | --- |
+| $x^n$ | $nx^{n-1}$ |
+| $e^{cx}$ | $ce^{cx}$ |
+| $a^x$ | $a^x\ln a$ |
+| $\ln \lvert x \rvert$ | $\frac{1}{x}$ |
+| $\log_a \lvert x \rvert$ | $\frac{1}{x\ln a}$ |
+| $\sin x$ | $\cos x$ |
+| $\cos x$ | $-\sin x$ |
+| $\tan x$ | $\frac{1}{\cos^2 x}$ |
+| $\arcsin x$ | $\frac{1}{\sqrt{1 - x^2}}$ |
+| $\arccos x$ | $-\frac{1}{\sqrt{1 - x^2}}$ |
+| $\arctan x$ | $\frac{1}{1 + x^2}$ |
+| $\operatorname{arccot} x$ | $-\frac{1}{1 + x^2}$ |
+
+# 增长速度与对数坐标
+
+> **本章的问题：** 不同的函数增长得有多快？数据跨越很多个数量级时，怎样把它画出来、读出来？
+
+## Growth Rate
+
+按增长速度从慢到快排列：
+
+$$\ln x \ \ll \ x,\ x^2,\ x^3,\ \dots \ \ll \ 2^x,\ e^x,\ 10^x,\ \dots \ \ll \ x!,\ x^x$$
+
+依次是对数（logarithmic）、多项式（polynomial）、指数（exponential）和阶乘（factorial）的增长。
+
+“ $\ll$ ”的意思是后者比前者增长得快得多，两者之比趋于 $\infty$（倒过来，比值趋于 0，就是“减慢的速度”）。例如对任意 $p$ 和 $a > 1$：
+
+$$\lim_{x \rightarrow \infty}\frac{x^p}{a^x} = 0, \qquad \lim_{n \rightarrow \infty}\frac{a^n}{n!} = 0, \qquad \lim_{n \rightarrow \infty}\frac{n!}{n^n} = 0$$
+
+阶乘的增长速度由 Stirling 公式给出： $n! \approx \sqrt{2\pi n}\left(\frac{n}{e}\right)^n$（ $n = 10$ 时相对误差约 0.8%）。
+
+## Logarithmic Plot
+
+对数尺度能够处理极大或者极小（ $x \rightarrow 0$ ）的值，但是在对数尺度下没有 $0$ 和负数。
+
+对数尺度还能把非线性问题变成线性问题，所以有两种常用的坐标：
+
+$$\begin{aligned}
+y = Ax^n &\rightarrow \log y = \log A + n\log x, \quad \text{log-log plot（斜率为 } n \text{）} \\
+y = B \cdot 10^{Cx} &\rightarrow \log_{10} y = \log_{10} B + Cx, \quad \text{semi-log plot（以 10 为底，斜率为 } C \text{）}
+\end{aligned}$$
+
+
+
+
+读图的办法：双对数坐标下是直线，说明是幂函数关系；半对数坐标下是直线，说明是指数增长或衰减。指数增长 $y = y_0e^{ct}$ 的翻倍时间是 $\frac{\ln 2}{c}$。
+
+```{r}
+#| label: fig-growth
+#| fig.width: 9.6
+#| fig.height: 3.3
+#| fig.cap: "同样的四个函数（x^2、x^3、2^x、1.5^x），画在三种坐标下。线性坐标下增长速度难以比较；双对数坐标下幂函数是直线（斜率是指数 n），指数函数向上弯曲；半对数坐标下指数函数是直线，幂函数向下弯曲。"
+cB <- "#1f77b4"; cR <- "#d62728"; cG <- "#2ca02c"; cO <- "#ff7f0e"
+cols <- c(cB, cG, cR, cO)
+labs <- c("x^2", "x^3", "2^x", "1.5^x")
+fs <- list(function(x) x^2, function(x) x^3, function(x) 2^x, function(x) 1.5^x)
+par(mfrow = c(1, 3), mar = c(3.2, 3.4, 2.2, 0.8), mgp = c(2, 0.5, 0))
+x <- seq(1, 12, length.out = 200)
+plot(NA, xlim = c(1, 12), ylim = c(0, 3000), xlab = "x", ylab = "y", main = "linear axes", cex.main = 0.9)
+for (i in 1:4) lines(x, fs[[i]](x), col = cols[i], lwd = 2)
+legend("topleft", labs, col = cols, lwd = 2, bty = "n", cex = 0.8)
+x <- 10^seq(0, 2, length.out = 200)
+plot(NA, xlim = c(1, 100), ylim = c(1, 1e6), log = "xy", xlab = "x", ylab = "y", main = "log-log: powers = lines", cex.main = 0.9)
+for (i in 1:4) lines(x, fs[[i]](x), col = cols[i], lwd = 2)
+x <- seq(1, 30, length.out = 200)
+plot(NA, xlim = c(1, 30), ylim = c(1, 1e6), log = "y", xlab = "x", ylab = "y", main = "semi-log: exp = lines", cex.main = 0.9)
+for (i in 1:4) lines(x, fs[[i]](x), col = cols[i], lwd = 2)
+stopifnot(abs((log(100^3) - log(10^3)) / (log(100) - log(10)) - 3) < 1e-12,
+          abs((log(2^20) - log(2^10)) / 10 - log(2)) < 1e-12)
+```
+
+> **留下的问题：** 导数告诉我们函数在一点附近像一条直线。这条直线能不能用来解方程？
+
+# Linear Approximation/Newton's Method
+
+## Linear Approximation
+
+在 $a$ 附近，用切线代替曲线：
+
+$$f(x) \approx f(a) + f'(a)(x - a)$$
+
+误差是 $(x - a)^2$ 量级，由二阶导数控制（见泰勒级数一章）。
+
+## Newton's Method
+
+解方程 $F(x) = 0$：在 $a$ 处用切线代替 $F$，令切线等于 0，
+
+$$0 = F(a) + F'(a)(x - a) \rightarrow x - a = -\frac{F(a)}{F'(a)}$$
+
+把解出的 $x$ 当作新的 $a$，反复迭代：
+
+$$x_{n+1} = x_n - \frac{F(x_n)}{F'(x_n)}$$
+
+The core of Newton's method is iteration。例如解 $x^2 - 2 = 0$，迭代公式化为 $x_{n+1} = \frac{1}{2}\left(x_n + \frac{2}{x_n}\right)$，从 $x_0 = 1$ 出发：
+
+| $n$ | $x_n$ | 误差 |
+| --- | --- | --- |
+| 1 | 1.5 | $8.6 \times 10^{-2}$ |
+| 2 | 1.4166667 | $2.5 \times 10^{-3}$ |
+| 3 | 1.4142157 | $2.1 \times 10^{-6}$ |
+| 4 | 1.4142136 | $\approx 10^{-12}$ |
+
+每一步的误差大致是上一步误差的平方，所以有效数字大约每步翻倍，称为二次收敛。
+
+```{r}
+#| label: fig-newton
+#| fig.width: 5
+#| fig.height: 3.6
+#| fig.cap: "牛顿法解 x^2 - 2 = 0：在 x0 = 1 处作切线，切线与 x 轴的交点就是下一个近似 x1 = 1.5；再在 x1 处作切线得到 x2 = 1.4167，很快逼近 √2 = 1.4142。"
+cB <- "#1f77b4"; cR <- "#d62728"; cG <- "#2ca02c"; cO <- "#ff7f0e"
+f <- function(x) x^2 - 2; fp <- function(x) 2 * x
+x0 <- 1; x1 <- x0 - f(x0) / fp(x0); x2 <- x1 - f(x1) / fp(x1)
+xx <- seq(0.8, 1.8, length.out = 200)
+par(mar = c(3.2, 3.4, 2.2, 0.8), mgp = c(2, 0.5, 0))
+plot(xx, f(xx), type = "l", lwd = 2, xlab = "x", ylab = "f(x) = x^2 - 2",
+     main = sprintf("x1 = %.4f, x2 = %.4f, sqrt(2) = %.4f", x1, x2, sqrt(2)), cex.main = 0.9)
+abline(h = 0, col = "grey50")
+tang <- function(p, col) {
+  xs <- c(p - 0.25, p + 0.65)
+  lines(xs, f(p) + fp(p) * (xs - p), col = col, lty = 2, lwd = 2)
+}
+tang(x0, cB); tang(x1, cR)
+segments(c(x0, x1), 0, c(x0, x1), f(c(x0, x1)), lty = 3)
+points(c(x0, x1, x2), c(f(x0), f(x1), 0), pch = 19)
+text(c(x0, x1, x2), 0, c("x0", "x1", "x2"), pos = 1)
+stopifnot(abs(x1 - 1.5) < 1e-12, abs(x2 - 17 / 12) < 1e-12)
+```
+
+牛顿法也会失败：初值离根太远、 $F'(a) = 0$（切线水平）或者迭代陷入循环时，都不收敛。
+
+牛顿法也用于求极值：极值点满足 $f'(x) = 0$，对 $f'$ 用牛顿法，得到 $x_{n+1} = x_n - \frac{f'(x_n)}{f''(x_n)}$。多元时 $f''$ 换成 Hessian 矩阵（见“二阶导数：Hessian、多元泰勒与凸性”与“梯度下降与优化”两章）。
+
+# Power Series/Euler's Great Formula
+
+> **本章的问题：** 一次近似（切线）不够精确时，怎样系统地改进？答案是用多项式。
+
+## 用多项式近似函数
+
+多项式是最容易计算的函数，所以想用它来逼近一般的函数 $f$。要让多项式 $\sum a_nx^n$ 在 $x = 0$ 处与 $f$ 的各阶导数都匹配，只需看 $n$ 阶导数在 0 处的值：
+
+- 次数低于 $n$ 的项，求 $n$ 次导数以后都变成 0；
+- 次数高于 $n$ 的项，求 $n$ 次导数以后仍然带着因子 $x$，在 $x = 0$ 处也是 0；
+- 只有 $a_nx^n$ 这一项留下，求 $n$ 次导数得到 $n!\,a_n$。
+
+所以 $f^{(n)}(0) = n!\,a_n$，即 $a_n = \frac{f^{(n)}(0)}{n!}$。在一般的点 $a$ 展开，形式上写成 **泰勒级数**：
+
+$$f(x) = \sum_{n=0}^{\infty}\frac{f^{(n)}(a)}{n!}(x - a)^n$$
+
+等号成立需要余项 $R_N(x) \to 0$ （例如 $f$ 解析）；一般情形只有有限项 $f(x) = \sum_{n=0}^{N}\frac{f^{(n)}(a)}{n!}(x - a)^n + R_N(x)$ 。
+
+
+
+
+只取前 $n$ 项时，误差（Lagrange 余项）为
+
+$$R_n(x) = \frac{f^{(n+1)}(\xi)}{(n+1)!}(x - a)^{n+1}, \quad \xi \text{ 介于 } a \text{ 与 } x \text{ 之间}$$
+
+例如指数函数在 0 处的各阶导数值：
+
+$$1, 1, 1, \dots, 1$$
+
+为了匹配这些值，第 $n$ 项取 $\frac{1}{n!}x^n$，就回到了前面的指数级数：
+
+$$e^x = 1 + x + \frac{1}{2}x^2 + \dots + \frac{1}{n!}x^n + \dots$$
+
+$\sin x$ 在 0 处的各阶导数依次是 $0, 1, 0, -1, 0, 1, \dots$（ $\sin \rightarrow \cos \rightarrow -\sin \rightarrow -\cos$ 循环），同理得到 $\sin x$ 与 $\cos x$ 的幂级数：
+
+$$\begin{aligned}
+\sin x &= \sum_{n=0}^{\infty}(-1)^n\frac{x^{2n+1}}{(2n+1)!} = x - \frac{x^3}{3!} + \frac{x^5}{5!} - \dots \\
+\cos x &= \sum_{n=0}^{\infty}(-1)^n\frac{x^{2n}}{(2n)!} = 1 - \frac{x^2}{2!} + \frac{x^4}{4!} - \dots
+\end{aligned}$$
+
+这三个级数对所有的 $x$ 都收敛。例如 $x = 1$ 时， $\sin 1$ 的前三项给出 $0.84167$，真值是 $0.84147$。
+
+```{r}
+#| label: fig-taylor-sin
+#| fig.width: 6
+#| fig.height: 3.6
+#| fig.cap: "sin x（黑色粗线）与它的泰勒多项式（1、3、5、7 次）。多项式在 0 附近与 sin x 重合，次数越高，重合的区间越宽。"
+cB <- "#1f77b4"; cR <- "#d62728"; cG <- "#2ca02c"; cO <- "#ff7f0e"
+taylor_sin <- function(x, m) {
+  s <- 0
+  for (k in 0:m) s <- s + (-1)^k * x^(2 * k + 1) / factorial(2 * k + 1)
+  s
+}
+x <- seq(-2 * pi, 2 * pi, length.out = 400)
+cols <- c(cR, cO, cG, cB)
+par(mar = c(3.2, 3.4, 1.0, 0.8), mgp = c(2, 0.5, 0))
+plot(x, sin(x), type = "l", lwd = 3, xlab = "x", ylab = "y", ylim = c(-2, 2))
+for (j in 1:4) lines(x, taylor_sin(x, j - 1), col = cols[j], lwd = 1.5)
+legend("topright", c("sin x", "degree 1", "degree 3", "degree 5", "degree 7"), col = c("black", cols),
+       lwd = c(3, rep(1.5, 4)), bty = "n", cex = 0.8)
+stopifnot(abs(taylor_sin(1, 4) - sin(1)) < 1e-6)
+```
+
+## Euler's Great Formula
+
+把 $x$ 换成 $i\theta$ 代入指数级数：
+
+$$e^{i\theta} = 1 + i\theta + \frac{1}{2}(i\theta)^2 + \frac{1}{6}(i\theta)^3 + \dots$$
+
+利用 $i^2 = -1$，把实部和虚部分开，整理之后可见，实部是 $\cos\theta$ 的幂级数，虚部是 $\sin\theta$ 的幂级数：
+
+$$e^{i\theta} = \cos\theta + i\sin\theta$$
+
+在复平面上（横轴是实部，纵轴是虚部）， $e^{i\theta}$ 是单位圆上与实轴夹角为 $\theta$ 的点，所以 $e^{i\pi} = -1$。它的导数 $\frac{d}{d\theta}e^{i\theta} = ie^{i\theta}$，乘以 $i$ 就是旋转 90 度，也就是速度与位置垂直，对应前面的圆周运动。反过来：
+
+$$\cos\theta = \frac{e^{i\theta} + e^{-i\theta}}{2}, \qquad \sin\theta = \frac{e^{i\theta} - e^{-i\theta}}{2i}$$
+
+这也说明了 $\cos$ 与 $\sin$ 都是 $y'' = -y$ 的解（因为 $e^{\pm i\theta}$ 是它的解）。
+
+## 其它重要的幂级数
+
+**几何级数**与它积分之后得到的级数：
+
+$$\begin{aligned}
+\frac{1}{1 - x} &= 1 + x + x^2 + \dots + x^n + \dots, \quad \lvert x \rvert < 1 \\
+-\ln(1 - x) &= x + \frac{1}{2}x^2 + \frac{1}{3}x^3 + \dots, \quad -1 \le x < 1
+\end{aligned}$$
+
+几何级数只在 $\lvert x \rvert < 1$ 时收敛，也就是收敛半径为 1：在 $x = 1$ 处函数本身无定义，越靠近 1 级数收敛越慢。第二个级数是对第一个逐项积分得到的。
+
+```{r}
+#| label: fig-geometric
+#| fig.width: 5
+#| fig.height: 3.4
+#| fig.cap: "几何级数 1/(1 - x) 的部分和（n = 2、4、8）。只有在 |x| < 1（虚线之间）内，部分和才逼近函数，并且次数越高逼近得越好；超出这个范围，部分和越来越偏离，这就是收敛半径为 1。"
+cB <- "#1f77b4"; cR <- "#d62728"; cG <- "#2ca02c"; cO <- "#ff7f0e"
+geo <- function(x, n) {
+  s <- 0
+  for (k in 0:n) s <- s + x^k
+  s
+}
+x <- seq(-1.6, 0.9, length.out = 300)
+cols <- c(cR, cG, cB)
+par(mar = c(3.2, 3.4, 1.0, 0.8), mgp = c(2, 0.5, 0))
+plot(x, 1 / (1 - x), type = "l", lwd = 3, xlab = "x", ylab = "y", ylim = c(0, 5))
+for (j in 1:3) lines(x, geo(x, c(2, 4, 8)[j]), col = cols[j], lwd = 1.5)
+abline(v = c(-1, 1), lty = 3, col = "grey50")
+legend("bottomright", c("1/(1 - x)", "n = 2", "n = 4", "n = 8"), col = c("black", cols),
+       lwd = c(3, rep(1.5, 3)), bty = "n", cex = 0.8)
+stopifnot(abs(geo(0.5, 60) - 2) < 1e-12)
+```
+
+**二项式级数**（binomial series）是 $(1 + x)^p$ 在 0 处的泰勒级数：
+
+$$(1 + x)^p = 1 + px + \frac{p(p-1)}{2 \cdot 1}x^2 + \dots = \sum_{k=0}^{\infty}\binom{p}{k}x^k, \quad \binom{p}{k} = \frac{p(p-1)\cdots(p-k+1)}{k!}$$
+
+当 $p$ 是正整数时，从第 $p + 1$ 项起系数全部为 0，级数变成有限项，就是 Pascal 三角形给出的二项式定理；对一般的 $p$，要求 $\lvert x \rvert < 1$。例如 $p = \frac{1}{2}$， $x = 0.2$ 时，取前 8 项得到 $1.095445$，真值 $\sqrt{1.2} = 1.095445$。
+
+> **留下的问题：** 指数函数既是 $y' = y$ 的解，也是增长的模型。把变化率写成方程，能解出哪些系统？
+
+# Differential Equations
+
+> **本章的问题：** 变化率由当前的状态决定时，状态怎样随时间变化？
+
+## Differential Equations of Growth
+
+增长率与自身成正比：
+
+$$\begin{aligned}
+\frac{dy}{dt} &= cy \\
+y(0) &\rightarrow \text{Given start} \\
+y(t) &= y(0)e^{ct}
+\end{aligned}$$
+
+加上一个源项（source term） $s$：
+
+$$\begin{aligned}
+\frac{dy}{dt} &= cy + s \\
+\frac{d\left(y + \frac{s}{c}\right)}{dt} &= c\left(y + \frac{s}{c}\right) \\
+y + \frac{s}{c} &= \left(y(0) + \frac{s}{c}\right)e^{ct}
+\end{aligned}$$
+
+对线性方程，解的结构是：
+
+$$y(t) = y_{\text{particular}}(t) + y_{\text{homogeneous}}(t)$$
+
+即一个特解，加上右端为 0 的方程（齐次方程）的通解。对 $\frac{dy}{dt} = cy + s$：
+
+$$\begin{aligned}
+y_{\text{particular}} &= -\frac{s}{c} \quad \text{（令 } y' = 0 \text{ 得到的稳态）} \\
+y_{\text{homogeneous}} &= Ae^{ct} \quad \text{（令 } s = 0 \text{）}
+\end{aligned}$$
+
+所以
+
+$$y = -\frac{s}{c} + Ae^{ct}$$
+
+令 $t = 0$ 来确定 $A$： $y(0) = -\frac{s}{c} + A$，即 $A = y(0) + \frac{s}{c}$。当 $c < 0$ 时 $e^{ct} \rightarrow 0$， $y$ 趋于稳态 $-\frac{s}{c}$（例如温度趋向环境温度、药物浓度趋向稳态值）； $c > 0$ 时则指数发散。
+
+**非线性方程**，人口模型（logistic）：
+
+$$\frac{dp}{dt} = cp - sp^2$$
+
+求解时令 $y = \frac{1}{p}$，则 $\frac{dy}{dt} = -\frac{1}{p^2}\frac{dp}{dt} = -cy + s$，就变成了上面的线性方程，解为 $y = \frac{s}{c} + Ae^{-ct}$，即
+
+$$p(t) = \frac{1}{\frac{s}{c} + Ae^{-ct}}, \quad A = \frac{1}{p(0)} - \frac{s}{c}$$
+
+当 $t \rightarrow \infty$ 时 $p \rightarrow \frac{c}{s}$，是环境所能容纳的上限，整条曲线是一条 S 形曲线。
+
+```{r}
+#| label: fig-logistic
+#| fig.width: 5
+#| fig.height: 3.3
+#| fig.cap: "logistic 方程 dp/dt = cp - sp^2（c = 1，s = 0.5）的三条解。初值不同，但都趋于上限 c/s = 2：初值小时是 S 形增长，初值大于上限时单调下降。"
+cB <- "#1f77b4"; cR <- "#d62728"; cG <- "#2ca02c"; cO <- "#ff7f0e"
+c0 <- 1; s0 <- 0.5; p0 <- c(0.1, 0.5, 2.8)
+pfun <- function(t, p) 1 / (s0 / c0 + (1 / p - s0 / c0) * exp(-c0 * t))
+tt <- seq(0, 8, length.out = 200)
+cols <- c(cB, cG, cR)
+par(mar = c(3.2, 3.4, 1.0, 0.8), mgp = c(2, 0.5, 0))
+plot(NA, xlim = c(0, 8), ylim = c(0, 3), xlab = "t", ylab = "p(t)")
+for (j in seq_along(p0)) lines(tt, pfun(tt, p0[j]), col = cols[j], lwd = 2)
+abline(h = c0 / s0, lty = 2, col = "grey40")
+text(8, c0 / s0, "c/s", pos = 3)
+legend("bottomright", paste("p(0) =", p0), col = cols, lwd = 2, bty = "n", cex = 0.8)
+h <- 1e-6
+stopifnot(all(abs(pfun(50, p0) - c0 / s0) < 1e-9),
+          all(abs((pfun(1.3 + h, p0) - pfun(1.3 - h, p0)) / (2 * h) - (c0 * pfun(1.3, p0) - s0 * pfun(1.3, p0)^2)) < 1e-6))
+```
+
+## Differential Equations of Motion
+
+二阶线性方程（质量 $m$、阻尼 $r$、弹簧 $k$ ）：
+
+$$m\frac{d^2y}{dt^2} + 2r\frac{dy}{dt} + ky = 0$$
+
+几种特殊情形：
+
+$$\begin{aligned}
+m = 0:&\quad \frac{dy}{dt} = ay \ \left(a = -\frac{k}{2r}\right) \rightarrow y = ce^{at} \\
+r = 0:&\quad \frac{d^2y}{dt^2} = -\frac{k}{m}y = -\omega^2y \ \left(\omega = \sqrt{\tfrac{k}{m}}\right) \rightarrow y = C\cos\omega t + D\sin\omega t \\
+r = k = 0:&\quad \frac{d^2y}{dt^2} = 0 \rightarrow y = C + Dt
+\end{aligned}$$
+
+一般的解：试探 $y = e^{\lambda t}$，代入得到特征方程
+
+$$m\lambda^2 + 2r\lambda + k = 0, \qquad \lambda = \frac{-r \pm \sqrt{r^2 - mk}}{m}$$
+
+按判别式 $r^2 - mk$ 分成三种情形：
+
+| 判别式 | 特征根 | 解的形式 | 例子（ $m = 1$， $2r = 6$ ） |
+| --- | --- | --- | --- |
+| $r^2 - mk > 0$ | 两个不同的实根 | $Ce^{\lambda_1 t} + De^{\lambda_2 t}$（过阻尼） | $y'' + 6y' + 8y = 0$， $y = Ce^{-2t} + De^{-4t}$ |
+| $r^2 - mk < 0$ | 一对共轭复根 | 衰减的振荡（欠阻尼） | $y'' + 6y' + 10y = 0$， $y = Ce^{(-3-i)t} + De^{(-3+i)t}$ |
+| $r^2 - mk = 0$ | 重根 | $(C + Dt)e^{\lambda t}$（临界阻尼） | $y'' + 6y' + 9y = 0$， $y = Ce^{-3t} + Dte^{-3t}$ |
+
+复根的情形，用欧拉公式可以把复指数写成实数形式： $e^{(-3 \pm i)t} = e^{-3t}(\cos t \pm i\sin t)$，所以解也可以写成 $e^{-3t}(A\cos t + B\sin t)$，是按 $e^{-3t}$ 衰减的振荡。只要 $r > 0$，所有解都衰减到 0，这与特征根的实部为负是一回事。
+
+```{r}
+#| label: fig-damping
+#| fig.width: 5.5
+#| fig.height: 3.4
+#| fig.cap: "二阶方程 y'' + 2r y' + 9y = 0（y(0) = 1，y'(0) = 0）在三种阻尼下的解。过阻尼（2r = 12，两个不同的实根）缓慢衰减、不振荡；临界阻尼（2r = 6，重根）不振荡，回到 0 最快；欠阻尼（2r = 1.5，复根）按 e^(-rt) 衰减并振荡。"
+cB <- "#1f77b4"; cR <- "#d62728"; cG <- "#2ca02c"; cO <- "#ff7f0e"
+kk <- 9
+y_over <- function(t) {
+  r <- 6; l1 <- -r + sqrt(r^2 - kk); l2 <- -r - sqrt(r^2 - kk)
+  (-l2 * exp(l1 * t) + l1 * exp(l2 * t)) / (l1 - l2)
+}
+y_crit <- function(t) (1 + 3 * t) * exp(-3 * t)
+y_under <- function(t) {
+  r <- 0.75; om <- sqrt(kk - r^2)
+  exp(-r * t) * (cos(om * t) + r / om * sin(om * t))
+}
+tt <- seq(0, 6, length.out = 400)
+par(mar = c(3.2, 3.4, 1.0, 0.8), mgp = c(2, 0.5, 0))
+plot(tt, y_over(tt), type = "l", lwd = 2, col = cB, ylim = c(-0.6, 1.05), xlab = "t", ylab = "y")
+lines(tt, y_crit(tt), lwd = 2, col = cG)
+lines(tt, y_under(tt), lwd = 2, col = cR)
+abline(h = 0, col = "grey60")
+legend("topright", c("overdamped (2r = 12)", "critical (2r = 6)", "underdamped (2r = 1.5)"),
+       col = c(cB, cG, cR), lwd = 2, bty = "n", cex = 0.8)
+d1 <- function(y, t, h = 1e-6) (y(t + h) - y(t - h)) / (2 * h)
+stopifnot(abs(y_over(0) - 1) < 1e-12, abs(y_crit(0) - 1) < 1e-12, abs(y_under(0) - 1) < 1e-12,
+          abs(d1(y_over, 0)) < 1e-5, abs(d1(y_crit, 0)) < 1e-5, abs(d1(y_under, 0)) < 1e-5)
+```
+
+## 方程组：捕食与被捕食
+
+$$\begin{aligned}
+\frac{du}{dt} &= -cu + suv \\
+\frac{dv}{dt} &= cv - suv
+\end{aligned}$$
+
+其中 $u$ 是捕食者， $v$ 是被捕食者（ $suv$ 项表示两者相遇的机会）。 $u = v = \frac{c}{s}$ 是平衡点。这个方程组没有初等函数形式的解，但有一个守恒量：
+
+$$H = s(u + v) - c\ln(uv)$$
+
+沿着任何一条解， $\frac{dH}{dt} = 0$（用链式法则直接验证），所以轨道是平衡点周围的闭曲线，捕食者与被捕食者的数量周期性地起伏。
+
+```{r}
+#| label: fig-lotka-volterra
+#| fig.width: 4.2
+#| fig.height: 4.2
+#| fig.cap: "捕食者-被捕食者方程（c = s = 1）的守恒量 H = s(u + v) - c ln(uv) 的等高线。每条解的轨道都落在一条等高线上，所以是平衡点 (1, 1) 周围的闭曲线，两个种群的数量周期性地起伏。"
+cB <- "#1f77b4"; cR <- "#d62728"; cG <- "#2ca02c"; cO <- "#ff7f0e"
+H <- function(u, v) (u + v) - log(u * v)
+u <- seq(0.05, 4, length.out = 300); v <- u
+par(mar = c(3.2, 3.4, 1.0, 0.8), mgp = c(2, 0.5, 0))
+plot(NA, xlim = c(0, 4), ylim = c(0, 4), asp = 1, xlab = "u (predator)", ylab = "v (prey)")
+contour(u, v, outer(u, v, H), levels = c(2.1, 2.5, 3, 3.5), drawlabels = FALSE, add = TRUE, col = cB, lwd = 1.5)
+points(1, 1, pch = 19, col = cR)
+stopifnot(abs(H(1, 1) - 2) < 1e-12, min(outer(u, v, H)) >= 2 - 1e-12)
+```
+
+二阶方程也可以化成一阶方程组：令 $\mathbf{u} = (y, y')^{\mathrm{T}}$，则 $\mathbf{u}' = A\mathbf{u}$，其中
+
+$$A = \begin{bmatrix} 0 & 1 \\ -\frac{k}{m} & -\frac{2r}{m} \end{bmatrix}$$
+
+它的特征方程正是上面的 $m\lambda^2 + 2r\lambda + k = 0$（除以 $m$ ），解为 $e^{At}\mathbf{u}(0)$，见线性代数笔记中“马尔可夫链与线性微分方程”一节。
+
+# Six Functions, Six Rules, and Six Theorems
+
+这一章把前面的内容放在一起。
+
+## Six Functions
+
+每一行依次是：原函数（积分）、函数、导数。
+
+| 原函数（积分） | 函数 | 导数 |
+| --- | --- | --- |
+| $\frac{1}{n+1}x^{n+1}$ | $x^n$ | $nx^{n-1}$ |
+| $-\cos x$ | $\sin x$ | $\cos x$ |
+| $\sin x$ | $\cos x$ | $-\sin x$ |
+| $\frac{1}{c}e^{cx}$ | $e^{cx}$ | $ce^{cx}$ |
+| $x\ln x - x$ | $\ln x$ | $\frac{1}{x}$（ $x^{-1}$ 的原函数是 $\ln x$ ） |
+| 斜坡函数（ramp） | 阶跃函数（step） | $\delta$ 函数 |
+
+## Six Rules
+
+$$\begin{aligned}
+af(x) + bg(x) &\rightarrow a\frac{df}{dx} + b\frac{dg}{dx} \\
+f(x)g(x) &\rightarrow f(x)\frac{dg}{dx} + \frac{df}{dx}g(x) \\
+\frac{f(x)}{g(x)} &\rightarrow \frac{gf' - fg'}{g^2} \\
+x = f^{-1}(y) &\rightarrow \frac{dx}{dy} = \frac{1}{\frac{dy}{dx}} \\
+f(g(x)) &\rightarrow \frac{df}{dy}\cdot\frac{dy}{dx} \\
+\text{L'Hospital: } \frac{f}{g} \rightarrow \frac{df/dx}{dg/dx} &\quad \text{when } x \rightarrow a,\ f(a), g(a) \rightarrow 0
+\end{aligned}$$
+
+## Six Theorems
+
+1. **微积分基本定理**：微分与积分互为逆运算（见“导数与积分”一章）。
+2. **中值定理**（Mean Value Theorem）：设 $f$ 在 $[a, b]$ 上连续、在 $(a, b)$ 内可导，则存在 $c \in (a, b)$ 使得 $f'(c) = \frac{f(b) - f(a)}{b - a}$。即曲线上总有一点的切线平行于弦。推论： $f' = 0$ 则 $f$ 是常数， $f' > 0$ 则 $f$ 递增，基本定理第二部分与泰勒余项都用到它。
+3. **泰勒级数 / 泰勒定理**：用多项式逼近函数，系数由各阶导数决定（见幂级数一章）。
+4. **二项式定理**（Binomial Theorem）：它是 $(1 + x)^p$ 在 0 处的泰勒级数，对正整数 $p$ 对应 Pascal 三角形（公式见幂级数一章）。
+
+5. **介值定理**：设 $f$ 在 $[a, b]$ 上连续，则 $f$ 能取到 $f(a)$ 与 $f(b)$ 之间的每一个值（二分法求根的依据）。
+6. **极值定理**：闭区间上的连续函数一定能取到最大值和最小值。
+
+
+
+
+> **留下的问题：** 以上全部是一个变量。机器学习里的函数有成千上万个变量，下面把微积分推广到多变量。
+
+# 多元函数：偏导数、梯度与 Jacobian
+
+> **本章的问题：** 机器学习里的损失函数 $L(\mathbf{w})$ 依赖成千上万个参数。变化率在多个变量下怎么定义？往哪个方向走，函数下降得最快？
+
+前面的一元微积分在这里全部保留：导数仍然是“最好的线性近似”，链式法则仍然是“变化率相乘”，只是变量从一个变成了一组，数变成了向量和矩阵。
+
+约定：向量默认是列向量，用粗体 $\mathbf{x} \in \mathbb{R}^n$，转置记作 $\mathrm{T}$（与线代笔记一致）。两类函数：
+
+- 标量值函数 $f: \mathbb{R}^n \rightarrow \mathbb{R}$，例如损失函数。
+- 向量值函数 $F: \mathbb{R}^n \rightarrow \mathbb{R}^m$，例如神经网络的一层，或者一个变量变换。
+
+## 偏导数与梯度
+
+**偏导数**是只让一个变量变化、其余变量固定时的变化率：
+
+$$\frac{\partial f}{\partial x_i} = \lim_{h \rightarrow 0}\frac{f(\mathbf{x} + h\mathbf{e}_i) - f(\mathbf{x})}{h}$$
+
+例如 $f(x, y) = x^2y + \sin y$，则 $\frac{\partial f}{\partial x} = 2xy$， $\frac{\partial f}{\partial y} = x^2 + \cos y$。把所有偏导数排成列向量，就是**梯度**：
+
+$$\nabla f(\mathbf{x}) = \begin{bmatrix} \frac{\partial f}{\partial x_1} \\ \vdots \\ \frac{\partial f}{\partial x_n} \end{bmatrix}$$
+
+## 线性近似与可微
+
+一元的 $f(x + h) \approx f(x) + f'(x)h$ 在多元里变成
+
+$$f(\mathbf{x} + \mathbf{h}) = f(\mathbf{x}) + \nabla f(\mathbf{x})^{\mathrm{T}}\mathbf{h} + o(\lVert \mathbf{h} \rVert)$$
+
+满足这个式子的函数称为**可微**。偏导数都存在并不足以保证可微，但偏导数连续就够了，机器学习里常见的损失函数都满足这个条件。ReLU 这类在个别点不可导的函数，在这些点用次梯度（subgradient）代替，实践中不会带来问题。
+
+## 方向导数与最速下降
+
+沿单位向量 $\mathbf{u}$ 的变化率称为**方向导数**，由线性近似直接得到：
+
+$$D_{\mathbf{u}}f(\mathbf{x}) = \nabla f(\mathbf{x})^{\mathrm{T}}\mathbf{u} = \lVert \nabla f \rVert \cos\theta$$
+
+其中 $\theta$ 是 $\mathbf{u}$ 与 $\nabla f$ 的夹角。所以：
+
+- $\theta = 0$ 时最大：**梯度方向是函数增长最快的方向**，最大的增长率就是 $\lVert \nabla f \rVert$。
+- 反方向 $-\nabla f$ 是下降最快的方向，这就是梯度下降的依据。
+- 等高线上函数值不变，方向导数为 0，所以**梯度垂直于等高线**。
+
+```{r}
+#| label: fig-gradient
+#| fig.width: 4.8
+#| fig.height: 4.2
+#| fig.cap: "f(x, y) = x^2 + 3y^2 的等高线（灰色）与梯度（蓝色箭头，已缩短）。梯度处处垂直于等高线，指向函数增长最快的方向，它的反方向就是梯度下降要走的方向。"
+cB <- "#1f77b4"; cR <- "#d62728"; cG <- "#2ca02c"; cO <- "#ff7f0e"
+f <- function(x, y) x^2 + 3 * y^2
+xs <- seq(-2, 2, length.out = 200); ys <- seq(-2, 2, length.out = 200)
+t0 <- c(0.35, 1.3, 2.4, 3.6, 5.0)
+P <- cbind(2 * cos(t0), 2 / sqrt(3) * sin(t0))        # 在等高线 f = 4 上
+G <- cbind(2 * P[, 1], 6 * P[, 2])                     # 梯度
+par(mar = c(3.2, 3.4, 1.0, 0.8), mgp = c(2, 0.5, 0))
+plot(NA, xlim = c(-2, 2), ylim = c(-2, 2), asp = 1, xlab = "x", ylab = "y")
+contour(xs, ys, outer(xs, ys, f), levels = c(0.5, 1, 2, 4), drawlabels = FALSE, add = TRUE, col = "grey55")
+arrows(P[, 1], P[, 2], P[, 1] + 0.12 * G[, 1], P[, 2] + 0.12 * G[, 2], length = 0.08, col = cB, lwd = 2)
+points(P[, 1], P[, 2], pch = 19, cex = 0.7)
+stopifnot(all(abs(f(P[, 1], P[, 2]) - 4) < 1e-12),
+          all(f(P[, 1] - 1e-3 * G[, 1], P[, 2] - 1e-3 * G[, 2]) < 4))
+```
+
+## Jacobian 与多元链式法则
+
+向量值函数 $F: \mathbb{R}^n \rightarrow \mathbb{R}^m$ 的导数是 **Jacobian 矩阵**（ $m \times n$ ）：
+
+$$J_{ij} = \frac{\partial F_i}{\partial x_j}, \qquad F(\mathbf{x} + \mathbf{h}) \approx F(\mathbf{x}) + J\mathbf{h}$$
+
+也就是说，**导数在高维里是一个线性映射**，它的矩阵就是 Jacobian。标量函数是 $m = 1$ 的特例，Jacobian 是梯度的转置 $\nabla f^{\mathrm{T}}$（一行）。
+
+多元的链式法则是 Jacobian 的矩阵乘法。设 $\mathbf{y} = g(\mathbf{x})$， $\mathbf{z} = f(\mathbf{y})$，则
+
+$$J_{f \circ g}(\mathbf{x}) = J_f(g(\mathbf{x}))\,J_g(\mathbf{x})$$
+
+顺序不能交换：先作用的 $g$ 的 Jacobian 在右边。一元链式法则 $f'(g(x))g'(x)$ 就是 $1 \times 1$ 的情形。
+
+当最外层是标量（损失）时，更常用的是梯度形式。设 $L = \ell(h(\mathbf{w}))$，其中 $h$ 的 Jacobian 为 $J_h$，则
+
+$$\nabla_{\mathbf{w}}L = J_h(\mathbf{w})^{\mathrm{T}}\,\nabla_{h}\ell$$
+
+即**梯度沿着 Jacobian 的转置往回传**。反向传播就是反复用这一个公式（见下面“链式法则与反向传播”一节）。例如非线性最小二乘 $L = \frac{1}{2}\lVert g(\mathbf{x}) \rVert^2$，梯度为 $J_g^{\mathrm{T}}g$。
+
+# 矩阵微积分与常用梯度公式
+
+> **本章的问题：** 参数是向量、矩阵的时候，一个一个地写偏导数太繁琐。怎样把整个梯度一次性求出来？
+
+## 约定与办法
+
+约定：标量函数对向量（或矩阵）的梯度，与自变量的形状相同。对向量 $\mathbf{x}$， $\nabla_{\mathbf{x}}f$ 是同样长度的列向量；对矩阵 $W$， $\nabla_W f$ 是同样形状的矩阵，元素是 $\frac{\partial f}{\partial W_{ij}}$。（不同教材的布局约定不同，对照公式时要先确认。）
+
+办法是先求**微分**，再识别梯度：
+
+$$df = (\nabla f)^{\mathrm{T}}d\mathbf{x} \quad \text{（向量）}, \qquad df = \operatorname{tr}\left((\nabla_W f)^{\mathrm{T}}dW\right) \quad \text{（矩阵）}$$
+
+几条常用的规则： $d(AB) = dA\,B + A\,dB$，线性函数的微分就是它自己。逐元素函数 $\mathbf{a} = \sigma(\mathbf{z})$ 的微分是 $d\mathbf{a} = \sigma'(\mathbf{z}) \odot d\mathbf{z}$（ $\odot$ 是逐元素相乘），所以
+
+$$\nabla_{\mathbf{z}}f = \sigma'(\mathbf{z}) \odot \nabla_{\mathbf{a}}f$$
+
+## 常用公式
+
+下表中 $\mathbf{a}, \mathbf{b}$ 是常向量， $A$ 是常矩阵：
+
+| $f$ | 梯度 |
+| --- | --- |
+| $\mathbf{a}^{\mathrm{T}}\mathbf{x}$ | $\mathbf{a}$ |
+| $\lVert \mathbf{x} \rVert^2$ | $2\mathbf{x}$ |
+| $\mathbf{x}^{\mathrm{T}}A\mathbf{x}$ | $(A + A^{\mathrm{T}})\mathbf{x}$，对称时为 $2A\mathbf{x}$ |
+| $\frac{1}{2}\mathbf{x}^{\mathrm{T}}A\mathbf{x} - \mathbf{b}^{\mathrm{T}}\mathbf{x}$（ $A$ 对称） | $A\mathbf{x} - \mathbf{b}$ |
+| $\lVert A\mathbf{x} - \mathbf{b} \rVert^2$ | $2A^{\mathrm{T}}(A\mathbf{x} - \mathbf{b})$ |
+| $\lVert A\mathbf{x} - \mathbf{b} \rVert^2 + \lambda\lVert \mathbf{x} \rVert^2$ | $2A^{\mathrm{T}}(A\mathbf{x} - \mathbf{b}) + 2\lambda\mathbf{x}$ |
+| $\mathbf{a}^{\mathrm{T}}W\mathbf{b}$（对 $W$ 求梯度） | $\mathbf{a}\mathbf{b}^{\mathrm{T}}$ |
+| $g(A\mathbf{x})$（ $g$ 是标量函数） | $A^{\mathrm{T}}\nabla g(A\mathbf{x})$ |
+
+最后一行是线性层反向传播的核心：对 $\mathbf{z} = W\mathbf{a}$，梯度往回传时乘以 $W^{\mathrm{T}}$。第四行就是线代笔记里“优化与能量视角”的二次函数，令梯度为 0 得 $A\mathbf{x} = \mathbf{b}$。令第五行的梯度为 0，得到最小二乘的正规方程 $A^{\mathrm{T}}A\mathbf{x} = A^{\mathrm{T}}\mathbf{b}$；第六行（ridge 回归）则是 $(A^{\mathrm{T}}A + \lambda I)\mathbf{x} = A^{\mathrm{T}}\mathbf{b}$。
+
+自己推导的公式，可以用数值差分检验：对每个分量用中心差商 $\frac{f(\mathbf{x} + h\mathbf{e}_i) - f(\mathbf{x} - h\mathbf{e}_i)}{2h}$，取 $h$ 约为 $10^{-5}$（见“更多视角”一章中数值计算一节的误差表），与解析梯度比较，相对误差应在 $10^{-6}$ 以下。
+
+# 链式法则与反向传播
+
+> **本章的问题：** 一个多层网络的损失，对每一层参数的梯度怎么算？为什么只需要大约一次前向计算的代价？
+
+## 前向与反向
+
+考虑 $D$ 层的网络。记 $\mathbf{a}^{(0)} = \mathbf{x}$，每层为
+
+$$\mathbf{z}^{(l)} = W^{(l)}\mathbf{a}^{(l-1)} + \mathbf{b}^{(l)}, \qquad \mathbf{a}^{(l)} = \sigma(\mathbf{z}^{(l)})$$
+
+最后接一个损失 $L$。定义每层的“误差信号” $\boldsymbol{\delta}^{(l)} = \frac{\partial L}{\partial \mathbf{z}^{(l)}}$，即损失对该层线性输出的梯度。用上一章的两条规则（线性层乘 $W^{\mathrm{T}}$，逐元素函数乘 $\sigma'$），得到反向传播的递推：
+
+$$\begin{aligned}
+\boldsymbol{\delta}^{(D)} &= \nabla_{\mathbf{a}^{(D)}}L \odot \sigma'(\mathbf{z}^{(D)}) \\
+\boldsymbol{\delta}^{(l)} &= \left((W^{(l+1)})^{\mathrm{T}}\boldsymbol{\delta}^{(l+1)}\right) \odot \sigma'(\mathbf{z}^{(l)}) \\
+\nabla_{W^{(l)}}L &= \boldsymbol{\delta}^{(l)}(\mathbf{a}^{(l-1)})^{\mathrm{T}}, \qquad \nabla_{\mathbf{b}^{(l)}}L = \boldsymbol{\delta}^{(l)}
+\end{aligned}$$
+
+**例子**：两层网络 $\hat{y} = W^{(2)}\tanh(W^{(1)}\mathbf{x} + \mathbf{b}^{(1)}) + b^{(2)}$，损失 $L = \frac{1}{2}(\hat{y} - t)^2$。记 $\mathbf{a}^{(1)} = \tanh(\mathbf{z}^{(1)})$，则
+
+$$\boldsymbol{\delta}^{(2)} = \hat{y} - t, \qquad \boldsymbol{\delta}^{(1)} = \left((W^{(2)})^{\mathrm{T}}\boldsymbol{\delta}^{(2)}\right) \odot (1 - \mathbf{a}^{(1)} \odot \mathbf{a}^{(1)})$$
+
+$$\nabla_{W^{(2)}}L = \boldsymbol{\delta}^{(2)}(\mathbf{a}^{(1)})^{\mathrm{T}}, \qquad \nabla_{W^{(1)}}L = \boldsymbol{\delta}^{(1)}\mathbf{x}^{\mathrm{T}}$$
+
+这里用到 $\tanh' = 1 - \tanh^2$。这组公式可以用有限差分检验（见上一章末尾的梯度检验）。
+
+
+
+
+## 为什么用反向模式
+
+链式法则是 Jacobian 的乘积 $J_L \cdots J_2J_1$，乘法的结合顺序不影响结果，但影响计算量：
+
+- **前向模式**从右往左乘，每次得到 $J\mathbf{v}$（Jacobian-vector product），一次前向只能得到对**一个**输入方向的导数。要得到对 $n$ 个参数的梯度，需要 $n$ 次。
+- **反向模式**从左往右乘，每次得到 $\mathbf{v}^{\mathrm{T}}J$（vector-Jacobian product）。损失是标量时，最左边是一个行向量，一次反向传播就得到**所有**参数的梯度。
+
+所以参数多、输出是标量损失时，用反向模式。代价是需要保存前向计算中的中间结果（各层的 $\mathbf{a}^{(l)}, \mathbf{z}^{(l)}$），内存开销与网络深度成正比；一次反向传播的计算量与一次前向传播同阶（通常是 2 到 3 倍）。
+
+求导有三种办法：数值差分近似，每个参数要多算一次函数，只用于梯度检验；符号求导会随复合层数膨胀；**自动微分**（automatic differentiation）把计算拆成基本运算，对每一步用链式法则，结果精确到机器精度，代价与前向同阶，深度学习框架用的就是它。
+
+反过来，二阶信息也不必显式写出 Hessian：Hessian-vector product $H\mathbf{v}$ 可以对 $\nabla f^{\mathrm{T}}\mathbf{v}$ 再求一次梯度得到，代价与求一次梯度同阶，共轭梯度、Newton-CG 等方法只需要这个。
+
+## 梯度消失与爆炸
+
+梯度从第 $D$ 层传到第 $l$ 层，要乘上一串因子，每一层贡献 $\operatorname{diag}(\sigma'(\mathbf{z}^{(k)}))(W^{(k)})^{\mathrm{T}}$。若每一层的因子都小于 1，乘积随深度指数衰减（梯度消失）；都大于 1 则指数增长（梯度爆炸）。例如 sigmoid 的导数 $\sigma'(z) = \sigma(z)(1 - \sigma(z))$ 最大只有 $\frac{1}{4}$，权重范数约为 1 时，10 层之后梯度被压缩约 $\left(\frac{1}{4}\right)^{10} \approx 10^{-6}$ 倍。常见的对策：
+
+- 用 ReLU（导数是 0 或 1），不再每层压缩；
+- 合适的权重初始化，让每层的 Jacobian 范数保持在 1 左右；
+- 残差连接 $\mathbf{a}^{(l)} = \mathbf{a}^{(l-1)} + F(\mathbf{a}^{(l-1)})$，其 Jacobian 是 $I + J_F$，乘积里始终有一条恒等的通路；
+- 梯度裁剪（针对爆炸）。
+
+```{r}
+#| label: fig-sigmoid-gradient
+#| fig.width: 8.5
+#| fig.height: 3.4
+#| fig.cap: "左：sigmoid 函数及其导数，导数的最大值只有 1/4（虚线）。右：每一层贡献的因子不超过 1/4 时，经过 k 层之后梯度的上界 (1/4)^k 随层数指数衰减，这就是梯度消失。"
+cB <- "#1f77b4"; cR <- "#d62728"; cG <- "#2ca02c"; cO <- "#ff7f0e"
+z <- seq(-8, 8, length.out = 401)
+s <- 1 / (1 + exp(-z)); ds <- s * (1 - s)
+par(mfrow = c(1, 2), mar = c(3.2, 3.4, 2.2, 0.8), mgp = c(2, 0.5, 0))
+plot(z, s, type = "l", lwd = 2, col = cB, ylim = c(0, 1), xlab = "z", ylab = "",
+     main = "sigmoid and its derivative", cex.main = 0.9)
+lines(z, ds, lwd = 2, col = cR)
+abline(h = 0.25, lty = 3, col = "grey50")
+legend("right", c("σ(z)", "σ'(z)"), col = c(cB, cR), lwd = 2, bty = "n", cex = 0.9)
+k <- 1:20
+plot(k, 0.25^k, log = "y", type = "b", pch = 19, cex = 0.6, col = cR,
+     xlab = "number of layers k", ylab = "(1/4)^k", main = "upper bound of the product", cex.main = 0.9)
+stopifnot(abs(max(ds) - 0.25) < 1e-6)
+```
+
+> **留下的问题：** 梯度告诉我们往哪个方向走。梯度为 0 的点是极小、极大还是鞍点？损失曲面有多“弯”，决定了走得多快、走得多稳。这需要二阶导数。
+
+# 二阶导数：Hessian、多元泰勒与凸性
+
+> **本章的问题：** 梯度为 0 的点是极小、极大还是鞍点？损失曲面有多“弯”，这个“弯”如何决定优化的难易？
+
+## Hessian 与多元泰勒展开
+
+标量函数的二阶偏导数排成矩阵，就是 **Hessian**：
+
+$$H_{ij} = \frac{\partial^2 f}{\partial x_i\,\partial x_j}$$
+
+当二阶偏导数连续时， $\frac{\partial^2 f}{\partial x_i\partial x_j} = \frac{\partial^2 f}{\partial x_j\partial x_i}$，所以 $H$ 是对称矩阵（Schwarz 定理），它有实特征值和一组标准正交的特征向量。泰勒展开到二阶：
+
+$$f(\mathbf{x} + \mathbf{h}) \approx f(\mathbf{x}) + \nabla f(\mathbf{x})^{\mathrm{T}}\mathbf{h} + \frac{1}{2}\mathbf{h}^{\mathrm{T}}H(\mathbf{x})\mathbf{h}$$
+
+这和线代笔记里的二次函数是同一个对象：在任何光滑函数的一个点附近，都可以用一个“碗”（二次型）来近似，碗的形状由 Hessian 决定。Hessian 的特征向量是碗的主轴，特征值是各主轴方向上的曲率。
+
+## 极值的判别
+
+极值的必要条件是 $\nabla f = \mathbf{0}$（驻点）。在驻点，二阶项决定了是什么类型：
+
+| Hessian | 驻点的类型 | 一元时的对应 |
+| --- | --- | --- |
+| 正定（所有特征值 $> 0$） | 局部极小 | $f'' > 0$ |
+| 负定（所有特征值 $< 0$） | 局部极大 | $f'' < 0$ |
+| 不定（有正有负） | 鞍点 | 无（一元没有） |
+| 半正定或半负定 | 二阶判别失效，需看更高阶 | $f'' = 0$ |
+
+例如 $f(x, y) = x^2 - y^2$，在原点 $H = \operatorname{diag}(2, -2)$ 不定：沿 $x$ 轴向上弯，沿 $y$ 轴向下弯，是鞍点。
+
+```{r}
+#| label: fig-hessian-types
+#| fig.width: 9
+#| fig.height: 3.4
+#| fig.cap: "二次函数在驻点处的三种 Hessian。左：正定，等高线是椭圆，局部极小；中：负定，局部极大；右：不定，沿一个方向上升、沿另一个方向下降，是鞍点（蓝色实线为正值的等高线，红色虚线为负值的等高线）。"
+cB <- "#1f77b4"; cR <- "#d62728"; cG <- "#2ca02c"; cO <- "#ff7f0e"
+g <- seq(-1.5, 1.5, length.out = 120)
+panel <- function(f, ttl, lev_pos, lev_neg) {
+  plot(NA, xlim = c(-1.5, 1.5), ylim = c(-1.5, 1.5), asp = 1, xlab = "x", ylab = "y", main = ttl, cex.main = 0.9)
+  z <- outer(g, g, f)
+  if (length(lev_pos) > 0) contour(g, g, z, levels = lev_pos, drawlabels = FALSE, add = TRUE, col = cB, lwd = 1.5)
+  if (length(lev_neg) > 0) contour(g, g, z, levels = lev_neg, drawlabels = FALSE, add = TRUE, col = cR, lwd = 1.5, lty = 2)
+  points(0, 0, pch = 19)
+}
+par(mfrow = c(1, 3), mar = c(3.2, 3.4, 2.2, 0.8), mgp = c(2, 0.5, 0))
+panel(function(x, y) x^2 + y^2, "minimum: H positive definite", c(0.25, 0.75, 1.5), numeric(0))
+panel(function(x, y) -x^2 - y^2, "maximum: H negative definite", numeric(0), c(-0.25, -0.75, -1.5))
+panel(function(x, y) x^2 - y^2, "saddle: H indefinite", c(0.25, 0.75, 1.5), c(-0.25, -0.75, -1.5))
+ev <- eigen(diag(c(2, -2)))$values
+stopifnot(min(ev) < 0, max(ev) > 0)
+```
+
+高维的损失曲面里，鞍点往往比局部极小多得多：Hessian 有 $n$ 个特征值，全部为正是很强的要求，只要有一个为负就是鞍点。所以训练神经网络的困难，常常是在鞍点附近梯度很小、走得很慢，而不是困在糟糕的局部极小里。
+
+## 凸函数
+
+凸函数是最好处理的一类。 $f$ 是**凸函数**，指的是任意两点之间的弦在图像之上：
+
+$$f(\theta\mathbf{x} + (1 - \theta)\mathbf{y}) \le \theta f(\mathbf{x}) + (1 - \theta)f(\mathbf{y}), \quad 0 \le \theta \le 1$$
+
+可微时有两个等价的判别：
+
+- 一阶条件：图像在切平面之上， $f(\mathbf{y}) \ge f(\mathbf{x}) + \nabla f(\mathbf{x})^{\mathrm{T}}(\mathbf{y} - \mathbf{x})$；
+- 二阶条件：Hessian 处处半正定， $H \succeq 0$（一元的 $f'' \ge 0$ ）。
+
+凸函数的好处是：**局部极小就是全局极小**，并且 $\nabla f = \mathbf{0}$ 等价于全局极小。线性回归、逻辑回归（交叉熵）、ridge 与 lasso 的目标函数都是凸的；神经网络一般不是。
+
+```{r}
+#| label: fig-convex
+#| fig.width: 4.8
+#| fig.height: 3.6
+#| fig.cap: "凸函数 f(x) = x^2。任意两点之间的弦（红色）在图像之上，这是凸函数的定义；任一点的切线（蓝色虚线）在图像之下，这是一阶条件。"
+cB <- "#1f77b4"; cR <- "#d62728"; cG <- "#2ca02c"; cO <- "#ff7f0e"
+f <- function(x) x^2
+x1 <- -1; x2 <- 2; x0 <- 0.5
+xs <- seq(-1.6, 2.6, length.out = 200)
+par(mar = c(3.2, 3.4, 1.0, 0.8), mgp = c(2, 0.5, 0))
+plot(xs, f(xs), type = "l", lwd = 2, xlab = "x", ylab = "f(x)")
+segments(x1, f(x1), x2, f(x2), col = cR, lwd = 2)
+lines(xs, f(x0) + 2 * x0 * (xs - x0), col = cB, lwd = 2, lty = 2)
+points(c(x1, x2, x0), f(c(x1, x2, x0)), pch = 19)
+legend("topleft", c("f(x) = x^2", "chord (above the graph)", "tangent (below the graph)"),
+       col = c("black", cR, cB), lty = c(1, 1, 2), lwd = 2, bty = "n", cex = 0.8)
+xi <- seq(x1, x2, length.out = 101)
+chord <- f(x1) + (f(x2) - f(x1)) / (x2 - x1) * (xi - x1)
+stopifnot(all(f(xi) <= chord + 1e-12), all(f(xs) >= f(x0) + 2 * x0 * (xs - x0) - 1e-12))
+```
+
+## 光滑性与条件数
+
+为了讨论优化的收敛速度，需要两个量。设函数二阶可微，Hessian 的特征值满足
+
+$$\mu I \preceq H(\mathbf{x}) \preceq LI$$
+
+- $L$ 是**光滑性**常数（梯度的 Lipschitz 常数），上界：最大曲率；
+- $\mu$ 是**强凸**常数，下界： $\mu > 0$ 说明碗处处至少有这么弯，极小点唯一；
+- 比值 $\kappa = \frac{L}{\mu}$ 是**条件数**，描述碗有多“扁”。
+
+对二次函数 $\frac{1}{2}\mathbf{x}^{\mathrm{T}}A\mathbf{x} - \mathbf{b}^{\mathrm{T}}\mathbf{x}$， $H = A$，所以 $L$、 $\mu$ 就是 $A$ 的最大、最小特征值，这正是线代笔记里的条件数。
+
+
+
+
+# 梯度下降与优化
+
+> **本章的问题：** 怎样用梯度（以及 Hessian）一步步走到最小点？步长怎么选？为什么有时会走得很慢？
+
+## 梯度下降
+
+由一阶泰勒展开，沿 $-\mathbf{g}$（ $\mathbf{g} = \nabla f(\mathbf{x})$ ）走一小步 $\alpha$：
+
+$$f(\mathbf{x} - \alpha\mathbf{g}) \approx f(\mathbf{x}) - \alpha\lVert \mathbf{g} \rVert^2$$
+
+只要 $\alpha$ 足够小，函数值就下降。于是得到**梯度下降**：
+
+$$\mathbf{x}_{k+1} = \mathbf{x}_k - \alpha\nabla f(\mathbf{x}_k)$$
+
+步长 $\alpha$ 不能随意取。设 $f$ 是 $L$-光滑的，二阶展开加上 $H \preceq LI$ 的上界，得到
+
+$$f(\mathbf{x} - \alpha\nabla f) \le f(\mathbf{x}) - \alpha\left(1 - \frac{L\alpha}{2}\right)\lVert \nabla f \rVert^2$$
+
+所以 $\alpha < \frac{2}{L}$ 时函数值一定下降；取 $\alpha = \frac{1}{L}$ 时每步至少下降 $\frac{1}{2L}\lVert \nabla f \rVert^2$。步长太大会越过碗底，在两侧来回震荡甚至发散。
+
+## 收敛速度与条件数
+
+对 $\mu$-强凸、 $L$-光滑的函数，取 $\alpha = \frac{1}{L}$，则
+
+$$f(\mathbf{x}_k) - f^* \le \left(1 - \frac{\mu}{L}\right)^k\left(f(\mathbf{x}_0) - f^*\right) = \left(1 - \frac{1}{\kappa}\right)^k\left(f(\mathbf{x}_0) - f^*\right)$$
+
+对二次函数取最优的固定步长 $\alpha = \frac{2}{L + \mu}$，误差每步缩小为原来的 $\frac{\kappa - 1}{\kappa + 1}$ 倍（与线代笔记“优化与能量视角”一节给出的因子相同）。 $\kappa$ 越大，因子越接近 1，收敛越慢：在扁长的碗里，梯度几乎垂直于通向碗底的方向，每一步都在窄方向上来回折返，在宽方向上只前进一点点。
+
+```{r}
+#| label: fig-gd-paths
+#| fig.width: 6.5
+#| fig.height: 5.0
+#| fig.cap: "梯度下降（步长 2/(L + μ)）在 f = (x^2 + κ y^2)/2 上的路径，上：κ = 2，下：κ = 20。条件数越大，碗越扁，路径在窄方向上来回折返，沿宽方向前进得很慢；每步误差的收缩因子是 (κ - 1)/(κ + 1)。"
+cB <- "#1f77b4"; cR <- "#d62728"; cG <- "#2ca02c"; cO <- "#ff7f0e"
+gd_path <- function(kappa, x0, k = 25) {
+  alpha <- 2 / (kappa + 1)
+  P <- matrix(NA_real_, k + 1, 2)
+  P[1, ] <- x0
+  for (i in 1:k) P[i + 1, ] <- P[i, ] - alpha * c(1, kappa) * P[i, ]
+  P
+}
+x0 <- c(3, 1)
+xs <- seq(-5, 5, length.out = 300); ys <- seq(-1.6, 1.6, length.out = 300)
+par(mfrow = c(2, 1), mar = c(3.2, 3.4, 2.0, 0.8), mgp = c(2, 0.5, 0))
+for (kappa in c(2, 20)) {
+  P <- gd_path(kappa, x0)
+  f <- function(x, y) 0.5 * (x^2 + kappa * y^2)
+  f0 <- f(x0[1], x0[2])
+  rho <- (kappa - 1) / (kappa + 1)
+  plot(NA, xlim = c(-5, 5), ylim = c(-1.6, 1.6), asp = 1, xlab = "x", ylab = "y",
+       main = sprintf("kappa = %g, contraction (kappa - 1)/(kappa + 1) = %.2f", kappa, rho), cex.main = 0.9)
+  contour(xs, ys, outer(xs, ys, f), levels = f0 * c(0.02, 0.06, 0.15, 0.35, 0.7, 1),
+          drawlabels = FALSE, add = TRUE, col = "grey60")
+  lines(P[, 1], P[, 2], col = cR, lwd = 1.5)
+  points(P[, 1], P[, 2], pch = 19, cex = 0.5, col = cR)
+  stopifnot(all(sqrt(rowSums(P^2)) <= rho^(0:25) * sqrt(sum(x0^2)) + 1e-12))
+}
+```
+
+所以改善优化，就是想办法降低条件数：
+
+- **标准化输入**，让各特征的尺度相近，Hessian 的特征值就不会差得太远；
+- **正则化**： $L_2$ 正则给 Hessian 加上 $\lambda I$，所有特征值都平移 $\lambda$，条件数从 $\frac{\lambda_{\max}}{\lambda_{\min}}$ 变成 $\frac{\lambda_{\max} + \lambda}{\lambda_{\min} + \lambda}$（例如 $\lambda_{\max} = 10$， $\lambda_{\min} = 0.1$ 时，加上 $\lambda = 1$，条件数从 100 降到 10）；
+- 用动量、自适应方法、二阶方法（下面）。
+
+## 牛顿法与拟牛顿法
+
+牛顿法对二次近似直接求极小，也就是令近似的梯度为 0：
+
+$$\mathbf{x}_{k+1} = \mathbf{x}_k - H^{-1}\nabla f(\mathbf{x}_k)$$
+
+它把 Hessian 当作“度量”，把扁碗拉成圆碗，所以对二次函数一步到位，对一般的光滑函数在最优点附近二次收敛。代价是每步要形成并求解 $n \times n$ 的线性方程组（ $O(n^3)$ ，存储 $O(n^2)$ ），参数很多时不可行；另外在非凸区域 $H$ 可能不定，牛顿方向未必是下降方向，需要阻尼或信赖域。
+
+实践中的折中是**拟牛顿法**（如 L-BFGS）：只用最近几步的梯度变化来近似 $H^{-1}$，不显式形成矩阵。
+
+## 动量与自适应步长
+
+**动量法**（momentum）给下降方向加上“惯性”：
+
+$$\mathbf{v}_{k+1} = \beta\mathbf{v}_k + \nabla f(\mathbf{x}_k), \qquad \mathbf{x}_{k+1} = \mathbf{x}_k - \alpha\mathbf{v}_{k+1}$$
+
+在一致的方向上累积加速，在来回震荡的方向上互相抵消。对二次函数，动量法（重球法、Nesterov 加速）把迭代次数对条件数的依赖从 $O(\kappa)$ 降到 $O(\sqrt{\kappa})$。
+
+**Adam** 等自适应方法给每个参数一个自己的步长。设 $\mathbf{g}_t$ 是第 $t$ 步的梯度：
+
+$$\begin{aligned}
+\mathbf{m}_t &= \beta_1\mathbf{m}_{t-1} + (1 - \beta_1)\mathbf{g}_t \\
+\mathbf{s}_t &= \beta_2\mathbf{s}_{t-1} + (1 - \beta_2)\mathbf{g}_t \odot \mathbf{g}_t \\
+\mathbf{x}_{t} &= \mathbf{x}_{t-1} - \alpha\frac{\hat{\mathbf{m}}_t}{\sqrt{\hat{\mathbf{s}}_t} + \epsilon}
+\end{aligned}$$
+
+其中 $\hat{\mathbf{m}}_t = \frac{\mathbf{m}_t}{1 - \beta_1^t}$， $\hat{\mathbf{s}}_t = \frac{\mathbf{s}_t}{1 - \beta_2^t}$ 是偏差修正，常用的默认值是 $\beta_1 = 0.9$， $\beta_2 = 0.999$， $\epsilon = 10^{-8}$。 $\mathbf{m}_t$ 是梯度的指数滑动平均（动量）， $\mathbf{s}_t$ 是梯度平方的滑动平均，除以 $\sqrt{\mathbf{s}_t}$ 相当于按各参数的梯度尺度做归一化，可以看成一个对角形式的预条件。第一步的更新量约为 $\alpha\operatorname{sign}(\mathbf{g})$，所以 $\alpha$ 近似是每步每个参数的最大改变量。
+
+## 随机梯度下降
+
+机器学习的损失是 $N$ 个样本损失的平均， $\mathcal{L}(\mathbf{w}) = \frac{1}{N}\sum_{i=1}^{N}\ell_i(\mathbf{w})$。每步只用一个小批量 $B$ 估计梯度：
+
+$$\tilde{\mathbf{g}} = \frac{1}{\lvert B \rvert}\sum_{i \in B}\nabla\ell_i(\mathbf{w}), \qquad E[\tilde{\mathbf{g}}] = \nabla\mathcal{L}(\mathbf{w})$$
+
+估计是无偏的，方差大致与 $\frac{1}{\lvert B \rvert}$ 成正比。噪声带来的结果是：步长固定时，迭代不会收敛到最优点，而是在它附近的一个“噪声球”里波动；要收敛，步长需要递减，经典的条件（Robbins-Monro）是 $\sum\alpha_k = \infty$ 且 $\sum\alpha_k^2 < \infty$，前者保证走得到，后者保证噪声被压下去。
+
+## 约束优化与拉格朗日乘子
+
+在约束 $g(\mathbf{x}) = 0$ 下极小化 $f$：在最优点，约束曲面不能再让 $f$ 下降，所以 $\nabla f$ 必须垂直于约束曲面，也就是与 $\nabla g$ 平行：
+
+$$\nabla f = \lambda\nabla g$$
+
+$\lambda$ 是**拉格朗日乘子**，等价于对拉格朗日函数 $f - \lambda g$ 求驻点。线代笔记里就用了这个办法：在 $\lVert \mathbf{x} \rVert = 1$ 下极大化 $\mathbf{x}^{\mathrm{T}}A\mathbf{x}$，得到 $A\mathbf{x} = \lambda\mathbf{x}$，特征值就是约束极值问题的乘子。不等式约束（如 SVM）把条件推广为 KKT 条件，思路相同。 $L_2$ 正则也可以看作“约束 $\lVert \mathbf{w} \rVert^2 \le c$”的拉格朗日形式。
+
+## 方法对照
+
+| 方法 | 用到的导数 | 每步代价 | 特点 |
+| --- | --- | --- | --- |
+| 梯度下降 | 一阶 | $O(n)$ | 收敛因子 $1 - \frac{1}{\kappa}$，受条件数影响大 |
+| 动量法 | 一阶 | $O(n)$ | 对条件数的依赖约为 $\sqrt{\kappa}$ |
+| Adam | 一阶 | $O(n)$ | 按参数自适应步长，深度学习中最常用 |
+| SGD | 一阶（小批量） | $O(\lvert B \rvert\,n)$ | 无偏但有噪声，步长要递减 |
+| 牛顿法 | 二阶 | $O(n^3)$ | 二次函数一步到位，局部二次收敛 |
+| L-BFGS | 近似二阶 | $O(mn)$（保存 $m$ 步） | 中等规模、光滑问题 |
+
+> **留下的问题：** 工具有了。把它们用到最常见的几个模型上，看看公式会长成什么样。
+
+# 机器学习中的典型推导
+
+> **本章的问题：** 把前面的工具用在最常见的几个模型上，看看梯度、Hessian 和优化性质分别是什么。
+
+## 线性回归
+
+损失 $L(\mathbf{w}) = \frac{1}{2n}\lVert X\mathbf{w} - \mathbf{y} \rVert^2$，由矩阵微积分的公式：
+
+$$\nabla L = \frac{1}{n}X^{\mathrm{T}}(X\mathbf{w} - \mathbf{y}), \qquad H = \frac{1}{n}X^{\mathrm{T}}X$$
+
+$H = \frac{1}{n}X^{\mathrm{T}}X$ 半正定，所以 $L$ 是凸函数，令梯度为 0 就是正规方程 $X^{\mathrm{T}}X\mathbf{w} = X^{\mathrm{T}}\mathbf{y}$。当 $X$ 列满秩时 $H$ 正定，解唯一。 $H$ 的特征值是 $X$ 的奇异值的平方（再除以 $n$ ），所以条件数 $\kappa(H) = \kappa(X)^2$，这就是线代笔记里“不直接解正规方程”和“先标准化特征”的理由：特征尺度悬殊时，梯度下降会很慢。
+
+## 逻辑回归
+
+模型 $p_i = \sigma(\mathbf{x}_i^{\mathrm{T}}\mathbf{w})$， $\sigma(z) = \frac{1}{1 + e^{-z}}$，它的导数有一个很好的形式：
+
+$$\sigma'(z) = \sigma(z)\left(1 - \sigma(z)\right)$$
+
+交叉熵损失 $L = -\sum_i\left[y_i\ln p_i + (1 - y_i)\ln(1 - p_i)\right]$。对 $z_i = \mathbf{x}_i^{\mathrm{T}}\mathbf{w}$ 求导，逐项用链式法则，分子里的 $p_i(1 - p_i)$ 与分母恰好约去：
+
+$$\frac{\partial L}{\partial z_i} = p_i - y_i$$
+
+再用线性层的规则（梯度乘 $X^{\mathrm{T}}$ ），得到
+
+$$\nabla L = X^{\mathrm{T}}(\mathbf{p} - \mathbf{y}), \qquad H = X^{\mathrm{T}}\operatorname{diag}\big(p_i(1 - p_i)\big)X$$
+
+$p_i(1 - p_i) \ge 0$，所以 $H$ 半正定，逻辑回归的损失是凸函数。形式上，梯度与线性回归一样，都是“特征乘以预测误差”。
+
+对它用牛顿法，设 $W = \operatorname{diag}\big(p_i(1 - p_i)\big)$，每一步是
+
+$$\mathbf{w} \leftarrow \mathbf{w} - (X^{\mathrm{T}}WX)^{-1}X^{\mathrm{T}}(\mathbf{p} - \mathbf{y}) = (X^{\mathrm{T}}WX)^{-1}X^{\mathrm{T}}W\mathbf{z}, \qquad \mathbf{z} = X\mathbf{w} + W^{-1}(\mathbf{y} - \mathbf{p})$$
+
+这是一个加权最小二乘问题，所以牛顿法在统计里叫**迭代重加权最小二乘**（IRLS），这是统计软件拟合广义线性模型的标准做法，与概率统计笔记里回归的内容相衔接。当数据线性可分时，不存在有限的最优解，权重会无限增大，同时 $p_i(1 - p_i) \rightarrow 0$， $H$ 趋于 0。
+
+## Softmax 与交叉熵
+
+多分类时 $p_k = \frac{e^{z_k}}{\sum_j e^{z_j}}$。它的 Jacobian 是
+
+$$\frac{\partial p_k}{\partial z_j} = p_k(\delta_{kj} - p_j)$$
+
+其中 $\delta_{kj}$ 在 $k = j$ 时为 1，否则为 0。损失取真实类别 $t$ 的负对数概率 $L = -\ln p_t$，用链式法则代入后同样约去，得到与逻辑回归一模一样的形式：
+
+$$\frac{\partial L}{\partial \mathbf{z}} = \mathbf{p} - \mathbf{y}$$
+
+其中 $\mathbf{y}$ 是 one-hot 向量。逻辑回归就是 $K = 2$ 的情形。实现时应直接对 logits 计算损失（log-softmax），并用 $\ln\sum_j e^{z_j} = m + \ln\sum_j e^{z_j - m}$（ $m = \max_j z_j$ ）避免溢出，而不是先算 softmax 再取对数。
+
+## 正则化
+
+在损失上加 $L_2$ 正则 $\frac{\lambda}{2}\lVert \mathbf{w} \rVert^2$：梯度多一项 $\lambda\mathbf{w}$，Hessian 加上 $\lambda I$，每个特征值都平移 $\lambda$。所以 $\mu \ge \lambda$，函数变成强凸，解唯一，条件数也降低（前面例子里从 100 降到 10）。梯度下降一步变成
+
+$$\mathbf{w} \leftarrow (1 - \alpha\lambda)\mathbf{w} - \alpha\nabla L$$
+
+也就是每一步先把权重按比例缩小，所以 $L_2$ 正则又叫权重衰减（weight decay）。
+
+$L_1$ 正则 $\lambda\lVert \mathbf{w} \rVert_1$ 在 $w_i = 0$ 处不可导，用次梯度处理（ $w_i \ne 0$ 时是 $\lambda\operatorname{sign}(w_i)$，在 0 处取 $[-\lambda, \lambda]$ 中的任意值），对应的近端梯度法每步做一次“软阈值”，把小的权重直接压成 0，这就是 lasso 得到稀疏解的原因。
+
+# 多重积分与概率
+
+> **本章的问题：** 概率密度的积分、期望、变量替换，在多个变量下怎么处理？对一个含参数的期望，怎样求导？
+
+## 多重积分与变量替换
+
+二重积分 $\iint_D f(x, y)\,dA$ 对应曲面下的体积。当 $f$ 连续时，可以化成累次积分，而且积分顺序可以交换（Fubini 定理）：
+
+$$\iint_{[0,1]^2}xy\,dA = \int_0^1\left(\int_0^1xy\,dy\right)dx = \int_0^1\frac{x}{2}dx = \frac{1}{4}$$
+
+变量替换是一元换元的推广。设 $\mathbf{x} = \mathbf{x}(\mathbf{u})$，则
+
+$$\int f(\mathbf{x})\,d\mathbf{x} = \int f(\mathbf{x}(\mathbf{u}))\,\lvert \det J_{\mathbf{x}}(\mathbf{u}) \rvert\,d\mathbf{u}$$
+
+Jacobian 行列式 $\lvert \det J \rvert$ 是体积的局部缩放因子（线代笔记里行列式的几何意义）。例如极坐标 $x = r\cos\theta$， $y = r\sin\theta$ 的 $\lvert \det J \rvert = r$，由此可以算出高斯积分：
+
+$$\left(\int_{-\infty}^{\infty}e^{-x^2/2}dx\right)^2 = \iint e^{-(x^2 + y^2)/2}dx\,dy = \int_0^{2\pi}\int_0^{\infty}e^{-r^2/2}r\,dr\,d\theta = 2\pi$$
+
+所以 $\int_{-\infty}^{\infty}e^{-x^2/2}dx = \sqrt{2\pi}$，这是正态分布密度里 $\frac{1}{\sqrt{2\pi}}$ 的来源。
+
+```{r}
+#| label: fig-jacobian-area
+#| fig.width: 9
+#| fig.height: 3.9
+#| fig.cap: "左：极坐标下的面积元 r dr dθ（红色小块），离原点越远，同样的 dr、dθ 对应的面积越大。右：线性变换 A 把单位圆（蓝色虚线）变成椭圆（红色），面积乘以 |det A| = 2；两个箭头是 A 作用在基向量上的结果。"
+cB <- "#1f77b4"; cR <- "#d62728"; cG <- "#2ca02c"; cO <- "#ff7f0e"
+tt <- seq(0, 2 * pi, length.out = 400)
+par(mfrow = c(1, 2), mar = c(3.2, 3.4, 2.2, 0.8), mgp = c(2, 0.5, 0))
+plot(NA, xlim = c(-1.6, 1.6), ylim = c(-1.6, 1.6), asp = 1, xlab = "x", ylab = "y", main = "polar: dA = r dr dθ", cex.main = 0.9)
+for (r in c(0.5, 1, 1.5)) lines(r * cos(tt), r * sin(tt), col = "grey60")
+for (a in seq(0, 2 * pi, length.out = 13)[-13]) segments(0, 0, 1.6 * cos(a), 1.6 * sin(a), col = "grey85")
+aa <- seq(0.6, 0.95, length.out = 30)
+polygon(c(1 * cos(aa), rev(1.25 * cos(aa))), c(1 * sin(aa), rev(1.25 * sin(aa))), col = adjustcolor(cR, 0.5), border = cR)
+A <- matrix(c(2, 0.8, 0, 1), 2, byrow = TRUE)
+E <- A %*% rbind(cos(tt), sin(tt))
+plot(NA, xlim = c(-3, 3), ylim = c(-1.6, 1.6), asp = 1, xlab = "x", ylab = "y",
+     main = sprintf("area is multiplied by |det A| = %.1f", abs(det(A))), cex.main = 0.9)
+lines(cos(tt), sin(tt), col = cB, lty = 2, lwd = 2)
+lines(E[1, ], E[2, ], col = cR, lwd = 2)
+arrows(0, 0, A[1, 1], A[2, 1], length = 0.08, lwd = 2)
+arrows(0, 0, A[1, 2], A[2, 2], length = 0.08, lwd = 2)
+area <- 0.5 * abs(sum(E[1, -ncol(E)] * E[2, -1] - E[1, -1] * E[2, -ncol(E)]))
+stopifnot(abs(area - pi * abs(det(A))) < 1e-3)
+```
+
+## 概率密度的变换
+
+设 $\mathbf{y} = g(\mathbf{x})$ 是可逆变换， $\mathbf{x}$ 的密度为 $p_X$，则 $\mathbf{y}$ 的密度要乘以反变换的体积缩放因子：
+
+$$p_Y(\mathbf{y}) = p_X\big(g^{-1}(\mathbf{y})\big)\,\lvert \det J_{g^{-1}}(\mathbf{y}) \rvert$$
+
+线性变换 $\mathbf{y} = A\mathbf{x} + \mathbf{b}$ 时就是 $p_Y(\mathbf{y}) = \frac{p_X(A^{-1}(\mathbf{y} - \mathbf{b}))}{\lvert \det A \rvert}$。多元正态分布密度里的 $(\det\Sigma)^{-1/2}$ 就是这样来的：把标准正态 $\mathbf{x}$ 经过 $\mathbf{y} = \Sigma^{1/2}\mathbf{x} + \boldsymbol{\mu}$ 变换，
+
+$$p(\mathbf{y}) = \frac{1}{(2\pi)^{n/2}(\det\Sigma)^{1/2}}\exp\left(-\frac{1}{2}(\mathbf{y} - \boldsymbol{\mu})^{\mathrm{T}}\Sigma^{-1}(\mathbf{y} - \boldsymbol{\mu})\right)$$
+
+取对数后有 $\ln p_Y = \ln p_X - \ln\lvert \det J_g \rvert$，生成模型里的 normalizing flow 就是用一串可逆变换，使这个对数行列式容易计算。
+
+## 期望与蒙特卡洛
+
+期望是积分：
+
+$$E[f(X)] = \int f(\mathbf{x})p(\mathbf{x})\,d\mathbf{x}$$
+
+维数高时，网格上的数值积分所需的点数随维数指数增长（维数灾难），而蒙特卡洛用样本平均近似：
+
+$$E[f(X)] \approx \frac{1}{N}\sum_{i=1}^{N}f(\mathbf{x}_i), \qquad \mathbf{x}_i \sim p$$
+
+误差约为 $O\left(\frac{1}{\sqrt{N}}\right)$，收敛速度与维数无关。小批量梯度（上一章）本质上就是把“对全体样本取平均”这个积分，用一个小样本来近似。
+
+## 对期望求导
+
+训练变分自编码器、强化学习等模型时，要对含有参数的分布求期望的梯度， $\nabla_\theta E_{x \sim p_\theta}[f(x)]$，积分的变量和被求导的参数在同一个分布里。常用的两种办法：
+
+**重参数化**：把随机性分离出来。例如 $x = \mu + \sigma\epsilon$， $\epsilon \sim \mathcal{N}(0, 1)$，则期望里不再含有 $\mu, \sigma$，可以把求导放进去：
+
+$$\nabla_\mu E[f(\mu + \sigma\epsilon)] = E[f'(\mu + \sigma\epsilon)], \qquad \nabla_\sigma E[f(\mu + \sigma\epsilon)] = E[f'(\mu + \sigma\epsilon)\,\epsilon]$$
+
+这是链式法则加上蒙特卡洛，通常方差较小，缺点是要求 $f$ 可微、分布能够这样重参数化。
+
+**得分函数（对数导数技巧）**：用 $\nabla_\theta p_\theta = p_\theta\nabla_\theta\ln p_\theta$，得到
+
+$$\nabla_\theta E_{p_\theta}[f(x)] = E_{p_\theta}\big[f(x)\,\nabla_\theta\ln p_\theta(x)\big]$$
+
+它只需要能对 $\ln p_\theta$ 求导，不要求 $f$ 可微（离散变量也可以），代价是估计量的方差通常更大（强化学习里的 REINFORCE）。
+
+## 交叉熵与 KL 散度
+
+交叉熵是期望 $-E_p[\ln q] = -\int p\ln q\,dx$，KL 散度是 $D(p \Vert q) = \int p\ln\frac{p}{q}dx$。因为 $-\ln$ 是凸函数，由 Jensen 不等式 $D(p \Vert q) \ge 0$，等号成立当且仅当 $p = q$。所以最小化交叉熵就是最小化 KL 散度（ $p$ 固定时两者相差一个与 $q$ 无关的常数，即 $p$ 的熵），最大似然估计与上面逻辑回归、softmax 的损失就是这样联系在一起的。
+
+# 更多视角
+
+> **本章的问题：** 前面是按“函数、法则、定理”的顺序组织的。把它们放到多元函数、线性代数、概率统计和数值计算里再看，同一批公式会有新的含义。
+
+## 局部线性化：从一元到多元
+
+全篇最核心的想法是用简单的东西逼近复杂的东西：一元用切线、多项式，多元用线性映射（Jacobian）和二次型（Hessian）。一元的每个概念，在多元里都有对应：
+
+| 一元 | 多元 |
+| --- | --- |
+| 导数 $f'(x)$ | 梯度 $\nabla f$（标量函数）、Jacobian $J$（向量函数） |
+| 二阶导数 $f''(x)$ | Hessian $H$ |
+| $f(x + h) \approx f + f'h + \frac{1}{2}f''h^2$ | $f + \nabla f^{\mathrm{T}}\mathbf{h} + \frac{1}{2}\mathbf{h}^{\mathrm{T}}H\mathbf{h}$ |
+| $f'' > 0$：局部极小 | $H$ 正定：局部极小；不定：鞍点 |
+| 牛顿法 $x - \frac{f'}{f''}$ | $\mathbf{x} - H^{-1}\nabla f$ |
+| 链式法则 $f'(g)\,g'$ | Jacobian 的乘积 $J_fJ_g$；梯度形式 $J_g^{\mathrm{T}}\nabla f$ |
+| 差商的误差阶 | 同样来自泰勒展开，见下面的数值计算 |
+
+## 线性映射与特征函数
+
+求导 $D = \frac{d}{dx}$ 是函数空间上的线性映射：
+
+$$D(af + bg) = aDf + bDg$$
+
+它的特征函数是指数函数：
+
+$$De^{\lambda x} = \lambda e^{\lambda x}$$
+
+特征值是 $\lambda$。所以常系数线性微分方程，试探 $e^{\lambda t}$ 就等价于解特征值问题：一阶方程 $y' = \lambda y$ 的解是特征函数本身；方程组 $\mathbf{u}' = A\mathbf{u}$ 的解是 $e^{At}\mathbf{u}(0) = Se^{\Lambda t}S^{-1}\mathbf{u}(0)$；二阶方程 $y'' = -y$ 的解 $\cos t, \sin t$ 是 $D^2$ 的特征值为 $-1$ 的特征函数（ $e^{\pm it}$ 的组合）。
+
+这也是前面“实部为负则衰减”的来由：特征值的实部决定了解的长期行为。
+
+## 积分与概率统计
+
+连续随机变量的密度函数 $f$ 的积分给出概率，累积分布函数 $F$ 与密度之间就是基本定理：
+
+$$P(a < X \le b) = \int_a^b f(x)\,dx, \qquad F(x) = \int_{-\infty}^{x}f(t)\,dt, \qquad F'(x) = f(x)$$
+
+期望与方差也是积分： $E(X) = \int x f(x)\,dx$， $\operatorname{Var}(X) = \int (x - \mu)^2 f(x)\,dx$。
+
+泰勒展开最常用的统计应用是 **delta 方法**。样本均值 $\bar{X}$ 的均值为 $\mu$，方差为 $\frac{\sigma^2}{n}$，对它做函数变换 $g(\bar{X})$，在 $\mu$ 处做一阶展开 $g(\bar{X}) \approx g(\mu) + g'(\mu)(\bar{X} - \mu)$，得到
+
+$$\operatorname{Var}\,g(\bar{X}) \approx g'(\mu)^2\frac{\sigma^2}{n}$$
+
+例如 $g = \ln$， $\mu = 10$， $\sigma = 2$， $n = 400$ 时，公式给出 $1.0 \times 10^{-4}$，模拟得到的值约为 $1.003 \times 10^{-4}$。要让变换后的方差不再依赖均值，需要 $g'(\mu) \propto \frac{1}{\sigma(\mu)}$：标准差与均数成正比选对数，方差与均数成正比选平方根。这正是聚类与降维笔记里数据变换一节的依据。
+
+最大似然估计要解 $\ell'(\theta) = 0$，其中 $\ell$ 是对数似然（对数把乘积变成求和）。 $-\ell''(\hat{\theta})$ 是似然曲线在最大点处的曲率，曲率越大，估计越精确，近似地 $\operatorname{Var}(\hat{\theta}) \approx \frac{1}{-\ell''(\hat{\theta})}$。求解 $\ell'(\theta) = 0$ 常用的就是牛顿法。
+
+## 数值计算
+
+计算机上 $\Delta x$ 不能真的趋于 0。对 $f'(a)$，两种差商的截断误差由泰勒展开给出：
+
+$$\begin{aligned}
+\frac{f(a + h) - f(a)}{h} &= f'(a) + \frac{f''(a)}{2}h + \dots \quad \text{（误差 } O(h) \text{）} \\
+\frac{f(a + h) - f(a - h)}{2h} &= f'(a) + \frac{f'''(a)}{6}h^2 + \dots \quad \text{（误差 } O(h^2) \text{）}
+\end{aligned}$$
+
+另一方面，两个相近的数相减会丢失有效数字，舍入误差约为 $\frac{\epsilon}{h}$（双精度下 $\epsilon \approx 1.1 \times 10^{-16}$ ）。所以 $h$ 并不是越小越好：截断误差随 $h$ 减小而降低，舍入误差随 $h$ 减小而增大，最优的 $h$ 在两者之间。下面是 $f = \sin$， $a = 1$ 的实验：
+
+| $h$ | 单边差商的误差 | 中心差商的误差 |
+| --- | --- | --- |
+| $10^{-1}$ | $4.3 \times 10^{-2}$ | $9.0 \times 10^{-4}$ |
+| $10^{-3}$ | $4.2 \times 10^{-4}$ | $9.0 \times 10^{-8}$ |
+| $10^{-5}$ | $4.2 \times 10^{-6}$ | $1.1 \times 10^{-11}$ |
+| $10^{-8}$ | $3.0 \times 10^{-9}$ | $2.6 \times 10^{-9}$ |
+| $10^{-11}$ | $1.2 \times 10^{-6}$ | $1.2 \times 10^{-6}$ |
+
+单边差商的最优 $h$ 约为 $\sqrt{\epsilon} \approx 10^{-8}$，中心差商约为 $\epsilon^{1/3} \approx 10^{-5}$。
+
+```{r}
+#| label: fig-numdiff
+#| fig.width: 5.6
+#| fig.height: 3.6
+#| fig.cap: "对 sin x 在 x = 1 处求导，两种差商的误差随 h 的变化（双对数坐标）。h 较大时截断误差占主导：单边差商的误差与 h 成正比，中心差商与 h^2 成正比；h 太小时舍入误差占主导，误差反而变大。最优的 h，单边约 10^-8，中心约 10^-5。"
+cB <- "#1f77b4"; cR <- "#d62728"; cG <- "#2ca02c"; cO <- "#ff7f0e"
+h <- 10^seq(-1, -12, length.out = 56)
+a <- 1
+err_f <- abs((sin(a + h) - sin(a)) / h - cos(a))
+err_c <- abs((sin(a + h) - sin(a - h)) / (2 * h) - cos(a))
+par(mar = c(3.2, 3.4, 1.0, 0.8), mgp = c(2, 0.5, 0))
+plot(h, err_f, log = "xy", type = "l", lwd = 2, col = cB, xlab = "h", ylab = "error", ylim = c(1e-13, 1))
+lines(h, err_c, lwd = 2, col = cR)
+legend("bottomleft", c("forward difference", "central difference"), col = c(cB, cR), lwd = 2, bty = "n", cex = 0.85)
+i5 <- which.min(abs(log10(h) + 5)); i8 <- which.min(abs(log10(h) + 8))
+stopifnot(err_c[i5] < 1e-9, err_c[i5] < err_c[1], err_c[i5] < err_c[length(err_c)],
+          err_f[i8] < err_f[1], err_f[i8] < err_f[length(err_f)])
+```
+
+
+
+
+积分也是一样：把积分写成求和（矩形法，误差 $O(h)$ ），用梯形公式误差降到 $O(h^2)$，Simpson 公式降到 $O(h^4)$，它们的误差阶也都来自泰勒展开。
+
+## 微积分与线性代数的对照
+
+| 微积分 | 线性代数 |
+| --- | --- |
+| 求导 $\frac{d}{dx}$ | 线性映射（算子） |
+| $e^{\lambda x}$ 是求导的特征函数 | 特征向量， $A\mathbf{x} = \lambda\mathbf{x}$ |
+| $\mathbf{u}' = A\mathbf{u}$ | 解为 $e^{At}\mathbf{u}(0)$， $\operatorname{Re}\lambda < 0$ 时稳定 |
+| 一元 $f'' > 0$ | Hessian 正定 |
+| 多元链式法则 | Jacobian 的矩阵乘积，反向传播是它的转置形式 |
+| 牛顿法 | 解线性方程组 $H\Delta\mathbf{x} = -\nabla f$ |
+| 泰勒展开 | 用线性映射（Jacobian）和二次型（Hessian）逼近 |
+| 积分 $\int f(x)g(x)\,dx$ | 函数空间里的内积 |
+| 极值 | 二次型的最小化，特征值是曲率 |
+
+## 延伸方向
+
+- 多元积分与变量替换：换元时的 Jacobian 行列式就是体积的缩放因子，对应线代笔记里行列式的几何意义。
+- 向量微积分：梯度、散度、旋度。Green、Stokes、散度定理是微积分基本定理在高维的推广，仍然是“边界上的值等于内部变化的累积”。
+- 傅里叶级数：在函数空间里做标准正交展开，系数是投影长度，对应线代笔记里的投影与正交基。
+
+# 参考
+
+- Strang, G. *Highlights of Calculus*. MIT OpenCourseWare.
+- Strang, G. *Calculus*. Wellesley-Cambridge Press.
+- Spivak, M. *Calculus*. Publish or Perish.（ε-δ 与极限的严格处理）
+- Stewart, J. *Calculus*. Cengage.
+- Nocedal, J. & Wright, S. J. *Numerical Optimization*. Springer.（牛顿法、Hessian、梯度下降）
+- Boyd, S. & Vandenberghe, L. *Convex Optimization*. Cambridge University Press.（凸函数、强凸与光滑性）
+- Goodfellow, I., Bengio, Y. & Courville, A. *Deep Learning*. MIT Press.（数值计算、反向传播、优化）
+- Petersen, K. B. & Pedersen, M. S. *The Matrix Cookbook*.（矩阵微积分公式速查）
+- Baydin, A. G. et al. (2018). Automatic differentiation in machine learning: a survey. *Journal of Machine Learning Research*, 18.
+- Kingma, D. P. & Ba, J. (2015). Adam: A method for stochastic optimization. *ICLR*.
+- Dauphin, Y. N. et al. (2014). Identifying and attacking the saddle point problem in high-dimensional non-convex optimization. *NIPS*.
