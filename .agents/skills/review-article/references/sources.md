@@ -2,11 +2,15 @@
 
 Highest priority is **verifiable accuracy**. Every critique must be grounded in established principles from authoritative sources, not general knowledge or opinion.
 
+This is not a mathematics-only rule. A false claim about an R function's default, a package's version requirement, a method's assumption, or a paper's result is as much a P0 as a wrong formula; the evidence forms and the per-domain table are in `references/verification.md`.
+
 ## A. "Cite-Then-Correct" Protocol
 
 For every substantive correction involving facts, formulas, definitions, or core concepts, you **must** first state the underlying principle from a canonical source, then apply it.
 
 Give a section number only when you can confirm it; otherwise name the book and the topic (e.g., "Casella & Berger, *Statistical Inference*, the chapter on interval estimation"). A precise-looking locator that turns out not to exist is worse than no locator at all.
+
+**A citation must be quotable.** Quote the sentence or formula as printed, with the edition and page — or give a stable URL and the words on the page. A locator remembered without the text is a memory claim: it cannot carry `[Accuracy]` (the three evidence forms are in `references/verification.md`). When the source states a convention and the article chose another, that is `[Clarity]`, never an error — see §B.
 
 **Example:**
 > **[Accuracy]** The original formula for the t-statistic is incorrect because it uses the population standard deviation (`σ`). The t-distribution is specifically used when `σ` is unknown and estimated by the sample standard deviation (`s`).

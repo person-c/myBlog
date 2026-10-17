@@ -69,6 +69,14 @@ pull request; they are hard gates. The fifth re-renders, so it is local-only.
 | `check-products.R` | every committed `.html` built by the same litedown, and not behind the installed one | CI |
 | `check-repo.R` | `layout:` names, the dead `paginate` key, workflow YAML, static assets | CI |
 | `check-fresh.R` | whether each committed `.html` is what its `.Rmd` renders to right now | local |
+| `check-render.R` | the rendered page: TeX that will not parse, a `$` left in text, figure/caption balance, TOC presence and depth, a dead `@fold-details` | on demand |
+
+`check-render.R` is not in `make check` or CI — it reads the rendered `.html`, so it
+only helps after a render. The article-review workflow runs it in Step 0
+(`.agents/skills/review-article/SKILL.md`); run it by hand after editing a formula.
+It lints the TeX KaTeX actually receives, which is the only place a missing brace or
+a `\left` without `\right` shows up: KaTeX runs in the browser, so a broken formula
+is invisible in the `.html` file itself.
 
 ### Why two different product checks
 

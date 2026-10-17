@@ -86,4 +86,4 @@ Record further decisions in this table.
 
 Triggered by "审查文章", "审稿", "review", or an article file path. Follow **`.agents/skills/review-article/SKILL.md`** — it is the canonical, tool-neutral workflow (Open Agent Skills format): the annotation and summary templates, the review-intensity table, and the R/Python/metadata checklists, with the citation protocol under its `references/`. Any agent can read it; no vendor-specific skill mechanism is required.
 
-One rule applies whether or not the workflow file is loaded: **every critique is evidence-based** — cite the canonical source, or downgrade to `[Suggestion]` (see `.agents/skills/review-article/references/sources.md`).
+One rule applies whether or not the workflow file is loaded: **every critique is evidence-based** — an `[Accuracy]` or `[Render]` claim carries Run, Quote, or Derivation evidence, or it is downgraded to `[Question]` / `[Suggestion]` (see `.agents/skills/review-article/references/verification.md`); the citation protocol is in `references/sources.md`.

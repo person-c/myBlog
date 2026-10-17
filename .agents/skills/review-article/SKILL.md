@@ -3,7 +3,8 @@ name: review-article
 description: |-
   Review an article in this Hugo blog (content/blog, content/note, content/slides, content/ramblings) and annotate it in place with evidence-based critiques, then print a P0–P3 summary.
   TRIGGER — use whenever the user says 审查文章 / 审稿 / review, names an article or file path to check, or asks to critique or proofread an article before publishing.
-  It runs the deterministic checks first (scripts/check-math.R, scripts/check-meta.R), writes [Accuracy]/[Clarity]/[Suggestion]/[Kudos]/[Question] annotation blocks into the source file, and keeps the review itself out of the terminal.
+  It runs the deterministic checks first (scripts/check-math.R, scripts/check-meta.R, scripts/check-render.R), writes [Accuracy]/[Clarity]/[Suggestion]/[Kudos]/[Question] annotation blocks into the source file, and keeps the review itself out of the terminal.
+  Every [Accuracy]/[Render] claim must carry Run, Quote, or Derivation evidence (references/verification.md), and one adversarial pass tries to refute the annotations before the summary is finalised.
   SKIP for reviewing a code diff and for writing a new article from scratch.
 ---
 
@@ -12,6 +13,8 @@ description: |-
 > This is the canonical, tool-neutral workflow (Open Agent Skills format). Any agent that can read files can follow it; no vendor-specific skill mechanism is required.
 
 Act as a meticulous, exacting reviewer — a senior researcher and technical editor. The defining characteristic: **every critique is evidence-based**. State the principle from a canonical source before applying it, and downgrade to `[Suggestion]` when no authoritative source can be found. The citation protocol and the tier lists are in `references/sources.md`.
+
+A citation is not evidence until it can be checked. Every `[Accuracy]` and `[Render]` claim carries a **Run**, **Quote**, or **Derivation** evidence line; without one it is a `[Question]` or a `[Suggestion]`, never a P0. The gate, the grading rules and the adversarial pass are in `references/verification.md` — read it before writing the first annotation.
 
 ## Review intensity by section
 
@@ -46,7 +49,7 @@ Review depth is determined by the content section. Apply the correct intensity b
 
 ## Checklist: code and metadata
 
-The per-language checklists (R, Python) and the front-matter rules are in `references/code-checks.md` — read it whenever the article contains code or YAML front matter, which is almost always. The litedown math rules are in `docs/litedown.md` — read its "Math protection" section when a formula may not render; `scripts/check-math.R` and `scripts/check-meta.R` implement both checks mechanically.
+The per-language checklists (R, Python) and the front-matter rules are in `references/code-checks.md` — read it whenever the article contains code or YAML front matter, which is almost always. The litedown math rules are in `docs/litedown.md` — read its "Math protection" section when a formula may not render; `scripts/check-math.R`, `scripts/check-meta.R` and `scripts/check-render.R` implement the mechanical checks. `check-render.R` reads the rendered `.html` and lints the TeX that actually reaches KaTeX (braces, `\left`/`\right`, `\begin`/`\end`), a `$` left in visible text, figure/caption balance, TOC presence and depth, and a loaded `@fold-details` with nothing to fold.
 
 ## Workflow
 
@@ -62,8 +65,8 @@ Each tag maps to exactly one priority in the summary — that mapping is what th
 
 | Tag | Border | Background | Priority | Meaning |
 |---|---|---|---|---|
-| `[Accuracy]` | `#e53e3e` (red) | `#fff5f5` | **P0** | A fact, formula, definition or piece of metadata is wrong — must fix |
-| `[Render]` | `#e53e3e` (red) | `#fff5f5` | **P0** | It will not display: litedown math rules, raw HTML/Markdown the parser eats |
+| `[Accuracy]` | `#e53e3e` (red) | `#fff5f5` | **P0** | A claim the article presents as fact is false — formula, code behaviour, tool or data fact, statistic, definition, metadata — and the annotation carries Run/Quote/Derivation evidence |
+| `[Render]` | `#e53e3e` (red) | `#fff5f5` | **P0** | It will not display: litedown math rules, raw HTML/Markdown the parser eats — same evidence line |
 | `[Clarity]` | `#dd6b20` (orange) | `#fffaf0` | **P1** | Unclear, imprecise, missing context |
 | `[Repro]` | `#dd6b20` (orange) | `#fffaf0` | **P1** | The code will not run for a reader: hardcoded paths, `setwd()`, `rm(list=ls())` |
 | `[Question]` | `#805ad5` (purple) | `#faf5ff` | **P1** | Needs the author's answer; if the answer exposes a factual error, re-tag it P0 |
@@ -83,10 +86,14 @@ Every block also carries `class="review-note"`, so annotations can be found and 
 
 **Principle:** [Cite the authoritative source with section number.]
 
+**Evidence:** [One of three: `Run` — the copy-pasteable command and the output it printed; `Quote` — the source, edition, page, and the sentence or formula verbatim; `Derivation` — the one to three steps that settle it. See references/verification.md.]
+
 **Correction:** [Specific fix to apply.]
 
 </div>
 ```
+
+The **Evidence** line is mandatory. A claim you cannot run, quote, or derive is a `[Question]` when only the author can settle it, and a `[Suggestion]` otherwise — never `[Accuracy]`. A locator with no quoted sentence, or a command with no output, is a memory claim.
 
 `[Render]` uses the `[Accuracy]` template (a formula that will not display is as bad as a wrong one) and `[Repro]` the `[Clarity]` one.
 
@@ -142,11 +149,14 @@ Every block also carries `class="review-note"`, so annotations can be found and 
 ```sh
 Rscript scripts/check-math.R <file>   # math litedown will not protect (directive 3.1)
 Rscript scripts/check-meta.R <file>   # front matter (directive 3.3)
+Rscript scripts/check-render.R <file> # rendered .Rmd pages: TeX parse, leaked '$', TOC, figures
 ```
 
-Everything they report is a P0 item. Math problems are fixed in the `.Rmd`, never only in the rendered `.html`.
+Everything they report is a P0 item. Math problems are fixed in the `.Rmd`, never only in the rendered `.html`. `check-render.R` reads the sibling `.html`, so it needs the page to exist; it lints the formulas the browser will actually feed to KaTeX, which is the only place a missing brace or `\left` without `\right` shows up.
 
 #### Step 1: Add Executive Summary at the top
+
+Fill its counts and checkboxes after Step 2.5 — the summary reports the review as it finally stands, not as first drafted.
 
 Right after the YAML front matter (before any section heading), insert a summary using the following **priority grading system**:
 
@@ -154,8 +164,8 @@ Right after the YAML front matter (before any section heading), insert a summary
 
 | Priority | Meaning | Scope |
 |---|---|---|
-| **P0** | 必须修改 — factual errors, formula mistakes, broken rendering | Critical correctness or functionality |
-| **P1** | 应该修改 — unclear wording, imprecise definitions, missing context | Clarity and rigor |
+| **P0** | 必须修改 — a claim the article presents as fact is false in any domain (formula, code behaviour, tool or data fact, statistics, definition, metadata), or the page will not render it | Critical correctness or functionality |
+| **P1** | 应该修改 — unclear wording, imprecise definitions, missing context, a notation choice that leaves the claim true | Clarity and rigor |
 | **P2** | 建议优化 — style improvements, better notation, non-critical refinements | Nice-to-have |
 | **P3** | 亮点 — strengths worth noting, no action needed | Positive reinforcement |
 
@@ -200,9 +210,15 @@ Items within each priority level are numbered sequentially (P0-1, P0-2, ...; P1-
 
 Annotate every substantive issue. For trivial typos/spelling/grammar, fix directly without annotation.
 
+Write each **Evidence:** line together with its annotation, not reconstructed afterwards. If the check fails, do not soften the wording — change the tag.
+
+#### Step 2.5: Adversarial pass
+
+Before the summary is finalised, hand every `[Accuracy]`/`[Render]` annotation, with the source text it judges, to a fresh context — a subagent where the tool provides one, otherwise a second model or session — and ask it to refute them. The prompt template, the CONFIRMED/REFUTED/UNSURE handling and examples are in `references/verification.md`. A refuted annotation is deleted or narrowed to the true claim; an unresolved one becomes `[Question]`. Skip the pass only for language-only (`content/ramblings/`) and metadata-only reviews.
+
 #### Step 3: Terminal summary
 
-After all edits, output 2-3 sentences: overall quality, total annotations added, and the single most critical issue.
+After all edits, output 2-3 sentences: overall quality, total annotations added, and the single most critical issue. State what the adversarial pass did with the P0 items (e.g. "3 P0, all confirmed; 2 P1 downgraded to P2") — a review that reports 0 P0 with no evidence lines in any annotation is a warning sign, not a clean bill.
 
 Annotations stay in the file on purpose: they are the author's checklist (`[x]`/`[ ]` tracks what is resolved), and the author deliberately publishes some of them so readers can judge the author's and the AI's views side by side. So report how many you left and where — do not strip them. Raw HTML survives both renderers, so an annotation is live once its file is published (in `.md` immediately, in `.Rmd` as soon as that `.Rmd` is re-rendered). `scripts/clear-review-notes.sh` clears them if the clean version is wanted, and `.github/workflows/annotation-guard.yml` lists what is public.
 
