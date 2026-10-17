@@ -11,34 +11,6 @@ output:
       js: ["@fold-details"]
 ---
 
-<div class="review-note" style="border-left: 4px solid #2b6cb0; padding: 0.5em 1em; margin: 1em 0 2em 0; background: #ebf4ff;">
-
-## Review Summary
-
-**Overall:** 一份准确、结构清楚、可读性好的笔记。逐节复核未发现公式或事实错误：`check-math` / `check-meta` 均通过，关键恒等式（`P² = P`、`P = QQᵀ`、`R = QᵀA`、Eckart-Young 的最优性、`κ(AᵀA) = κ(A)²`、SVD 给出四个子空间、能量配方的最小点）用 R 逐一验算也全部成立。本轮 0 / 7 项已改——审查只批注、不改正文：0 P0、5 P1、2 P2，另有 3 处亮点。
-
-### P0 — 必须修改 (0 issues)
-- 无。
-
-### P1 — 应该修改 (5 issues)
-- [ ] P1-1: 符号 `R` 同篇三义（行最简形 / `QR` 的上三角因子 / `A = RᵀR` 的因子）— 建议把最后一处改用 `C`，与后文 Cholesky 的 `A = CCᵀ` 统一
-- [ ] P1-2: 「特解」一词两用（零空间的 n−r 个解 vs `Ax = b` 的特解 `x_p`，自由变量一个取 1、一个取 0）— 建议前者改称「特殊解」或「基础解系」
-- [ ] P1-3: 一级标题「消元的矩阵表示」之下含正交、投影、Gram-Schmidt、QR 与最小二乘一整块 — 标题与内容不符，与开头的路线图分部也不一致
-- [ ] P1-4: 「厄米矩阵」的译名 — 数学通用译名是「埃尔米特矩阵」（《物理学名词》2019 年审定的「厄米矩阵」属物理学名词），且同篇人名术语的译名策略不统一
-- [ ] P1-5: `R²` 等于夹角余弦的平方，缺「有截距时」这一前提（统计笔记同一处有这个限定，两处目前不一致）
-
-### P2 — 建议优化 (2 issues)
-- [ ] P2-1: YAML 里的 `js: ["@fold-details"]` 已无折叠对象（全篇 `echo = FALSE`，渲染页上 `<pre>` 数量为 0）
-- [ ] P2-2: `A = LDU` 处 `U` 在同一句里被复用为另一个矩阵（对角线全为 1 的那个）
-
-### P3 — 亮点 (3 items)
-- P3-1: 「线性变换、基变换下的矩阵分解」把 `S` 与 `S⁻¹` 的方向从约定推出来，而不是直接给结论——这正是最常搞反的一步
-- P3-2: 指出 SVD 的「降维」来自 `Σ` 中为 0 的奇异值，而非那份额外的旋转 `E`
-- P3-3: 「计算视角」把每个分解落到计算量与数值稳定性，并给出四条可执行的实践建议
-
-**Annotations:** 7 处问题 + 2 处 Kudos，见下文行内批注（`class="review-note"`，需要干净版本时用 `scripts/clear-review-notes.sh` 清除）。
-
-</div>
 
 ```{r}
 #| label: setup
@@ -86,13 +58,6 @@ right_angle <- function(corner, d1, d2, s = 0.15) {
 .caption .katex-display { display: inline-block; margin: 0; }
 ```
 
-<div class="review-note" style="border-left: 4px solid #3182ce; padding: 0.5em 1em; margin: 1em 0; background: #ebf8ff;">
-
-**[Suggestion]** YAML 头部的 `meta: js: ["@fold-details"]` 已经没有作用对象了。这个脚本的作用是把元素包进 `<details>` 里以便折叠，默认折叠代码块（见 litedown 文档 05-assets 的「Code folding」一节），而 setup chunk 里已经设了 `echo = FALSE`，渲染出来的页面上 `<pre>` 数量为 0——脚本却仍随每一页加载（页面里能看到 `fold-details.min.js`）。
-
-**Correction:** 删掉这一行即可；日后若想让读者按需展开代码，再连同 `echo` 一起改回来。顺带一提：统计笔记开头那条注释写着「线代笔记的做法是把代码折叠起来（YAML 里的 js: ["@fold-details"]）」，在本笔记改为不显示代码之后，那句话也已经过时。
-
-</div>
 
 # 前言
 
@@ -135,13 +100,6 @@ right_angle <- function(corner, d1, d2, s = 0.15) {
 
 # 消元的矩阵表示
 
-<div class="review-note" style="border-left: 4px solid #dd6b20; padding: 0.5em 1em; margin: 1em 0; background: #fffaf0;">
-
-**[Clarity]** 这个一级标题罩不住它下面的内容：`## 正交与投影`、`### Gram-Schmidt 正交化与 QR 分解`、`### 投影到列空间与最小二乘` 都在它之下，而「消元的矩阵表示」只对应开头的高斯消元与 `LU` 那一部分。开头的路线图把这些内容列成了独立的第二部分（「无解怎么办」），标题与自述的分部结构并不一致；而 TOC 只显示到三级，读者从目录里看到的是「消元的矩阵表示 → 正交与投影」。
-
-**Correction:** 把该一级标题改宽（如「消元、正交与最小二乘」），或把「正交与投影」提为与「方阵、行列式、特征值、对角化」并列的一级标题——后者与路线图的分部一致。
-
-</div>
 
 $$\begin{aligned}
 2x_1 + 3x_2 &= 8 \\
@@ -256,13 +214,6 @@ $$EA = U \rightarrow A = LU \rightarrow A = LDU$$
 
 其中 $L = E^{-1}$ 是 $E$ 的逆（下三角矩阵），这就是矩阵的 $LU$  分解；再把 $U$ 的主元提出来得到对角矩阵 $D$，就是 $A = LDU$（此时 $U$ 的对角线全为 1）。
 
-<div class="review-note" style="border-left: 4px solid #3182ce; padding: 0.5em 1em; margin: 1em 0; background: #ebf8ff;">
-
-**[Suggestion]** 同一句里 `U` 换了身份：`EA = U` 里的 `U` 对角线是主元，而 `A = LDU` 里的 `U` 对角线全是 1（把主元提出去以后得到的是另一个上三角矩阵）。括号里已经点明了，读第二遍能明白，但它和 `EA = U` 就挨在一起，容易看漏。
-
-**Correction:** 可写作 `A = LD\tilde{U}` 或 `A = LDU_0`，与前面的 `U` 区分开。Strang 的教材同样写作 `A = LDU`，所以这只是可读性建议，不是错误。
-
-</div>
 
 若涉及行交换，先把所需的行交换合并成置换矩阵 $P$，则：
 
@@ -294,13 +245,6 @@ $$\begin{bmatrix} I & F \end{bmatrix} \begin{bmatrix} \mathbf{x}_{\text{pivot}} 
 
 于是零空间矩阵 $N = \begin{bmatrix} -F \\ I \end{bmatrix}$（ $RN=0$）。对自由变量依次取一个为 1、其余为 0，就得到一个特解，这 $n-r$ 个特解（ $N$ 的列）构成了零空间的一组基。
 
-<div class="review-note" style="border-left: 4px solid #dd6b20; padding: 0.5em 1em; margin: 1em 0; background: #fffaf0;">
-
-**[Clarity]** 「特解」在本笔记里指两个不同的东西：这里指的是 `Ax = 0` 的 n−r 个解（自由变量依次取 1），而 `Ax = b` 一节里「特解」指的是把所有自由变量取 0 得到的 `x_p`——那是非齐次方程的一个解，做法正好相反（一个把自由变量取 1，一个取 0）。四个基本子空间的那张表里也沿用了前一种说法。
-
-**Correction:** 建议把零空间的这 n−r 个解改称「特殊解」（Strang 的 special solutions）或「基础解系」，把「特解」留给 `Ax = b` 的 `x_p`；上面那张表的「特解（`N` 的列）」一并改。
-
-</div>
 
 NOTE： $U \rightarrow R$ 只需要行变换。如果为了写成上面的标准块形式而对列做过置换 $\Pi$，则求得 $N$ 之后，要按 $\Pi$ 把各分量还原到原来的变量位置。
 
@@ -832,13 +776,6 @@ $$\mathbf{u}(t) = c_1e^{\lambda_1 t}\mathbf{x}_1 + \dots + c_ne^{\lambda_n t}\ma
 
 前面的结论在复数域上有对应的版本：把转置 $A^{\mathrm{T}}$ 换成共轭转置 $A^{\mathrm{H}} = \overline{A}^{\mathrm{T}}$。满足 $A = A^{\mathrm{H}}$ 的矩阵称为 **厄米矩阵**（Hermitian），满足 $Q^{\mathrm{H}}Q = I$ 的矩阵称为 **酉矩阵**（unitary），实对称矩阵与正交矩阵分别是它们的特例。厄米矩阵同样有实特征值和一组标准正交的特征向量，即 $A = Q\Lambda Q^{\mathrm{H}}$；酉矩阵保持向量长度不变，它的特征值落在单位圆上。更一般地，满足 $AA^{\mathrm{H}} = A^{\mathrm{H}}A$ 的 **正规矩阵**（包括厄米、反厄米、酉矩阵）都可以被酉矩阵对角化。
 
-<div class="review-note" style="border-left: 4px solid #dd6b20; padding: 0.5em 1em; margin: 1em 0; background: #fffaf0;">
-
-**[Clarity]** 「厄米矩阵」是**物理学**名词：2019 年经全国科学技术名词审定委员会审定发布，出自《物理学名词》第三版；**数学**的通用译名是「埃尔米特矩阵」（《英汉数学词汇》，张鸿林、葛显良编订）。两者指同一个对象，都不算错，但本笔记是数学笔记，且同篇已经用了数学通行译名（若尔当标准形、克莱姆法则、马尔可夫链），而 Rayleigh、Schur、Cholesky、Eckart-Young、Householder 等又直接写原文——人名术语的译名策略目前并不统一。
-
-**Correction:** 二选一并在全篇贯彻：或统一改为「埃尔米特矩阵」（与同篇其他数学译名一致），或在首次出现处注明「厄米矩阵（Hermitian，数学文献中亦称埃尔米特矩阵）」。若定下其中一种，按 CLAUDE.md 的「写作约定」表记一笔。
-
-</div>
 
 ### Rayleigh 商
 
@@ -866,13 +803,6 @@ $$\mathbf{x}^{\mathrm{T}} A \mathbf{x} > 0 \quad (\mathbf{x} \neq \mathbf{0})$$
 
 此外，它还等价于存在列满秩矩阵 $R$ 使得 $A = R^{\mathrm{T}}R$（此时 $\mathbf{x}^{\mathrm{T}}A\mathbf{x} = \|R\mathbf{x}\|^2 > 0$）。
 
-<div class="review-note" style="border-left: 4px solid #dd6b20; padding: 0.5em 1em; margin: 1em 0; background: #fffaf0;">
-
-**[Clarity]** 这里的 `R` 已经是本笔记里第三个含义了：前面用 `R` 表示行最简形（`R = [I F; 0 0]`、`EA = R`、「`R` 的零行」），`QR` 一节用 `R` 表示上三角因子（`R = QᵀA`），此处再用 `R` 表示 `A = RᵀR` 里的因子。三处都是教材里的常见记号，但同篇并存时，「`R` 的前 r 行」这类说法读者要多想一步才能对上号。
-
-**Correction:** 建议此处改用 `C`，与后面 Cholesky 一节的 `A = CCᵀ` 统一（那里用的正是正定矩阵的平方根因子）；行最简形与 `QR` 的 `R` 是教材惯例，保留即可。
-
-</div>
 
 对于二次型，我们可以用配方的方法来验证其是否具有最小值：
 
@@ -1087,11 +1017,6 @@ $$\begin{bmatrix}
 
 $$A\mathbf{x} = S\Lambda S^{-1}\mathbf{x} \longrightarrow A = S\Lambda S^{-1}$$
 
-<div class="review-note" style="border-left: 4px solid #38a169; padding: 0.5em 1em; margin: 1em 0; background: #f0fff4;">
-
-**[Kudos]** 这一章把基变换的方向讲透了：先立住「过渡矩阵的列是新基向量在旧基下的坐标 ⇒ `P` 把新坐标换算成旧坐标」这条约定，再用它解释 `A = SΛS⁻¹` 里为什么是 `S⁻¹` 把向量送到特征向量坐标、由 `S` 送回来。`S` 与 `S⁻¹` 哪个朝哪边，正是这一节最常被搞反的地方，这里是从约定推出来的，而不是直接给结论。
-
-</div>
 
 ## A = U Σ Vᵀ
 
@@ -1106,11 +1031,6 @@ MV = U\Sigma \rightarrow M = U\Sigma V^{\mathrm{T}}$$
 
 可以看到奇异值分解与特征值分解的区别在于：特征值分解输入与输出使用 **同一组基**（特征向量），所以变换只剩缩放 $\Lambda$；奇异值分解的输入与输出使用 **两组不同的标准正交基** $V$ 与 $U$，二者之间的错位表现为额外的旋转 $E$。而“投影”（降维）并不来自 $E$（ $E$ 是正交矩阵），而是来自 $\Sigma$ 中为 0 的奇异值。
 
-<div class="review-note" style="border-left: 4px solid #38a169; padding: 0.5em 1em; margin: 1em 0; background: #f0fff4;">
-
-**[Kudos]** 「降维来自 `Σ` 中为 0 的奇异值，而不是来自 `E`（`E` 是正交矩阵）」这句点在要害上：先把「特征分解只有缩放」「SVD 多一个旋转」讲清楚，紧接着说明哪一部分才是信息的丢失，避免了把降维归因于那个旋转的常见误读。
-
-</div>
 
 需要注意的是，虽然上面从视角转换的角度解释了特征分解以及奇异值分解，但矩阵分解同样可以从空间变换的角度理解。例如对于奇异值分解有如下解释：第一个变换 $V^{\mathrm{T}}$ 把标准正交向量 $\mathbf{v}_1, \mathbf{v}_2$ 转到水平和垂直方向（标准基方向）； $\Sigma$ 对这两个方向分别放缩（单位圆变成椭圆， $\sigma_i$ 是半轴长）； $U$ 再把放缩后的椭圆旋转（或反射）到最后的位置。
 
@@ -1194,13 +1114,6 @@ $$\frac{1}{n-1}\|X\mathbf{u}\|^2 = \mathbf{u}^{\mathrm{T}}S\mathbf{u}$$
 
 回归是同样的几何：线性回归把 $\mathbf{y}$ 投影到设计矩阵的列空间（见“投影到列空间与最小二乘”一节），残差垂直于列空间，决定系数 $R^2$ 是夹角余弦的平方。概率统计笔记的最后一章，把 $t$ 检验、方差分析与 $F$ 检验都放进了这一幅图里。
 
-<div class="review-note" style="border-left: 4px solid #dd6b20; padding: 0.5em 1em; margin: 1em 0; background: #fffaf0;">
-
-**[Clarity]** `R²` 等于夹角余弦的平方，前提是模型**带截距**：此时 `R² = cor²(y, ŷ)`。不含截距的回归里这个等式一般不成立（`SS_reg / SS_tot` 与 `cor²` 会分家）。统计笔记的对应段落（「视角三：样本空间中的几何」）写的是「**有截距时**，决定系数……等于……夹角余弦的平方」，两处目前说法不一致。
-
-**Correction:** 补上限定词，如「回归带截距时，决定系数 `R²` 是……夹角余弦的平方」，与统计笔记保持一致。
-
-</div>
 
 ## 计算视角
 

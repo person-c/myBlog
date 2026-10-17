@@ -121,14 +121,6 @@ section.footnotes {
 <div class="body">
 <div id="TOC">
 <ul>
-<li><a href="#sec:review-summary">Review Summary</a>
-<ul>
-<li><a href="#sec:p0-0-issues">P0 — 必须修改 (0 issues)</a></li>
-<li><a href="#sec:p1-5-issues">P1 — 应该修改 (5 issues)</a></li>
-<li><a href="#sec:p2-2-issues">P2 — 建议优化 (2 issues)</a></li>
-<li><a href="#sec:p3-3-items">P3 — 亮点 (3 items)</a></li>
-</ul>
-</li>
 <li><a href="#chp:_1">前言</a>
 <ul>
 <li><a href="#sec:_1">本笔记的路线</a></li>
@@ -221,43 +213,11 @@ section.footnotes {
 <li><a href="#chp:_7">各种分解总览</a></li>
 </ul>
 </div>
-<div class="review-note" style="border-left: 4px solid #2b6cb0; padding: 0.5em 1em; margin: 1em 0 2em 0; background: #ebf4ff;">
-<h2 id="sec:review-summary">Review Summary</h2>
-<p><strong>Overall:</strong> 一份准确、结构清楚、可读性好的笔记。逐节复核未发现公式或事实错误：<code>check-math</code> / <code>check-meta</code> 均通过，关键恒等式（<code>P² = P</code>、<code>P = QQᵀ</code>、<code>R = QᵀA</code>、Eckart-Young 的最优性、<code>κ(AᵀA) = κ(A)²</code>、SVD 给出四个子空间、能量配方的最小点）用 R 逐一验算也全部成立。本轮 0 / 7 项已改——审查只批注、不改正文：0 P0、5 P1、2 P2，另有 3 处亮点。</p>
-<h3 id="sec:p0-0-issues">P0 — 必须修改 (0 issues)</h3>
-<ul>
-<li>无。</li>
-</ul>
-<h3 id="sec:p1-5-issues">P1 — 应该修改 (5 issues)</h3>
-<ul>
-<li><input type="checkbox" /> P1-1: 符号 <code>R</code> 同篇三义（行最简形 / <code>QR</code> 的上三角因子 / <code>A = RᵀR</code> 的因子）— 建议把最后一处改用 <code>C</code>，与后文 Cholesky 的 <code>A = CCᵀ</code> 统一</li>
-<li><input type="checkbox" /> P1-2: 「特解」一词两用（零空间的 n−r 个解 vs <code>Ax = b</code> 的特解 <code>x_p</code>，自由变量一个取 1、一个取 0）— 建议前者改称「特殊解」或「基础解系」</li>
-<li><input type="checkbox" /> P1-3: 一级标题「消元的矩阵表示」之下含正交、投影、Gram-Schmidt、QR 与最小二乘一整块 — 标题与内容不符，与开头的路线图分部也不一致</li>
-<li><input type="checkbox" /> P1-4: 「厄米矩阵」的译名 — 数学通用译名是「埃尔米特矩阵」（《物理学名词》2019 年审定的「厄米矩阵」属物理学名词），且同篇人名术语的译名策略不统一</li>
-<li><input type="checkbox" /> P1-5: <code>R²</code> 等于夹角余弦的平方，缺「有截距时」这一前提（统计笔记同一处有这个限定，两处目前不一致）</li>
-</ul>
-<h3 id="sec:p2-2-issues">P2 — 建议优化 (2 issues)</h3>
-<ul>
-<li><input type="checkbox" /> P2-1: YAML 里的 <code>js: [&quot;@fold-details&quot;]</code> 已无折叠对象（全篇 <code>echo = FALSE</code>，渲染页上 <code>&lt;pre&gt;</code> 数量为 0）</li>
-<li><input type="checkbox" /> P2-2: <code>A = LDU</code> 处 <code>U</code> 在同一句里被复用为另一个矩阵（对角线全为 1 的那个）</li>
-</ul>
-<h3 id="sec:p3-3-items">P3 — 亮点 (3 items)</h3>
-<ul>
-<li>P3-1: 「线性变换、基变换下的矩阵分解」把 <code>S</code> 与 <code>S⁻¹</code> 的方向从约定推出来，而不是直接给结论——这正是最常搞反的一步</li>
-<li>P3-2: 指出 SVD 的「降维」来自 <code>Σ</code> 中为 0 的奇异值，而非那份额外的旋转 <code>E</code></li>
-<li>P3-3: 「计算视角」把每个分解落到计算量与数值稳定性，并给出四条可执行的实践建议</li>
-</ul>
-<p><strong>Annotations:</strong> 7 处问题 + 2 处 Kudos，见下文行内批注（<code>class=&quot;review-note&quot;</code>，需要干净版本时用 <code>scripts/clear-review-notes.sh</code> 清除）。</p>
-</div>
 <style type="text/css">
 /* 图注里只能写 $$...$$（markdown 会把 \( \) 反转义成括号），这里把 KaTeX 的
    display 版式压回行内，免得公式在图注句子里另起一行 */
 .caption .katex-display { display: inline-block; margin: 0; }
 </style>
-<div class="review-note" style="border-left: 4px solid #3182ce; padding: 0.5em 1em; margin: 1em 0; background: #ebf8ff;">
-<p><strong>[Suggestion]</strong> YAML 头部的 <code>meta: js: [&quot;@fold-details&quot;]</code> 已经没有作用对象了。这个脚本的作用是把元素包进 <code>&lt;details&gt;</code> 里以便折叠，默认折叠代码块（见 litedown 文档 05-assets 的「Code folding」一节），而 setup chunk 里已经设了 <code>echo = FALSE</code>，渲染出来的页面上 <code>&lt;pre&gt;</code> 数量为 0——脚本却仍随每一页加载（页面里能看到 <code>fold-details.min.js</code>）。</p>
-<p><strong>Correction:</strong> 删掉这一行即可；日后若想让读者按需展开代码，再连同 <code>echo</code> 一起改回来。顺带一提：统计笔记开头那条注释写着「线代笔记的做法是把代码折叠起来（YAML 里的 js: [”@fold-details”]）」，在本笔记改为不显示代码之后，那句话也已经过时。</p>
-</div>
 <h1 id="chp:_1">前言</h1>
 <blockquote>
 <p>以下内容摘抄自<a href="https://www.zhihu.com/question/311724817/answer/695067704">知乎回答</a>（个别表述已按严谨性做了修订）。整篇笔记主要参考<a href="https://zhuanlan.zhihu.com/p/45707832">这篇笔记</a>以及 MIT 18.06（Gilbert Strang）的线性代数课程。</p>
@@ -285,10 +245,6 @@ section.footnotes {
 <li><strong>更多视角</strong>：优化与能量（解方程等价于最小化能量，特征值是曲率）、数据与统计（协方差与 PCA）、数值计算（每个分解都是一个算法）。</li>
 </ol>
 <h1 id="chp:_2">消元的矩阵表示</h1>
-<div class="review-note" style="border-left: 4px solid #dd6b20; padding: 0.5em 1em; margin: 1em 0; background: #fffaf0;">
-<p><strong>[Clarity]</strong> 这个一级标题罩不住它下面的内容：<code>## 正交与投影</code>、<code>### Gram-Schmidt 正交化与 QR 分解</code>、<code>### 投影到列空间与最小二乘</code> 都在它之下，而「消元的矩阵表示」只对应开头的高斯消元与 <code>LU</code> 那一部分。开头的路线图把这些内容列成了独立的第二部分（「无解怎么办」），标题与自述的分部结构并不一致；而 TOC 只显示到三级，读者从目录里看到的是「消元的矩阵表示 → 正交与投影」。</p>
-<p><strong>Correction:</strong> 把该一级标题改宽（如「消元、正交与最小二乘」），或把「正交与投影」提为与「方阵、行列式、特征值、对角化」并列的一级标题——后者与路线图的分部一致。</p>
-</div>
 <p>$$\begin{aligned}
 2x_1 + 3x_2 &amp;= 8 \\
 x_1 - x_2 &amp;= 1
@@ -493,10 +449,6 @@ $$E_{21} = \begin{bmatrix} 1 &amp; 0 &amp; 0 \\ -\ell_{21} &amp; 1 &amp; 0 \\ 0 
 <p>在不涉及行交换的情况下：</p>
 <p>$$EA = U \rightarrow A = LU \rightarrow A = LDU$$</p>
 <p>其中 \(L = E^{-1}\) 是 \(E\) 的逆（下三角矩阵），这就是矩阵的 \(LU\)  分解；再把 \(U\) 的主元提出来得到对角矩阵 \(D\)，就是 \(A = LDU\)（此时 \(U\) 的对角线全为 1）。</p>
-<div class="review-note" style="border-left: 4px solid #3182ce; padding: 0.5em 1em; margin: 1em 0; background: #ebf8ff;">
-<p><strong>[Suggestion]</strong> 同一句里 <code>U</code> 换了身份：<code>EA = U</code> 里的 <code>U</code> 对角线是主元，而 <code>A = LDU</code> 里的 <code>U</code> 对角线全是 1（把主元提出去以后得到的是另一个上三角矩阵）。括号里已经点明了，读第二遍能明白，但它和 <code>EA = U</code> 就挨在一起，容易看漏。</p>
-<p><strong>Correction:</strong> 可写作 <code>A = LD\tilde{U}</code> 或 <code>A = LDU_0</code>，与前面的 <code>U</code> 区分开。Strang 的教材同样写作 <code>A = LDU</code>，所以这只是可读性建议，不是错误。</p>
-</div>
 <p>若涉及行交换，先把所需的行交换合并成置换矩阵 \(P\)，则：</p>
 <p>$$E(PA) = U \Rightarrow PA = LU \quad (L = E^{-1})$$</p>
 <p>\(LU\) 形式优于 \(EA = U\) 的地方在于： \(L\) 可以直接写入每一步的消元乘数 \(\ell_{ij}\)，而没有交叉项。</p>
@@ -519,10 +471,6 @@ $$E_{21} = \begin{bmatrix} 1 &amp; 0 &amp; 0 \\ -\ell_{21} &amp; 1 &amp; 0 \\ 0 
 <p>原方程 \(A\mathbf{x} = \mathbf{0}\) 等价于 \(R\mathbf{x} = \mathbf{0}\)：</p>
 <p>$$\begin{bmatrix} I &amp; F \end{bmatrix} \begin{bmatrix} \mathbf{x}_{\text{pivot}} \\ \mathbf{x}_{\text{free}} \end{bmatrix} = \mathbf{0}$$</p>
 <p>于是零空间矩阵 \(N = \begin{bmatrix} -F \\ I \end{bmatrix}\)（ \(RN=0\)）。对自由变量依次取一个为 1、其余为 0，就得到一个特解，这 \(n-r\) 个特解（ \(N\) 的列）构成了零空间的一组基。</p>
-<div class="review-note" style="border-left: 4px solid #dd6b20; padding: 0.5em 1em; margin: 1em 0; background: #fffaf0;">
-<p><strong>[Clarity]</strong> 「特解」在本笔记里指两个不同的东西：这里指的是 <code>Ax = 0</code> 的 n−r 个解（自由变量依次取 1），而 <code>Ax = b</code> 一节里「特解」指的是把所有自由变量取 0 得到的 <code>x_p</code>——那是非齐次方程的一个解，做法正好相反（一个把自由变量取 1，一个取 0）。四个基本子空间的那张表里也沿用了前一种说法。</p>
-<p><strong>Correction:</strong> 建议把零空间的这 n−r 个解改称「特殊解」（Strang 的 special solutions）或「基础解系」，把「特解」留给 <code>Ax = b</code> 的 <code>x_p</code>；上面那张表的「特解（<code>N</code> 的列）」一并改。</p>
-</div>
 <p>NOTE： \(U \rightarrow R\) 只需要行变换。如果为了写成上面的标准块形式而对列做过置换 \(\Pi\)，则求得 \(N\) 之后，要按 \(\Pi\) 把各分量还原到原来的变量位置。</p>
 <h3 id="sec:_5">线性无关、基、维数与秩</h3>
 <p>在谈子空间之前，先把几个基本概念说清楚，它们是后面“维数”和“秩”的来由。</p>
@@ -1485,10 +1433,6 @@ AS &amp;= A \begin{bmatrix} \mathbf{x}_1 &amp; \mathbf{x}_2 &amp; \dots &amp; \m
 </blockquote>
 <h3 id="sec:_18">复数情形：厄米矩阵与酉矩阵</h3>
 <p>前面的结论在复数域上有对应的版本：把转置 \(A^{\mathrm{T}}\) 换成共轭转置 \(A^{\mathrm{H}} = \overline{A}^{\mathrm{T}}\)。满足 \(A = A^{\mathrm{H}}\) 的矩阵称为 <strong>厄米矩阵</strong>（Hermitian），满足 \(Q^{\mathrm{H}}Q = I\) 的矩阵称为 <strong>酉矩阵</strong>（unitary），实对称矩阵与正交矩阵分别是它们的特例。厄米矩阵同样有实特征值和一组标准正交的特征向量，即 \(A = Q\Lambda Q^{\mathrm{H}}\)；酉矩阵保持向量长度不变，它的特征值落在单位圆上。更一般地，满足 \(AA^{\mathrm{H}} = A^{\mathrm{H}}A\) 的 <strong>正规矩阵</strong>（包括厄米、反厄米、酉矩阵）都可以被酉矩阵对角化。</p>
-<div class="review-note" style="border-left: 4px solid #dd6b20; padding: 0.5em 1em; margin: 1em 0; background: #fffaf0;">
-<p><strong>[Clarity]</strong> 「厄米矩阵」是<strong>物理学</strong>名词：2019 年经全国科学技术名词审定委员会审定发布，出自《物理学名词》第三版；<strong>数学</strong>的通用译名是「埃尔米特矩阵」（《英汉数学词汇》，张鸿林、葛显良编订）。两者指同一个对象，都不算错，但本笔记是数学笔记，且同篇已经用了数学通行译名（若尔当标准形、克莱姆法则、马尔可夫链），而 Rayleigh、Schur、Cholesky、Eckart-Young、Householder 等又直接写原文——人名术语的译名策略目前并不统一。</p>
-<p><strong>Correction:</strong> 二选一并在全篇贯彻：或统一改为「埃尔米特矩阵」（与同篇其他数学译名一致），或在首次出现处注明「厄米矩阵（Hermitian，数学文献中亦称埃尔米特矩阵）」。若定下其中一种，按 CLAUDE.md 的「写作约定」表记一笔。</p>
-</div>
 <h3 id="sec:rayleigh">Rayleigh 商</h3>
 <p>对称矩阵的特征值可以用一个极值问题来刻画。对非零向量 \(\mathbf{x}\)，定义 <strong>Rayleigh 商</strong>：</p>
 <p>$$R(\mathbf{x}) = \frac{\mathbf{x}^{\mathrm{T}}A\mathbf{x}}{\mathbf{x}^{\mathrm{T}}\mathbf{x}}$$</p>
@@ -1505,10 +1449,6 @@ AS &amp;= A \begin{bmatrix} \mathbf{x}_1 &amp; \mathbf{x}_2 &amp; \dots &amp; \m
 <li>所有主元大于 0。</li>
 </ol>
 <p>此外，它还等价于存在列满秩矩阵 \(R\) 使得 \(A = R^{\mathrm{T}}R\)（此时 \(\mathbf{x}^{\mathrm{T}}A\mathbf{x} = \|R\mathbf{x}\|^2 &gt; 0\)）。</p>
-<div class="review-note" style="border-left: 4px solid #dd6b20; padding: 0.5em 1em; margin: 1em 0; background: #fffaf0;">
-<p><strong>[Clarity]</strong> 这里的 <code>R</code> 已经是本笔记里第三个含义了：前面用 <code>R</code> 表示行最简形（<code>R = [I F; 0 0]</code>、<code>EA = R</code>、「<code>R</code> 的零行」），<code>QR</code> 一节用 <code>R</code> 表示上三角因子（<code>R = QᵀA</code>），此处再用 <code>R</code> 表示 <code>A = RᵀR</code> 里的因子。三处都是教材里的常见记号，但同篇并存时，「<code>R</code> 的前 r 行」这类说法读者要多想一步才能对上号。</p>
-<p><strong>Correction:</strong> 建议此处改用 <code>C</code>，与后面 Cholesky 一节的 <code>A = CCᵀ</code> 统一（那里用的正是正定矩阵的平方根因子）；行最简形与 <code>QR</code> 的 <code>R</code> 是教材惯例，保留即可。</p>
-</div>
 <p>对于二次型，我们可以用配方的方法来验证其是否具有最小值：</p>
 <p>$$f(x, y) = 2x^2 + 12xy + 20y^2 = 2(x + 3y)^2 + 2y^2$$</p>
 <p>配方实际上就是消元：</p>
@@ -1889,9 +1829,6 @@ A^{\mathrm{T}} A &amp;= V \Sigma^{\mathrm{T}} U^{\mathrm{T}} U \Sigma V^{\mathrm
 <p>考虑方阵 \(A\)，它代表了一个空间变换，这个变换只对 \(A\) 的特征向量起到缩放作用。那么 \(A\) 所代表的变换，可以分三步来理解：先把向量 \(\mathbf{x}\) 转化为用 \(A\) 的特征向量构成的基来表示，再在这个基下做缩放，最后回到原来的基。</p>
 <p>其中 \(S\) 为 \(A\) 的特征向量构成的矩阵。 \(S\) 的列是特征向量在原来（标准）坐标下的表示，所以按上面的约定， \(S\) 把“特征向量坐标”换算成“原坐标”。因此要从原坐标变到特征向量坐标，需要的是 \(S^{-1}\)（而不是 \(S\)），即 \(S^{-1}\mathbf{x}\)。在特征向量坐标下， \(A\) 的作用仅仅是在每个维度上缩放，这个缩放用对角矩阵 \(\Lambda\)（对角线上是对应的特征值）表示，变成 \(\Lambda S^{-1}\mathbf{x}\)。完成变换后，再左乘 \(S\) 回到原来的坐标，整个变换就是：</p>
 <p>$$A\mathbf{x} = S\Lambda S^{-1}\mathbf{x} \longrightarrow A = S\Lambda S^{-1}$$</p>
-<div class="review-note" style="border-left: 4px solid #38a169; padding: 0.5em 1em; margin: 1em 0; background: #f0fff4;">
-<p><strong>[Kudos]</strong> 这一章把基变换的方向讲透了：先立住「过渡矩阵的列是新基向量在旧基下的坐标 ⇒ <code>P</code> 把新坐标换算成旧坐标」这条约定，再用它解释 <code>A = SΛS⁻¹</code> 里为什么是 <code>S⁻¹</code> 把向量送到特征向量坐标、由 <code>S</code> 送回来。<code>S</code> 与 <code>S⁻¹</code> 哪个朝哪边，正是这一节最常被搞反的地方，这里是从约定推出来的，而不是直接给结论。</p>
-</div>
 <h2 id="sec:a-u-v">A = U Σ Vᵀ</h2>
 <p>考虑一组标准正交向量 \(\mathbf{v}_1, \mathbf{v}_2\)，如果它们在经历线性变换 \(M\) 以后仍然映射为一组正交的向量，则这两个像向量可以写成 \(\sigma_1\mathbf{u}_1, \sigma_2\mathbf{u}_2\)，其中 \(\mathbf{u}_1, \mathbf{u}_2\) 是单位正交向量， \(\sigma_i\) 是长度。即：</p>
 <p>$$M[\mathbf{v}_1, \mathbf{v}_2] = [\mathbf{u}_1, \mathbf{u}_2] \begin{bmatrix} \sigma_1 &amp;  \\  &amp; \sigma_2 \end{bmatrix} \rightarrow
@@ -1899,9 +1836,6 @@ MV = U\Sigma \rightarrow M = U\Sigma V^{\mathrm{T}}$$</p>
 <p>对奇异值分解可以有如下直观理解：先用 \(V^{\mathrm{T}}\) 转换到 \(V\) 的视角（输入空间中的一组标准正交基），在这个视角下各个方向只被缩放 \(\Sigma\)，然后用 \(U\) 变换到输出空间中的一组标准正交基。</p>
 <p>对于方阵 \(M\)，若令 \(E = V^{\mathrm{T}}U\)（它是正交矩阵），则 \(M = U\Sigma V^{\mathrm{T}} = VE\Sigma V^{\mathrm{T}}\)：先转到 \(V\) 的视角，缩放 \(\Sigma\)，再做一个旋转（或反射） \(E\)，最后变换回原来的视角。</p>
 <p>可以看到奇异值分解与特征值分解的区别在于：特征值分解输入与输出使用 <strong>同一组基</strong>（特征向量），所以变换只剩缩放 \(\Lambda\)；奇异值分解的输入与输出使用 <strong>两组不同的标准正交基</strong> \(V\) 与 \(U\)，二者之间的错位表现为额外的旋转 \(E\)。而“投影”（降维）并不来自 \(E\)（ \(E\) 是正交矩阵），而是来自 \(\Sigma\) 中为 0 的奇异值。</p>
-<div class="review-note" style="border-left: 4px solid #38a169; padding: 0.5em 1em; margin: 1em 0; background: #f0fff4;">
-<p><strong>[Kudos]</strong> 「降维来自 <code>Σ</code> 中为 0 的奇异值，而不是来自 <code>E</code>（<code>E</code> 是正交矩阵）」这句点在要害上：先把「特征分解只有缩放」「SVD 多一个旋转」讲清楚，紧接着说明哪一部分才是信息的丢失，避免了把降维归因于那个旋转的常见误读。</p>
-</div>
 <p>需要注意的是，虽然上面从视角转换的角度解释了特征分解以及奇异值分解，但矩阵分解同样可以从空间变换的角度理解。例如对于奇异值分解有如下解释：第一个变换 \(V^{\mathrm{T}}\) 把标准正交向量 \(\mathbf{v}_1, \mathbf{v}_2\) 转到水平和垂直方向（标准基方向）； \(\Sigma\) 对这两个方向分别放缩（单位圆变成椭圆， \(\sigma_i\) 是半轴长）； \(U\) 再把放缩后的椭圆旋转（或反射）到最后的位置。</p>
 <p>下面把 SVD 的三步变换画出来： \(V^{\mathrm{T}}\) 把 \(\mathbf{v}_1, \mathbf{v}_2\) 转到坐标轴方向， \(\Sigma\) 沿坐标轴缩放（单位圆变成椭圆，半轴长为 \(\sigma_i\)）， \(U\) 再把椭圆转到最终位置。</p>
 <div id="fig:fig-svd-steps" class="figure">
@@ -2231,10 +2165,6 @@ SVD 的几何意义：$$x \to V^{\mathrm{T}} x \to \Sigma V^{\mathrm{T}} x \to U
 <li><strong>生成相关随机数</strong>：见前面的 Cholesky 分解一节。</li>
 </ul>
 <p>回归是同样的几何：线性回归把 \(\mathbf{y}\) 投影到设计矩阵的列空间（见“投影到列空间与最小二乘”一节），残差垂直于列空间，决定系数 \(R^2\) 是夹角余弦的平方。概率统计笔记的最后一章，把 \(t\) 检验、方差分析与 \(F\) 检验都放进了这一幅图里。</p>
-<div class="review-note" style="border-left: 4px solid #dd6b20; padding: 0.5em 1em; margin: 1em 0; background: #fffaf0;">
-<p><strong>[Clarity]</strong> <code>R²</code> 等于夹角余弦的平方，前提是模型<strong>带截距</strong>：此时 <code>R² = cor²(y, ŷ)</code>。不含截距的回归里这个等式一般不成立（<code>SS_reg / SS_tot</code> 与 <code>cor²</code> 会分家）。统计笔记的对应段落（「视角三：样本空间中的几何」）写的是「<strong>有截距时</strong>，决定系数……等于……夹角余弦的平方」，两处目前说法不一致。</p>
-<p><strong>Correction:</strong> 补上限定词，如「回归带截距时，决定系数 <code>R²</code> 是……夹角余弦的平方」，与统计笔记保持一致。</p>
-</div>
 <h2 id="sec:_24">计算视角</h2>
 <p>每一种分解同时也是一个算法，有自己的计算量和数值性质：</p>
 <table>
